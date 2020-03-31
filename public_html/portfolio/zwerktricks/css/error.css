@@ -1,0 +1,25 @@
+body {
+    background-image: url(../img/background.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    padding-top: 130px;
+}
+
+h2 {
+    padding-top: 250px;
+}
+p,h1,h2{
+    font-family: 'Merriweather', serif;
+    color: #FFFFFF;
+}
+
+#onder {
+    padding-top: 230px;
+}
