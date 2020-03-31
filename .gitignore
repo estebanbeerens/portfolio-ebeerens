@@ -25,11 +25,6 @@ _testmain.go
 
 # VisualStudio
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
 
 # Directory-based project format:
 .idea/
