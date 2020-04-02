@@ -80,7 +80,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 8px solid #2c2f3f;
 }
 
-#header .profile h1 {
+#header .profile h2 {
   font-size: 24px;
   margin: 0;
   padding: 0;
@@ -90,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Poppins", sans-serif;
 }
 
-#header .profile h1 a, #header .profile h1 a:hover {
+#header .profile h2 a, #header .profile h2 a:hover {
   color: #fff;
   text-decoration: none;
 }
