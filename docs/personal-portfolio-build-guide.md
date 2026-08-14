@@ -1,0 +1,587 @@
+# Personal Portfolio — Learning-Oriented Build Guide
+
+This is a hands-on, step-by-step execution guide for actually **building** the architecture
+described in [personal-portfolio-architecture-plan.md](./personal-portfolio-architecture-plan.md).
+
+It is optimized for **learning**, not for the shortest path to a deployed app. The order is
+deliberately different from that document's Phase 1–8 list: here you build a fully working app
+**locally** first (monorepo → database → API → auth → admin UI → public site), and only then layer
+in infrastructure one piece at a time (containers → server → reverse proxy → edge/CDN → CI/CD →
+backups/hardening). Each infrastructure piece is introduced right when you first need it, so you
+never have to configure something abstract before you understand what it's for.
+
+Throughout the guide, look for boxes like this:
+
+> 💡 **B1 explainer:** These boxes explain a concept in plain, simple English — no jargon assumed.
+> They show up most often in the infrastructure stages, since that's usually the least familiar
+> territory for developers coming from an app-development background.
+
+Every stage has the same five parts: **Goal**, **What you'll learn**, **Steps**, explainer boxes
+where useful, and **Verify it worked** — a concrete way to check the step actually succeeded before
+moving on.
+
+---
+
+## Stage 0 — Prerequisites & accounts
+
+**Goal:** have every account and local tool ready before writing any code.
+
+**What you'll learn:** what each external service is for, before you're deep in configuring it.
+
+**Steps:**
+
+1. Create/confirm accounts:
+   - GitHub account (source control + GitHub Actions + OAuth provider + GHCR container registry)
+   - Cloudflare account, with your domain's nameservers already delegated to Cloudflare
+   - Oracle Cloud account (sign up for Always Free)
+2. Install local tooling:
+   - Node.js (LTS) and a package manager (npm/pnpm)
+   - Docker Desktop (for local Postgres in Stage 2, and later for building images)
+   - A Postgres client (e.g. `psql` or a GUI like TablePlus) for peeking at data while developing
+   - Nx CLI: `npm i -g nx`
+3. When creating your Oracle Cloud account, pick a home region and check Arm (Ampere A1) capacity
+   is available there before committing — see the explainer below.
+
+> 💡 **B1 explainer — why does the Oracle region matter?**
+> Oracle's free Arm servers are popular, and not every data center ("region") always has free ones
+> ready to give out. If you pick a region that is full, you cannot create your free server there.
+> You can normally switch regions during signup or soon after, but it's easier to check first than
+> to fix it later.
+
+**Verify it worked:** you can log into GitHub, Cloudflare, and Oracle Cloud in a browser; running
+`node -v`, `docker -v`, and `nx --version` in a terminal all print a version number.
+
+**Reference:** architecture doc §3 (Hosting Strategy), §12 (Cloudflare).
+
+---
+
+## Stage 1 — Nx monorepo + app scaffolding
+
+**Goal:** a monorepo with three empty-but-running apps: `web` (public site), `admin`, and `api`.
+
+**What you'll learn:** how Nx organizes a multi-app repo, and how to generate SSR-ready Angular
+apps and a NestJS API inside it.
+
+**Steps:**
+
+1. Create the workspace:
+   ```
+   npx create-nx-workspace@latest portfolio --preset=apps
+   cd portfolio
+   ```
+2. Add the Angular and NestJS plugins:
+   ```
+   nx add @nx/angular
+   nx add @nx/nest
+   ```
+3. Generate the two Angular apps with SSR enabled:
+   ```
+   nx g @nx/angular:application web --ssr --routing
+   nx g @nx/angular:application admin --ssr --routing
+   ```
+4. Generate the NestJS API:
+   ```
+   nx g @nx/nest:application api
+   ```
+5. Create `libs/models` (shared TypeScript types) and `libs/ui` (shared Angular components) now,
+   even if they're nearly empty, so the folder structure matches the architecture doc from day one:
+   ```
+   nx g @nx/js:library models
+   nx g @nx/angular:library ui
+   ```
+
+> 💡 **B1 explainer — what does Nx actually do?**
+> Nx is a tool for repos that hold several apps and shared libraries at once ("monorepos"). Its two
+> main jobs are: (1) it knows which apps depend on which libraries (the "project graph"), so it can
+> figure out what needs rebuilding after a change, and (2) it caches build/test results, so it
+> doesn't redo work that hasn't changed. You don't need to configure this — it works from the
+> `apps/` and `libs/` structure and each project's config file.
+
+**Verify it worked:** `nx serve web`, `nx serve admin`, and `nx serve api` each start without
+errors and are reachable in a browser/`curl` on their local ports.
+
+**Reference:** architecture doc §4 (Monorepo Structure), §5 (Frontend), §6 (Backend).
+
+---
+
+## Stage 2 — Local database: Postgres + Prisma
+
+**Goal:** a Postgres database running in Docker on your machine, with Prisma migrations defined for
+the `profile`, `projects`, and `sessions` tables.
+
+**What you'll learn:** what containers/images/volumes actually are, and how to run a throwaway local
+database without installing Postgres directly on your machine.
+
+**Steps:**
+
+1. Create a `docker-compose.yml` at the repo root with a single `postgres` service, a named volume
+   for data persistence, and a mapped port (e.g. `5432:5432`). Use environment variables for the
+   user/password/database name — put the real values in a local `.env` file that is gitignored.
+2. Start it:
+   ```
+   docker compose up -d postgres
+   ```
+3. Add Prisma to the `api` app and point its `DATABASE_URL` at the container:
+   ```
+   nx g @nx/js:setup-prisma --project=api   # or install prisma manually if this generator isn't available
+   ```
+4. Define the initial schema in `schema.prisma`: `Profile`, `Project` (with `description` as
+   `Json`, matching architecture doc §9/§10), and `Session` (`id`, `tokenHash`, `githubUserId`,
+   `expiresAt`, `createdAt`).
+5. Run the first migration:
+   ```
+   npx prisma migrate dev --name init
+   ```
+
+> 💡 **B1 explainer — containers, images, and volumes.**
+> A **container** is like a small, isolated box that runs one program (here, Postgres) with
+> everything it needs already inside — you don't have to install Postgres yourself. An **image**
+> is the blueprint the container is built from (downloaded once, reused every time you start the
+> container). A **volume** is a folder that lives outside the container and survives even if you
+> delete and recreate the container — this is where Postgres's actual data lives, so you don't lose
+> it every time you restart.
+
+**Verify it worked:** `docker compose ps` shows the `postgres` container as healthy/running;
+`npx prisma studio` opens a browser UI showing the three empty tables.
+
+**Reference:** architecture doc §9 (Database), §13 (Docker, for the concepts — production
+containerization comes later in Stage 7).
+
+---
+
+## Stage 3 — OpenAPI contract + basic CRUD
+
+**Goal:** working REST endpoints for `profile` and `projects`, backed by Prisma, documented via
+Swagger.
+
+**What you'll learn:** generating an OpenAPI spec straight from NestJS decorators, and wiring a
+service/controller/repository layered structure.
+
+**Steps:**
+
+1. Add `@nestjs/swagger` and decorate your DTOs and controllers with `@ApiProperty`/`@ApiTags`/etc.
+2. Implement `GET/PUT /api/profile` and `GET/POST/PUT/DELETE /api/projects[/:id]` per architecture
+   doc §7, using a service layer that calls Prisma (don't call Prisma directly from controllers).
+3. Add request validation with `class-validator`/`class-transformer` (NestJS's `ValidationPipe`).
+4. Serve Swagger UI at `/api/docs` for manual testing while you build.
+
+**Verify it worked:** open `/api/docs` in a browser, create a project through the Swagger UI, and
+confirm the row appears via `npx prisma studio`.
+
+**Reference:** architecture doc §6 (Backend), §7 (OpenAPI), §9 (Database).
+
+---
+
+## Stage 4 — GitHub OAuth + opaque session
+
+**Goal:** "Login with GitHub" works end-to-end, and only your configured GitHub user ID is treated
+as an admin.
+
+**What you'll learn:** the OAuth redirect flow, and why this project uses a database-backed opaque
+session token instead of a JWT.
+
+**Steps:**
+
+1. Register a GitHub OAuth App (Settings → Developer settings), set the callback URL to your local
+   dev URL for now (you'll add the production one in Stage 11).
+2. Install `passport`, `passport-github2`, and NestJS's `@nestjs/passport`.
+3. Implement the GitHub strategy: on successful callback, check `githubUserId === configuredAdminGithubId`
+   from architecture doc §8. If it doesn't match, reject — don't create a session.
+4. On success, generate a random token (e.g. `crypto.randomBytes(32)`), store its **hash** (not the
+   raw value) plus `githubUserId` and `expiresAt` in the `Session` table, and set it as a cookie:
+   `HttpOnly`, `Secure`, `SameSite=Strict`.
+5. Add an auth guard that reads the cookie, hashes it, looks up the session, and rejects expired/
+   missing sessions. Apply it to all admin-only routes.
+6. Implement `/api/auth/logout` that deletes the session row and clears the cookie.
+
+> 💡 **B1 explainer — what happens when you click "Login with GitHub"?**
+> Your browser is sent to GitHub with a request that says "this app wants to know who you are."
+> GitHub asks you to approve it, then sends your browser back to your app's server with a one-time
+> code. Your server exchanges that code (secretly, server-to-server) for confirmed identity info
+> about you. Nothing about your GitHub password is ever seen by your app.
+>
+> 💡 **B1 explainer — why not just use a JWT?**
+> A JWT is a signed piece of data the server can verify without a database lookup — fast, but hard
+> to cancel: once issued, it stays valid until it expires, even if you "log out," unless you build
+> extra machinery to track cancelled ones. Since this app only ever needs one logged-in admin, it's
+> simpler and safer to store a small random token in the database instead: logging out just deletes
+> the row, and the token itself carries no information a leaked cookie could exploit.
+
+**Verify it worked:** clicking "Login with GitHub" locally redirects, approves, and lands you back
+authenticated; an admin-only endpoint returns 401 without the cookie and 200 with it; logging out
+and retrying the same cookie returns 401.
+
+**Reference:** architecture doc §8 (Authentication, including the full session design rationale).
+
+---
+
+## Stage 5 — Admin UI: CRUD forms, WYSIWYG, image upload
+
+**Goal:** a working admin screen to edit the profile and manage projects, including rich-text
+descriptions and image uploads.
+
+**What you'll learn:** integrating a WYSIWYG editor safely, and uploading files directly to object
+storage instead of through your API.
+
+**Steps:**
+
+1. Build the profile-edit form and project list/create/edit/delete screens in the `admin` app,
+   calling the API endpoints from Stage 3, gated behind the login flow from Stage 4.
+2. Add TipTap as the rich-text editor for `project.description`. Configure it to output/accept a
+   ProseMirror JSON document (not HTML) — this is what gets stored in the `Json` column.
+3. Create a Cloudflare R2 bucket (via the Cloudflare dashboard) for images. Add an endpoint
+   `POST /api/uploads/presign` that validates the requested content-type/size and returns a
+   short-lived presigned PUT URL using the S3-compatible R2 API.
+4. In the admin UI, upload the selected file directly to the presigned URL (not through your API),
+   then call a "confirm" endpoint that stores the resulting object key/URL against the project.
+5. When rendering the project description anywhere (admin preview or later, the public site),
+   serialize the ProseMirror JSON to HTML through a strict allowlisted serializer, then run it
+   through `sanitize-html` before display — never trust stored JSON as safe-to-render HTML blindly.
+
+> 💡 **B1 explainer — what is a "presigned URL"?**
+> Normally, uploading a file means: browser → your server → storage. A presigned URL lets you skip
+> the middle step safely: your server creates a special, temporary link that says "whoever has this
+> exact link is allowed to upload one file, for the next few minutes, to this exact spot in storage."
+> Your server hands that link to the browser, and the browser uploads straight to storage. Your
+> server never has to receive or forward the file's bytes, which keeps it fast and light.
+
+**Verify it worked:** creating a project with a rich-text description and an image in the admin UI
+results in a new row in `projects` with a `jsonb` description and a real R2 object URL; the image
+loads directly from the R2 URL in a browser.
+
+**Reference:** architecture doc §10 (Image Storage, including the WYSIWYG/sanitization design).
+
+---
+
+## Stage 6 — Public SSR site
+
+**Goal:** the public-facing site renders profile + project data, server-side rendered, with good
+SEO and accessibility basics.
+
+**What you'll learn:** using Angular's SSR output for a content-driven, read-only public site.
+
+**Steps:**
+
+1. Build the home/about/projects/project-detail pages in `web`, fetching data from the read-only
+   API endpoints (no auth needed for these).
+2. Configure per-page `<title>`/meta description tags for SEO.
+3. Run an accessibility check (e.g. axe DevTools or Lighthouse) and fix obvious issues (alt text,
+   color contrast, landmark regions, focus order).
+4. Confirm SSR is actually rendering server-side: view page source (not devtools' rendered DOM) and
+   confirm the content is already present in the raw HTML.
+
+**Verify it worked:** `curl` the `web` app's URL and see project/profile content in the raw HTML
+response, not just an empty `<app-root>` shell.
+
+**Reference:** architecture doc §5 (Frontend).
+
+---
+
+## Stage 7 — Containerize for production
+
+**Goal:** production-ready, multi-stage Dockerfiles for `web`, `admin`, and `api`, built for arm64,
+plus a production `docker-compose.yml`.
+
+**What you'll learn:** multi-stage builds, minimal production images, and why the Oracle VPS's CPU
+architecture matters for how you build images.
+
+**Steps:**
+
+1. Write a multi-stage Dockerfile per app: a build stage (full Node image, installs deps, runs
+   `nx build <app>`) and a slim runtime stage (copies only the built output, runs as a non-root
+   user).
+2. Add `HEALTHCHECK` instructions and read config via environment variables (no secrets baked into
+   images).
+3. Write the production `docker-compose.yml` with services for `nginx`, `web`, `admin`, `api`, and
+   `postgres`, using a named volume for Postgres data, and without publishing Postgres's port to the
+   host.
+4. Build once locally for arm64 to confirm the Dockerfiles work, using Docker's built-in `buildx`:
+   ```
+   docker buildx build --platform linux/arm64 -t portfolio-api:test -f apps/api/Dockerfile .
+   ```
+
+> 💡 **B1 explainer — what's a "multi-stage build" and why arm64?**
+> A multi-stage Dockerfile has two parts: one stage that has all the heavy tools needed to *build*
+> your app (compilers, full dependency trees), and a second, much smaller stage that only contains
+> the finished, already-built app. You throw away the first stage's bulk, so the final image is
+> small and has less attack surface. Separately: your own computer is probably an "amd64/x86"
+> chip, but the free Oracle server uses an "arm64" chip (the same processor family as phones and
+> Apple Silicon Macs) — like the difference between two languages that look similar but aren't
+> identical. An image built for one won't run on the other, so you must explicitly build an arm64
+> version, even from a non-arm64 machine.
+
+**Verify it worked:** `docker buildx build --platform linux/arm64 ...` completes without errors for
+each app; `docker compose config` validates the compose file with no syntax errors.
+
+**Reference:** architecture doc §13 (Docker, including the arm64/multi-arch section).
+
+---
+
+## Stage 8 — Provision the Oracle VPS
+
+**Goal:** a running Ampere A1 (Arm) VM, reachable only via SSH key, with a firewall and a
+non-root, least-privilege deploy user.
+
+**What you'll learn:** the basics of provisioning and locking down a Linux server.
+
+**Steps:**
+
+1. In the Oracle Cloud console, create a compute instance using the Ampere A1 shape (e.g. 2 OCPU /
+   12 GB RAM), Ubuntu or Oracle Linux, and upload your SSH public key during creation.
+2. Configure Oracle's cloud-level firewall ("security list"/"network security group") to allow only
+   ports 22 (SSH), 80, and 443 inbound.
+3. SSH in, then harden the OS-level firewall too (e.g. `ufw allow 22,80,443` + `ufw enable`) —
+   defense in depth in case the cloud-level rule is ever misconfigured.
+4. Disable SSH password authentication and root login in `/etc/ssh/sshd_config`
+   (`PasswordAuthentication no`, `PermitRootLogin no`), then restart `sshd`.
+5. Create a dedicated `deploy` user (no sudo, no interactive shell needed beyond running Docker
+   Compose) for Stage 12's CI/CD to use later — you can finish locking its SSH key down with a
+   forced command once you reach that stage.
+6. Install Docker Engine + the Docker Compose plugin on the VM.
+
+> 💡 **B1 explainer — SSH keys vs. passwords.**
+> An SSH key pair is two matched files: a private key (stays only on your computer, never shared)
+> and a public key (safe to give to any server). The server stores your public key and will only
+> let someone in if they can prove — mathematically, without ever sending the private key over the
+> network — that they hold the matching private key. This is much harder to break into than a
+> password, which can be guessed, reused, or leaked from another breach.
+>
+> 💡 **B1 explainer — what does a firewall actually do?**
+> A firewall is a set of rules that says which "doors" (network ports) into your server are open,
+> and to whom. Your server might be capable of running a database, a web server, etc., each
+> listening on its own port — a firewall makes sure the outside world can only ever knock on the
+> doors you intentionally left open (here: 22 for SSH, 80/443 for web traffic), and every other
+> port stays shut even if something on the server is (accidentally) listening on it.
+
+**Verify it worked:** you can SSH in using only your key (`ssh deploy@<vps-ip>` fails cleanly if you
+try a password); `sudo ufw status` shows only 22/80/443 allowed; `docker run hello-world` succeeds
+on the VM.
+
+**Reference:** architecture doc §3 (Instance shape), §15 (Server Security).
+
+---
+
+## Stage 9 — First manual deploy
+
+**Goal:** the full stack running on the actual VPS, deployed by hand once, before any automation
+exists — so you understand exactly what the automation will later do for you.
+
+**What you'll learn:** what "deploying" concretely means at this stage: copying files and running a
+command over SSH.
+
+**Steps:**
+
+1. Copy the production `docker-compose.yml` and a `.env` file with real secrets (GitHub OAuth
+   secret, R2 credentials, DB password, admin GitHub ID) to the VPS, e.g. via `scp`. Never commit
+   this `.env` file to Git.
+2. Build and push the three arm64 images somewhere reachable from the VPS for now — either build
+   directly on the Arm VPS itself (simplest for this one manual run) or push to GHCR from your own
+   machine using `buildx`.
+3. On the VPS: `docker compose pull && docker compose up -d` (or just `docker compose up -d --build`
+   if you built locally on the box).
+4. Run the Prisma migration against the production database from the VPS (or via a one-off
+   container) so the schema exists.
+
+**Verify it worked:** `curl http://<vps-ip>:<api-port>/api/profile` (or whichever port is exposed
+pre-Nginx) returns a real response from the VPS's public IP; `docker compose ps` on the VPS shows
+all services healthy.
+
+**Reference:** architecture doc §14 (Deployment).
+
+---
+
+## Stage 10 — Nginx reverse proxy
+
+**Goal:** a single entry point on the VPS (port 80/443) that routes to the right container based on
+path, instead of exposing each app's port directly.
+
+**What you'll learn:** what a reverse proxy is for, and why you still need one even with Cloudflare
+in front of everything.
+
+**Steps:**
+
+1. Add an `nginx` service to the compose file (or install Nginx directly on the VPS — a container is
+   more consistent with the rest of the stack).
+2. Write the Nginx config routing `/` → `web`, `/admin` → `admin`, `/api` → `api`, per architecture
+   doc §11.
+3. Add basic security headers and a `limit_req` zone as a defense-in-depth rate limit (Cloudflare's
+   edge rules are the primary defense — see Stage 11).
+4. Stop publishing the app containers' ports directly to the host; only Nginx should be reachable
+   from outside Docker's internal network.
+
+> 💡 **B1 explainer — why do I need Nginx if Cloudflare is already "in front"?**
+> Cloudflare sits between the whole internet and *your server as a whole* — it doesn't know that
+> your one server is actually running three separate apps inside Docker. Nginx's job is *inside*
+> your server: when a request arrives, Nginx looks at the path (`/`, `/admin`, `/api`) and forwards
+> it to the correct container. Think of Cloudflare as the building's front security desk, and Nginx
+> as the receptionist on your specific floor who knows which office door to send you to.
+
+**Verify it worked:** hitting the VPS's IP on port 80 for `/`, `/admin`, and `/api` each reach the
+correct app; hitting the old direct app ports (e.g. the API's raw port) no longer works from outside.
+
+**Reference:** architecture doc §11 (Nginx).
+
+---
+
+## Stage 11 — Cloudflare: DNS, TLS, R2, WAF
+
+**Goal:** your domain is served through Cloudflare with proper HTTPS end-to-end, and R2 buckets are
+in active use for images and backups.
+
+**What you'll learn:** how Cloudflare fits between users and your origin server, and why
+origin-to-Cloudflare TLS needs its own certificate.
+
+**Steps:**
+
+1. In Cloudflare DNS, point your domain (and `www`) at the VPS's public IP (proxied "orange cloud"
+   on, so traffic routes through Cloudflare).
+2. Under SSL/TLS, set the mode to **Full (strict)**, then generate a Cloudflare **Origin CA**
+   certificate and install it in Nginx (this is different from a normal publicly-trusted cert —
+   see the explainer below).
+3. Confirm the R2 buckets from Stages 5 and (later) 13 exist and note their access keys in your
+   VPS's `.env`.
+4. Add a couple of free-tier rate limiting rules (e.g. throttle repeated POSTs to `/api/auth/*`).
+5. Optionally enable basic WAF managed rules available on the free plan.
+
+> 💡 **B1 explainer — what is Cloudflare actually doing?**
+> Cloudflare runs a large network of servers around the world ("the edge"). When someone visits your
+> domain, they connect to whichever Cloudflare server is nearest to them, not directly to your VPS.
+> Cloudflare then forwards the request on to your real server ("the origin") behind the scenes. This
+> hides your server's real IP address from attackers, lets Cloudflare absorb large floods of
+> malicious traffic before it ever reaches you, and lets Cloudflare handle the "public" HTTPS
+> certificate that browsers check.
+>
+> 💡 **B1 explainer — why a separate "Origin" certificate?**
+> Cloudflare already gives visitors a trusted HTTPS certificate for your domain — that's the
+> "browser-to-Cloudflare" leg. But the "Cloudflare-to-your-server" leg is a separate connection that
+> also needs to be encrypted; otherwise the trip from Cloudflare to your VPS would be unprotected.
+> The Origin CA certificate is a certificate that only Cloudflare trusts (not the wider internet) —
+> it's for that second, private leg only.
+
+**Verify it worked:** visiting `https://yourdomain.com` in a browser shows a valid padlock; setting
+the SSL mode away from "Full (strict)" temporarily and back confirms the origin cert is actually
+being used (mismatched certs cause an error in strict mode).
+
+**Reference:** architecture doc §12 (Cloudflare), §10 (Image Storage / R2).
+
+---
+
+## Stage 12 — CI/CD
+
+**Goal:** pushing to your main branch automatically tests, builds arm64 images, and deploys to the
+VPS — no more manual `scp`/SSH steps.
+
+**What you'll learn:** cross-building images in CI, using a container registry, and deploying over
+SSH without giving CI full access to your server.
+
+**Steps:**
+
+1. Add a GitHub Actions workflow that runs lint/unit tests on every push/PR.
+2. Add a build job that uses `docker/setup-qemu-action` + `docker/setup-buildx-action` to cross-build
+   each app's arm64 image, then pushes it to GHCR (`ghcr.io/<you>/<app>:<sha>`), authenticated via
+   the automatically provided `GITHUB_TOKEN`.
+3. Finish locking down the `deploy` user from Stage 8: add its SSH key to `authorized_keys` with a
+   forced command, e.g.
+   ```
+   command="/opt/deploy/pull-and-restart.sh",no-port-forwarding,no-agent-forwarding,no-pty ssh-ed25519 AAAA...
+   ```
+   so that key can only ever run that one script.
+4. Write `/opt/deploy/pull-and-restart.sh` on the VPS to `docker compose pull && docker compose up -d`.
+5. Add a deploy job (e.g. using `appleboy/ssh-action` or a plain `ssh` step) that connects as
+   `deploy` using a private key stored in GitHub Actions encrypted secrets, running only the forced
+   command.
+
+> 💡 **B1 explainer — what is a container registry, and why GHCR?**
+> A container registry is like a storage locker for Docker images — CI builds an image and uploads
+> ("pushes") it there; your server later downloads ("pulls") that exact same image to run it. This
+> guarantees the server runs precisely what CI tested, not a slightly different local build. GHCR
+> (GitHub Container Registry) is convenient here because it's free for personal projects and
+> already authenticated inside GitHub Actions with no extra setup.
+>
+> 💡 **B1 explainer — what does QEMU do here?**
+> GitHub's free build machines use the same "amd64" chip family as most laptops — not the "arm64"
+> family your VPS uses. QEMU is a tool that lets one type of computer pretend to be another kind
+> long enough to run programs meant for it. `setup-qemu-action` turns this on so `buildx` can
+> produce a genuine arm64 image, even though the machine building it is amd64. It's slower than
+> building natively, but it works and costs nothing extra.
+>
+> 💡 **B1 explainer — what does that "forced command" SSH key do?**
+> Normally, an SSH key lets you run *anything* on the server. A forced command overrides that: no
+> matter what the connecting side asks to run, the server always runs the one fixed command instead.
+> So even if this specific key/secret ever leaked, whoever has it could only ever trigger your
+> pull-and-restart script — not open a shell, read files, or do anything else.
+
+**Verify it worked:** pushing a small change to main triggers the workflow in GitHub's Actions tab,
+ends green, and the change is visible on the live site within a couple of minutes without you
+touching SSH yourself.
+
+**Reference:** architecture doc §13 (arm64 builds), §14 (Deployment / SSH push-deploy).
+
+---
+
+## Stage 13 — Backups
+
+**Goal:** automated, tested Postgres backups stored off the VPS.
+
+**What you'll learn:** why "it's on the server's disk" is not a backup strategy.
+
+**Steps:**
+
+1. Write a small script that runs `pg_dump` against the production database, compresses the output,
+   and uploads it to a **separate** R2 bucket (not the images bucket) using the R2 S3-compatible API
+   (e.g. via the `aws` CLI configured against R2, or `rclone`).
+2. Schedule it with a cron job on the VPS (e.g. daily at a quiet hour).
+3. Add a retention policy in the script or via R2 lifecycle rules (e.g. keep the last 7 daily + 4
+   weekly dumps) so storage stays inside the free tier.
+4. Actually test a restore: spin up a throwaway local Postgres container, download a backup, and run
+   `pg_restore`/`psql` against it to confirm the dump is valid and complete.
+
+> 💡 **B1 explainer — why isn't the server's disk a backup?**
+> A backup's whole purpose is to survive the *original* being lost, damaged, or deleted. If your
+> only copy of the database sits on the same disk as the database itself, then anything that takes
+> out that disk (hardware failure, a bad command, the whole VPS being deleted) takes out your "backup"
+> at the same time. A real backup lives somewhere physically and logically separate — here, a
+> different storage service (R2) entirely, not just a different folder on the same machine.
+
+**Verify it worked:** a fresh dump appears in the backup R2 bucket after the cron job runs; the
+manual restore test in step 4 produces a working database with your real data in it.
+
+**Reference:** architecture doc §16 (Backups).
+
+---
+
+## Stage 14 — Hardening, health checks & observability
+
+**Goal:** a final pass to make sure the system is genuinely production-like, not just "working."
+
+**What you'll learn:** the operational checklist items that don't need deep explanation individually
+but matter collectively.
+
+**Steps:**
+
+1. Re-review architecture doc §15 (Server Security) as a checklist: SSH hardening, no exposed
+   Postgres port, secrets never committed, OAuth callback URLs restricted to your real domain,
+   uploaded images validated (type/size) both client- and server-side.
+2. Add `HEALTHCHECK` instructions to any container missing one, and confirm `docker compose ps`
+   reflects real health, not just "running."
+3. Confirm where logs live for each layer (application logs, Nginx access/error logs, Postgres
+   logs) and that they're retained somewhere you can actually read them later.
+4. Set up a free basic uptime monitor (e.g. an external ping/HTTP check) against your public URL.
+5. Do a final read-through of the whole live system against the architecture doc's §19
+   (Architecture Principles) — confirm you haven't accidentally introduced complexity (extra
+   services, unneeded queues, etc.) beyond what's documented.
+
+**Verify it worked:** all containers show `healthy`; you can locate and read a real log line from
+each of the three log sources; the uptime monitor reports your site as up.
+
+**Reference:** architecture doc §15 (Server Security), §17 (Observability), §19 (Architecture
+Principles).
+
+---
+
+## After this guide
+
+At this point every element in the architecture plan is built, deployed, automated, and backed up.
+From here, treat further work (project tags/links/technologies, error tracking, metrics, etc.) as
+optional additions — per the architecture doc's "avoid premature abstraction" principle, only add
+them when you hit a real need or a genuine learning goal, not by default.

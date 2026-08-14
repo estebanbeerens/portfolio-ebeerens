@@ -1,48 +1,49 @@
-# Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Folders
-_obj
-_test
+# compiled output
+dist
+tmp
+out-tsc
 
-# Architecture specific extensions/prefixes
-*.[568vq]
-[568vq].out
+# dependencies
+node_modules
 
-*.cgo1.go
-*.cgo2.c
-_cgo_defun.c
-_cgo_gotypes.go
-_cgo_export.*
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-_testmain.go
-
-*.exe
-*.test
-*.prof
-
-# VisualStudio
+# IDE - VSCode
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# Directory-based project format:
-.idea/
-.idea/workspace.xml
-**/.idea/workspace.xml
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
 
-# mac hidden files
+# System Files
 .DS_Store
+Thumbs.db
 
-##other
-#node_modules/
-#bower_components/
-.tmp
-#.sass-cache
-#builds/**/images/*
-#*.ogg
-#*.mp3
-#*.mp4
-#*.png
-#*.jpeg
-*.psd
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
+.claude/worktrees
+.claude/settings.local.json
+
+.angular
+
+__screenshots__/
