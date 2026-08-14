@@ -38,18 +38,8 @@
     }
   },
   "plugins": [
-    {
-      "plugin": "@nx/playwright/plugin",
-      "options": {
-        "targetName": "e2e"
-      }
-    },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
+    { "plugin": "@nx/playwright/plugin", "options": { "targetName": "e2e" } },
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
     {
       "plugin": "@nx/webpack/plugin",
       "options": {
@@ -63,9 +53,7 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
+      "options": { "targetName": "test" },
       "exclude": ["api-e2e/**/*", "apps/api-e2e/**/*"]
     }
   ],
@@ -76,5 +64,6 @@
       "style": "css",
       "unitTestRunner": "vitest-angular"
     }
-  }
+  },
+  "nxCloudId": "6a7ed5adeaa53a8e6892cbd0"
 }
