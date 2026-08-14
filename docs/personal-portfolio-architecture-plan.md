@@ -209,7 +209,7 @@ The public frontend should be read-only from the perspective of normal visitors.
 
 Build a dedicated REST API using **NestJS** (Node/TypeScript), generated via the Nx `@nx/nest` plugin. NestJS keeps the whole monorepo in TypeScript, has first-class Nx support, generates the OpenAPI spec directly from decorators via `@nestjs/swagger`, and integrates cleanly with Passport for GitHub OAuth.
 
-Use **Prisma** as the ORM/migration tool (TypeORM is a viable alternative, but Prisma's migration workflow is more ergonomic for a small solo project).
+Use **Prisma** as the ORM/migration tool (TypeORM is a viable alternative, but Prisma's migration workflow is more ergonomic for a small solo project). Target **Prisma 7**: it requires a database driver adapter (`@prisma/adapter-pg` for Postgres) instead of a bundled native query engine, requires Node ≥20.19 (22.x recommended), and ships as an ES module — see the build guide's Stage 2 for how this is reconciled with the monorepo's single, CommonJS-friendly root `package.json`. The v7 client also has no native engine binary to match to the arm64 host (see §13), which simplifies the Docker story from earlier Prisma versions.
 
 The API should own:
 

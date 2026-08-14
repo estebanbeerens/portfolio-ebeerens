@@ -1,0 +1,7 @@
+{
+  "npmName": "@portfolio-ebeerens/api-client",
+  "ngVersion": "22.0.0",
+  "providedInRoot": true,
+  "supportsES6": true,
+  "useSquareBracketsInArrayNames": true
+}

@@ -35,7 +35,7 @@ moving on.
    - Cloudflare account, with your domain's nameservers already delegated to Cloudflare
    - Oracle Cloud account (sign up for Always Free)
 2. Install local tooling:
-   - Node.js (LTS) and a package manager (npm/pnpm)
+   - Node.js **22.x** (Prisma 7, used from Stage 2, requires Node ≥20.19 and recommends 22.x)
    - Docker Desktop (for local Postgres in Stage 2, and later for building images)
    - A Postgres client (e.g. `psql` or a GUI like TablePlus) for peeking at data while developing
    - Nx CLI: `npm i -g nx`
@@ -121,16 +121,50 @@ database without installing Postgres directly on your machine.
    ```
    docker compose up -d postgres
    ```
-3. Add Prisma to the `api` app and point its `DATABASE_URL` at the container:
+3. There is no `setup-prisma` generator — install Prisma manually into the `api` app instead. Use
+   **Prisma 7**, which requires a database driver adapter and ships as an ES module:
    ```
-   nx g @nx/js:setup-prisma --project=api   # or install prisma manually if this generator isn't available
+   npm install prisma@7 @prisma/client@7 @prisma/adapter-pg pg dotenv
    ```
-4. Define the initial schema in `schema.prisma`: `Profile`, `Project` (with `description` as
-   `Json`, matching architecture doc §9/§10), and `Session` (`id`, `tokenHash`, `githubUserId`,
-   `expiresAt`, `createdAt`).
-5. Run the first migration:
+4. Add a `prisma.config.ts` at the **repo root** (Prisma 7 looks for it next to `package.json`;
+   since this is an Nx monorepo with a single root `package.json`, this one file configures Prisma
+   CLI for the whole workspace even though the schema itself lives under `apps/api/prisma/`):
+   ```ts
+   import 'dotenv/config';
+   import { defineConfig, env } from 'prisma/config';
+
+   export default defineConfig({
+     schema: 'apps/api/prisma/schema.prisma',
+     migrations: { path: 'apps/api/prisma/migrations' },
+     datasource: { url: env('DATABASE_URL') },
+   });
+   ```
+5. In `schema.prisma`'s generator block, use the new Rust-free client provider and a custom output
+   path (both required in v7):
+   ```prisma
+   generator client {
+     provider = "prisma-client"
+     output   = "../src/generated/prisma"
+   }
+   ```
+6. Define the initial models: `Profile`, `Project` (with `description` as `Json`, matching
+   architecture doc §9/§10), and `Session` (`id`, `tokenHash`, `githubUserId`, `expiresAt`,
+   `createdAt`). Do **not** put `url` in the `datasource` block — that now lives in
+   `prisma.config.ts` only.
+7. Run the first migration, then generate the client explicitly (v7's `migrate dev` no longer
+   auto-generates or auto-seeds):
    ```
    npx prisma migrate dev --name init
+   npx prisma generate
+   ```
+8. Instantiate `PrismaClient` in the api's `PrismaService` using the Postgres driver adapter (v7
+   requires an adapter for every database, there's no built-in native engine anymore):
+   ```ts
+   import { PrismaClient } from '../generated/prisma/client';
+   import { PrismaPg } from '@prisma/adapter-pg';
+
+   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+   export const prisma = new PrismaClient({ adapter });
    ```
 
 > 💡 **B1 explainer — containers, images, and volumes.**
@@ -141,11 +175,23 @@ database without installing Postgres directly on your machine.
 > delete and recreate the container — this is where Postgres's actual data lives, so you don't lose
 > it every time you restart.
 
+> 💡 **B1 explainer — why does Prisma 7 need an "adapter", and does the api app need to become ESM?**
+> Prisma 7 dropped its old Rust query engine binary in favor of a thin TypeScript client that talks
+> to your database through the same JS driver everyone else uses (`pg` for Postgres) — the
+> "adapter" is just the translator between Prisma's API and that driver. The generated client itself
+> ships as an ES module, which technically wants `"type": "module"` in the nearest `package.json`.
+> Because this repo has one root `package.json` shared by `web`, `admin`, and `api`, flipping it to
+> `"module"` would force Angular/webpack/Jest configs across *all three* apps to deal with ESM, not
+> just `api`. Pinning Node to ≥22.12 avoids that: recent Node versions can `require()` an ES module
+> synchronously, so the NestJS app can stay CommonJS and still load the generated Prisma client
+> without a repo-wide ESM migration. Confirm this works for you in Stage 3 before relying on it — if
+> it doesn't, the fallback is converting just `apps/api`'s tsconfig/webpack/Jest config to ESM output.
+
 **Verify it worked:** `docker compose ps` shows the `postgres` container as healthy/running;
 `npx prisma studio` opens a browser UI showing the three empty tables.
 
-**Reference:** architecture doc §9 (Database), §13 (Docker, for the concepts — production
-containerization comes later in Stage 7).
+**Reference:** architecture doc §6 (Backend, Prisma 7 notes), §9 (Database), §13 (Docker, for the
+concepts — production containerization comes later in Stage 7).
 
 ---
 

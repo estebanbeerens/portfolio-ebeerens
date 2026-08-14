@@ -49,3 +49,9 @@ Thumbs.db
 __screenshots__/
 
 .nx/polygraph
+
+# environment variables
+.env
+
+# generated Prisma client
+apps/*/src/generated/

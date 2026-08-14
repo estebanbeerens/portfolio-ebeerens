@@ -59,7 +59,9 @@
           "buildTarget": "admin:build:production"
         },
         "development": {
-          "buildTarget": "admin:build:development"
+          "buildTarget": "admin:build:development",
+          "port": 4300,
+          "proxyConfig": "apps/admin/proxy.conf.json"
         }
       }
     },

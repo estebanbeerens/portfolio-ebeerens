@@ -1,0 +1,307 @@
+openapi: 3.0.0
+paths:
+  /api/auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        '204':
+          description: Session ended
+        '401':
+          description: No valid session
+      tags: &ref_0
+        - auth
+  /api/auth/me:
+    get:
+      operationId: AuthController_me
+      parameters: []
+      responses:
+        '200':
+          description: The current admin session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponseDto'
+        '401':
+          description: No valid session
+      tags: *ref_0
+  /api/profile:
+    get:
+      operationId: ProfileController_getProfile
+      parameters: []
+      responses:
+        '200':
+          description: The current profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+        '404':
+          description: No profile has been created yet
+      tags: &ref_1
+        - profile
+    put:
+      operationId: ProfileController_updateProfile
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileDto'
+      responses:
+        '200':
+          description: The created or updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+        '401':
+          description: No valid session
+      tags: *ref_1
+  /api/projects:
+    get:
+      operationId: ProjectsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags: &ref_2
+        - projects
+    post:
+      operationId: ProjectsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectDto'
+      responses:
+        '201':
+          description: The created project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+        '401':
+          description: No valid session
+        '409':
+          description: A project with this slug already exists
+      tags: *ref_2
+  /api/projects/{id}:
+    get:
+      operationId: ProjectsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The requested project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+        '404':
+          description: No project with this id exists
+      tags: *ref_2
+    put:
+      operationId: ProjectsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectDto'
+      responses:
+        '200':
+          description: The updated project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No project with this id exists
+        '409':
+          description: A project with this slug already exists
+      tags: *ref_2
+    delete:
+      operationId: ProjectsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The project was deleted
+        '401':
+          description: No valid session
+        '404':
+          description: No project with this id exists
+      tags: *ref_2
+info:
+  title: Portfolio API
+  description: API documentation for the portfolio backend
+  version: 0.0.1
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    MeResponseDto:
+      type: object
+      properties:
+        githubUserId:
+          type: string
+      required:
+        - githubUserId
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the profile
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          description: Full name shown on the portfolio
+          example: Jane Doe
+        headline:
+          type: string
+          description: Short professional headline
+          example: Full-stack developer
+        bio:
+          type: string
+          description: Longer biography text
+        avatarUrl:
+          type: string
+          description: URL of the profile avatar image
+          example: https://cdn.example.com/avatar.png
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp of the last update
+          example: '2026-08-14T12:00:00.000Z'
+      required:
+        - id
+        - name
+        - updatedAt
+    UpdateProfileDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name shown on the portfolio
+          example: Jane Doe
+        headline:
+          type: string
+          description: Short professional headline
+          example: Full-stack developer
+        bio:
+          type: string
+          description: Longer biography text
+        avatarUrl:
+          type: string
+          description: URL of the profile avatar image
+          example: https://cdn.example.com/avatar.png
+      required:
+        - name
+    ProjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the project
+          example: cly1x8f9z0000abcd1234efgh
+        title:
+          type: string
+          example: Personal Portfolio
+        slug:
+          type: string
+          description: URL-safe unique identifier
+          example: personal-portfolio
+        description:
+          type: object
+          description: >-
+            ProseMirror JSON document — see the image-storage-r2 skill for how
+            this is produced/rendered
+          example:
+            type: doc
+            content: []
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/projects/portfolio.png
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+      required:
+        - id
+        - title
+        - slug
+        - description
+        - createdAt
+        - updatedAt
+    CreateProjectDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Personal Portfolio
+        slug:
+          type: string
+          description: URL-safe unique identifier
+          example: personal-portfolio
+        description:
+          type: object
+          description: >-
+            ProseMirror JSON document — see the image-storage-r2 skill for how
+            this is produced/rendered
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/projects/portfolio.png
+      required:
+        - title
+        - slug
+        - description
+    UpdateProjectDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Personal Portfolio
+        slug:
+          type: string
+          description: URL-safe unique identifier
+          example: personal-portfolio
+        description:
+          type: object
+          description: >-
+            ProseMirror JSON document — see the image-storage-r2 skill for how
+            this is produced/rendered
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/projects/portfolio.png

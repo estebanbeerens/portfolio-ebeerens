@@ -69,6 +69,16 @@
       "options": {
         "passWithNoTests": true
       }
+    },
+    "export-openapi": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "node dist/apps/api/main.js",
+        "env": {
+          "EXPORT_OPENAPI": "true"
+        }
+      }
     }
   }
 }
