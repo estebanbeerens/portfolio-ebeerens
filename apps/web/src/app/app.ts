@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { ThemeToggle } from '@portfolio-ebeerens/ui';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
+  imports: [RouterModule, ThemeToggle],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',

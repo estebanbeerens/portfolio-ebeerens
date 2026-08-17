@@ -1,0 +1,38 @@
+/* Shared design tokens for admin & web, mapped into Tailwind's theme. */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+
+  --color-bg: var(--color-bg-value);
+  --color-surface: var(--color-surface-value);
+  --color-text: var(--color-text-value);
+  --color-text-muted: var(--color-text-muted-value);
+  --color-border: var(--color-border-value);
+  --color-accent: var(--color-accent-value);
+  --color-accent-hover: var(--color-accent-hover-value);
+  --color-error: var(--color-error-value);
+}
+
+/* Semantic values swapped between light/dark; utilities above stay constant. */
+:root {
+  --color-bg-value: #ffffff;
+  --color-surface-value: #f6f8fa;
+  --color-text-value: #1f2328;
+  --color-text-muted-value: #57606a;
+  --color-border-value: #d0d7de;
+  --color-accent-value: #1f883d;
+  --color-accent-hover-value: #1a7f37;
+  --color-error-value: #d1242f;
+}
+
+.dark {
+  --color-bg-value: #0d1117;
+  --color-surface-value: #161b22;
+  --color-text-value: #f0f6fc;
+  --color-text-muted-value: #8b949e;
+  --color-border-value: #30363d;
+  --color-accent-value: #238636;
+  --color-accent-hover-value: #2ea043;
+  --color-error-value: #f85149;
+}

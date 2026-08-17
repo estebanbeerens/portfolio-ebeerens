@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "strict": false,
     "paths": {
-      "@portfolio-ebeerens/api-client": ["./libs/api-client/src/index.ts"]
+      "@portfolio-ebeerens/api-client": ["./libs/api-client/src/index.ts"],
+      "@portfolio-ebeerens/ui": ["./libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

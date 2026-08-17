@@ -1,1 +1,6 @@
+@import 'tailwindcss' source('./app');
+@import '../../../libs/ui/src/theme/index.css';
+
+@source '../../../libs/ui';
+
 /* You can add global styles to this file, and also import other style files */

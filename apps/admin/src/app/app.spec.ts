@@ -33,7 +33,7 @@ describe('App', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    const link = compiled.querySelector<HTMLAnchorElement>('a.login-button');
+    const link = compiled.querySelector<HTMLAnchorElement>('a[href="/api/auth/github"]');
     expect(link?.textContent).toContain('Log in with GitHub');
     expect(link?.getAttribute('href')).toBe('/api/auth/github');
   });

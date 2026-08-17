@@ -1,0 +1,9 @@
+<button
+  type="button"
+  class="border-border bg-surface text-text hover:bg-bg focus-visible:outline-accent inline-flex items-center justify-center rounded-md border p-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+  [attr.aria-pressed]="themeService.theme() === 'dark'"
+  aria-label="Toggle dark mode"
+  (click)="themeService.toggle()"
+>
+  <svg [lucideIcon]="icon()"></svg>
+</button>

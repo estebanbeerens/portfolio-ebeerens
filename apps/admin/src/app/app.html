@@ -1,19 +1,17 @@
-<main class="center-screen">
-  @switch (authState()) {
-    @case ('checking') {
-      <p>Checking session…</p>
-    }
-    @case ('loggedOut') {
-      @if (unauthorized) {
-        <p class="error-message">
-          This GitHub account isn't authorized to access this admin panel.
-        </p>
-      }
-      <a class="login-button" href="/api/auth/github">Log in with GitHub</a>
-    }
-    @case ('authenticated') {
-      <p>Logged in as {{ githubUserId() }}</p>
-      <button type="button" (click)="logout()">Log out</button>
-    }
+<main class="bg-bg text-text flex min-h-screen flex-col items-center justify-center gap-4 text-center">
+  <lib-theme-toggle />
+  @switch (authState()) { @case ('checking') {
+  <p>Checking session…</p>
+  } @case ('loggedOut') { @if (unauthorized) {
+  <p class="text-error max-w-96">This GitHub account isn't authorized to access this admin panel.</p>
   }
+  <a
+    class="bg-accent hover:bg-accent-hover inline-block rounded-md px-6 py-3 font-semibold text-white no-underline"
+    href="/api/auth/github"
+    >Log in with GitHub</a
+  >
+  } @case ('authenticated') {
+  <p>Logged in as {{ githubUserId() }}</p>
+  <button type="button" (click)="logout()">Log out</button>
+  } }
 </main>

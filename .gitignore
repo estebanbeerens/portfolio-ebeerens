@@ -55,3 +55,4 @@ __screenshots__/
 
 # generated Prisma client
 apps/*/src/generated/
+vitest.config.*.timestamp*
