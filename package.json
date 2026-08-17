@@ -7,7 +7,8 @@
     "studio": "npx prisma studio",
     "build:openapispec": "npx nx run api:export-openapi",
     "generate:api-client": "npx openapi-generator-cli generate -i openapi/api.yaml -g typescript-angular -o libs/api-client/src/generated -c libs/api-client/openapi-generator-config.json && rm -f libs/api-client/src/generated/package.json libs/api-client/src/generated/tsconfig.json libs/api-client/src/generated/ng-package.json libs/api-client/src/generated/git_push.sh",
-    "build:api-client": "npx npm run generate:api-client && nx build api-client"
+    "build:api-client": "npx npm run generate:api-client && nx build api-client",
+    "prepare": "husky"
   },
   "private": true,
   "devDependencies": {
@@ -49,6 +50,7 @@
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-playwright": "^1.6.2",
+    "husky": "^9.1.7",
     "jest": "~30.3.0",
     "jest-environment-node": "~30.3.0",
     "jest-util": "~30.3.0",
