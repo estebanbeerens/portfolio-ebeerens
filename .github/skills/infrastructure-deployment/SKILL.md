@@ -9,6 +9,7 @@ description: 'Containerize and deploy this project to the Oracle Cloud arm64 VPS
 
 - Writing/editing a Dockerfile, the production `docker-compose.yml`, or `nginx.conf`
 - Setting up the GitHub Actions CI/CD pipeline or the SSH deploy mechanism
+- Wiring test coverage reporting, code-quality checks, or security scanning into CI
 - Provisioning/hardening the Oracle VPS
 - Setting up Postgres backups or basic observability
 
@@ -23,6 +24,10 @@ The repo already has a local-dev-only [docker-compose.yml](../../../docker-compo
 ### Containerize & Ship
 
 Multi-stage Dockerfiles per app, arm64 cross-builds, GHCR push, SSH push-deploy. See [docker-and-cicd.md](./references/docker-and-cicd.md).
+
+### CI Quality Gates
+
+Test coverage artifacts, lint/typecheck/format checks, dependency/secret/container security scanning, and accessibility checks — all free tooling, wired into the same pipeline. See [docker-and-cicd.md](./references/docker-and-cicd.md#ci-quality-gates-all-free).
 
 ### Reverse Proxy & Edge
 
@@ -47,6 +52,8 @@ SSH/firewall hardening, `pg_dump` → R2 backup cron, basic logging/uptime monit
 - Secrets live in GitHub Actions encrypted secrets / the VPS's `.env`, never committed
 - A backup is not "real" until a restore has actually been tested
 - No new service (queue, cache, second VPS, etc.) without a genuine requirement — check against architecture plan §19 first
+- CI runs coverage (`nx affected -t test --coverage`), lint/typecheck/format, `pnpm audit`, and e2e (incl. a11y) on every push — before adding any paid coverage/security SaaS, confirm the free GitHub-native option (Actions artifacts/step summary, Dependabot, secret scanning, CodeQL) doesn't already cover it
+- Docker images are scanned with Trivy before being pushed to GHCR
 
 ## Keeping the Plan in Sync
 

@@ -84,10 +84,10 @@ The VPS is not necessary because of traffic requirements. It is chosen because i
 
 Oracle Always Free compute comes in two shapes:
 
-| Shape | Resources | Architecture |
-|---|---|---|
-| Ampere A1 (Arm) | Up to 4 OCPU + 24 GB RAM total, usable as 1–4 VMs (1,500 OCPU-hours + 9,000 GB-hours/month) | arm64 |
-| AMD micro (E2.1.Micro) | 2 VMs, 1/8 OCPU + 1 GB RAM each | amd64 |
+| Shape                  | Resources                                                                                   | Architecture |
+| ---------------------- | ------------------------------------------------------------------------------------------- | ------------ |
+| Ampere A1 (Arm)        | Up to 4 OCPU + 24 GB RAM total, usable as 1–4 VMs (1,500 OCPU-hours + 9,000 GB-hours/month) | arm64        |
+| AMD micro (E2.1.Micro) | 2 VMs, 1/8 OCPU + 1 GB RAM each                                                             | amd64        |
 
 Use a single **Ampere A1 Arm VM** (e.g. 2 OCPU / 12 GB RAM, leaving headroom under the always-free cap). The AMD micro shape is too small to run Postgres, the API, the SSR frontend, and Nginx together on one box.
 
@@ -716,10 +716,11 @@ GitHub
    │
    ▼
 CI
- ├── lint
- ├── unit tests
- ├── build
- └── optional integration tests
+ ├── lint + typecheck + format check
+ ├── unit tests + coverage
+ ├── security audit (dependency + secret + container scanning)
+ ├── e2e tests (incl. accessibility checks)
+ └── build
    │
    ▼
 Build Docker images (arm64, via QEMU + buildx)
@@ -750,6 +751,53 @@ execute arbitrary workflow code with the runner's privileges). Instead:
 - Rotate the deploy key periodically.
 
 Deployment should eventually be automated rather than requiring manual SSH commands.
+
+### CI quality gates (free tooling only)
+
+Run these on every push/PR, using Nx's affected commands so CI only re-checks what actually
+changed. None of it requires a paid service for a repo this size:
+
+**Test coverage**
+
+- Vitest (`admin`, `web`) and Jest (`api`, `api-e2e`) both support coverage natively
+  (`@vitest/coverage-v8`, Jest's built-in `--coverage`) — no extra tooling to add.
+- Run `nx affected -t test --coverage` so only changed projects are re-measured.
+- Publish the results as a free build artifact (`actions/upload-artifact`) and a human-readable
+  summary written to `$GITHUB_STEP_SUMMARY`. A third-party coverage service (Codecov, Coveralls)
+  is unnecessary for a private solo repo — GitHub's own Actions UI is enough.
+
+**Code quality**
+
+- `nx affected -t lint,typecheck` — ESLint plus `tsc --noEmit` on every affected project.
+- `prettier --check .` so unformatted code fails CI instead of silently drifting.
+- Nx's `@nx/enforce-module-boundaries` lint rule (already part of the workspace) keeps
+  `apps`/`libs` import boundaries honest — no extra setup needed.
+- `jscpd` (free, open-source duplicate-code detector) as an optional later addition if the
+  codebase grows large enough to make copy-paste drift a real problem — don't add it up front
+  (§19: avoid premature abstraction).
+
+**Security**
+
+- `pnpm audit` (or `npm audit`) on every CI run — free, already built into the package manager.
+- GitHub Dependabot (version + security update PRs) — free and native; only needs a
+  `.github/dependabot.yml`.
+- GitHub secret scanning + push protection — free on GitHub, enabled in repo settings.
+- GitHub CodeQL — free for public repos; if this repository is private, confirm current GitHub
+  plan entitlements before wiring it in rather than assuming it's free.
+- Trivy (Aqua Security, free CLI/Action) scans the built arm64 Docker images for known CVEs
+  before they're pushed to GHCR.
+- `license-checker` (free npm package) to flag copyleft (GPL/AGPL) dependencies that could be a
+  legal concern for a project pairing OSS with a personal brand.
+
+**Accessibility**
+
+- Already covered by the `vitest-axe` unit tests and `@axe-core/playwright` e2e checks described
+  in §5 and exercised in build guide Stage 6 — CI just needs to actually run
+  `nx affected -t test,e2e` on every push so these checks aren't only ever run locally.
+
+All of this reuses tooling that's either already free and built into GitHub, or a free open-source
+CLI — consistent with §19's "avoid premature abstraction" and the project's preference for free
+tooling throughout.
 
 ---
 
@@ -972,29 +1020,30 @@ Only introduce additional services or architectural patterns when there is a rea
 
 The exact choices can still be evaluated, but the target architecture is:
 
-| Layer | Technology |
-|---|---|
-| Frontend | Angular |
-| SSR | `@angular/ssr` (native Angular SSR) |
-| Backend | NestJS |
-| ORM/migrations | Prisma |
-| Monorepo | Nx (`@nx/angular`, `@nx/nest`) |
-| API | REST |
-| API contract | OpenAPI (generated via `@nestjs/swagger`) |
-| API client | Generated from OpenAPI |
-| Database | PostgreSQL |
-| Authentication | GitHub OAuth (Passport) |
-| Session | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis) |
-| Rich text | TipTap, stored as ProseMirror JSON (`jsonb`), sanitized on render |
-| Image storage | Cloudflare R2 (presigned uploads) |
-| Contact form spam protection | Google reCAPTCHA (token verified server-side against Google's API) |
-| Containers | Docker (arm64/multi-arch) |
-| Orchestration | Docker Compose |
-| Reverse proxy | Nginx |
-| Cloud | Oracle Cloud Always Free — Ampere A1 (Arm) |
-| Edge | Cloudflare (DNS/CDN/TLS/WAF + edge rate limiting) |
-| CI/CD | GitHub Actions → GHCR → SSH push-deploy |
-| Monitoring | Lightweight uptime/logging initially |
+| Layer                        | Technology                                                                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Frontend                     | Angular                                                                                                                                                                                          |
+| SSR                          | `@angular/ssr` (native Angular SSR)                                                                                                                                                              |
+| Backend                      | NestJS                                                                                                                                                                                           |
+| ORM/migrations               | Prisma                                                                                                                                                                                           |
+| Monorepo                     | Nx (`@nx/angular`, `@nx/nest`)                                                                                                                                                                   |
+| API                          | REST                                                                                                                                                                                             |
+| API contract                 | OpenAPI (generated via `@nestjs/swagger`)                                                                                                                                                        |
+| API client                   | Generated from OpenAPI                                                                                                                                                                           |
+| Database                     | PostgreSQL                                                                                                                                                                                       |
+| Authentication               | GitHub OAuth (Passport)                                                                                                                                                                          |
+| Session                      | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis)                                                                                 |
+| Rich text                    | TipTap, stored as ProseMirror JSON (`jsonb`), sanitized on render                                                                                                                                |
+| Image storage                | Cloudflare R2 (presigned uploads)                                                                                                                                                                |
+| Contact form spam protection | Google reCAPTCHA (token verified server-side against Google's API)                                                                                                                               |
+| Containers                   | Docker (arm64/multi-arch)                                                                                                                                                                        |
+| Orchestration                | Docker Compose                                                                                                                                                                                   |
+| Reverse proxy                | Nginx                                                                                                                                                                                            |
+| Cloud                        | Oracle Cloud Always Free — Ampere A1 (Arm)                                                                                                                                                       |
+| Edge                         | Cloudflare (DNS/CDN/TLS/WAF + edge rate limiting)                                                                                                                                                |
+| CI/CD                        | GitHub Actions → GHCR → SSH push-deploy                                                                                                                                                          |
+| CI quality gates             | Vitest/Jest coverage + GitHub Actions artifacts/step summary, `pnpm audit`, Dependabot, GitHub secret scanning, CodeQL, Trivy, `license-checker`, `vitest-axe`/`@axe-core/playwright` (all free) |
+| Monitoring                   | Lightweight uptime/logging initially                                                                                                                                                             |
 
 ---
 

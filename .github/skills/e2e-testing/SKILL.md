@@ -59,6 +59,7 @@ Quick steps:
 - API e2e specs assert on status code **and** response shape, not just "2xx"
 - Don't hardcode ports/hosts — reuse `process.env.HOST`/`PORT` (already wired in `api-e2e`'s setup) or Playwright's `baseURL`
 - Scaffolding a brand-new e2e project? Use the `nx-generate` skill rather than hand-rolling config
+- CI runs `nx affected -t e2e` on every push (see the `infrastructure-deployment` skill's CI quality gates) — keep specs green locally before pushing, since a flaky e2e spec blocks the pipeline for everyone
 
 ## Reference Files
 

@@ -132,6 +132,7 @@ database without installing Postgres directly on your machine.
 4. Add a `prisma.config.ts` at the **repo root** (Prisma 7 looks for it next to `package.json`;
    since this is an Nx monorepo with a single root `package.json`, this one file configures Prisma
    CLI for the whole workspace even though the schema itself lives under `apps/api/prisma/`):
+
    ```ts
    import 'dotenv/config';
    import { defineConfig, env } from 'prisma/config';
@@ -142,6 +143,7 @@ database without installing Postgres directly on your machine.
      datasource: { url: env('DATABASE_URL') },
    });
    ```
+
 5. In `schema.prisma`'s generator block, use the new Rust-free client provider and a custom output
    path (both required in v7):
    ```prisma
@@ -172,6 +174,7 @@ database without installing Postgres directly on your machine.
    ```
 8. Instantiate `PrismaClient` in the api's `PrismaService` using the Postgres driver adapter (v7
    requires an adapter for every database, there's no built-in native engine anymore):
+
    ```ts
    import { PrismaClient } from '../generated/prisma/client';
    import { PrismaPg } from '@prisma/adapter-pg';
@@ -194,7 +197,7 @@ database without installing Postgres directly on your machine.
 > "adapter" is just the translator between Prisma's API and that driver. The generated client itself
 > ships as an ES module, which technically wants `"type": "module"` in the nearest `package.json`.
 > Because this repo has one root `package.json` shared by `web`, `admin`, and `api`, flipping it to
-> `"module"` would force Angular/webpack/Jest configs across *all three* apps to deal with ESM, not
+> `"module"` would force Angular/webpack/Jest configs across _all three_ apps to deal with ESM, not
 > just `api`. Pinning Node to ≥22.12 avoids that: recent Node versions can `require()` an ES module
 > synchronously, so the NestJS app can stay CommonJS and still load the generated Prisma client
 > without a repo-wide ESM migration. Confirm this works for you in Stage 3 before relying on it — if
@@ -226,12 +229,11 @@ service/controller/repository layered structure.
 3. Add a read-only `GET /api/skills` endpoint (list all skills, ordered by name) so the full set of
    skills used across projects can be queried on its own.
 4. Implement `GET/POST/PUT/DELETE /api/organizations[/:id]` and `GET/POST/PUT/DELETE
-   /api/roles[/:id]` per architecture doc §7/§9 — the same public-GET/admin-mutation split as
+/api/roles[/:id]` per architecture doc §7/§9 — the same public-GET/admin-mutation split as
    `projects`. A `Role`'s `organizationId` is wired with a Prisma `connect` (not
    `connectOrCreate` — organizations carry `logoUrl`/`website`, so they're created explicitly via
    their own endpoint first); map a failed connect (Prisma `P2025`) to a 404, and map deleting an
-   `Organization` that still has `Role`s referencing it (Prisma `P2003`) to a 409 instead of a raw
-   500. `Role.skills` reuses the same `connectOrCreate`-by-name helper as `projects`.
+   `Organization` that still has `Role`s referencing it (Prisma `P2003`) to a 409 instead of a raw 500. `Role.skills` reuses the same `connectOrCreate`-by-name helper as `projects`.
 5. Add the public `POST /api/contact` endpoint. Verify the submitted reCAPTCHA token against
    Google's `siteverify` API server-side before storing the message — reject with 400 if
    verification fails. Add admin-only `GET /api/contact` and `DELETE /api/contact/{id}` (guarded by
@@ -241,9 +243,9 @@ service/controller/repository layered structure.
    (defaulting `enabled` to `false`) so the table is always complete, even right after adding a new
    flag — no separate seed script. Validate the `:key` path param with Nest's built-in
    `ParseEnumPipe` (auto-returns 400 for an unknown key), and add an explicit `@ApiParam({ name:
-   'key', enum: FeatureFlagKey })` on the route — without it, `nest/swagger` won't document the
+'key', enum: FeatureFlagKey })` on the route — without it, `nest/swagger` won't document the
    path parameter and the generated spec fails validation (`needs to be defined as a path
-   parameter`) when the Angular client is generated from it.
+parameter`) when the Angular client is generated from it.
 7. Add request validation with `class-validator`/`class-transformer` (NestJS's `ValidationPipe`).
 8. Serve Swagger UI at `/api/docs` for manual testing while you build.
 
@@ -411,7 +413,7 @@ architecture matters for how you build images.
    ```
 
 > 💡 **B1 explainer — what's a "multi-stage build" and why arm64?**
-> A multi-stage Dockerfile has two parts: one stage that has all the heavy tools needed to *build*
+> A multi-stage Dockerfile has two parts: one stage that has all the heavy tools needed to _build_
 > your app (compilers, full dependency trees), and a second, much smaller stage that only contains
 > the finished, already-built app. You throw away the first stage's bulk, so the final image is
 > small and has less attack surface. Separately: your own computer is probably an "amd64/x86"
@@ -520,8 +522,8 @@ in front of everything.
    from outside Docker's internal network.
 
 > 💡 **B1 explainer — why do I need Nginx if Cloudflare is already "in front"?**
-> Cloudflare sits between the whole internet and *your server as a whole* — it doesn't know that
-> your one server is actually running three separate apps inside Docker. Nginx's job is *inside*
+> Cloudflare sits between the whole internet and _your server as a whole_ — it doesn't know that
+> your one server is actually running three separate apps inside Docker. Nginx's job is _inside_
 > your server: when a request arrives, Nginx looks at the path (`/`, `/admin`, `/api`) and forwards
 > it to the correct container. Think of Cloudflare as the building's front security desk, and Nginx
 > as the receptionist on your specific floor who knows which office door to send you to.
@@ -586,20 +588,45 @@ SSH without giving CI full access to your server.
 
 **Steps:**
 
-1. Add a GitHub Actions workflow that runs lint/unit tests on every push/PR.
-2. Add a build job that uses `docker/setup-qemu-action` + `docker/setup-buildx-action` to cross-build
-   each app's arm64 image, then pushes it to GHCR (`ghcr.io/<you>/<app>:<sha>`), authenticated via
-   the automatically provided `GITHUB_TOKEN`.
-3. Finish locking down the `deploy` user from Stage 8: add its SSH key to `authorized_keys` with a
+1. Add a GitHub Actions workflow that runs `nx affected -t lint,typecheck,test,e2e` on every
+   push/PR — pass `--coverage` on the `test` target so Vitest/Jest emit a coverage report for
+   every affected project without re-checking untouched ones.
+2. Publish coverage as a free artifact: `actions/upload-artifact` the `coverage/` output, and write
+   a short summary table to `$GITHUB_STEP_SUMMARY` so coverage is visible directly on the Actions
+   run — no third-party coverage service (Codecov/Coveralls) needed for this repo's size.
+3. Add a code-quality step: `prettier --check .` (fails the build on unformatted code) alongside
+   the lint/typecheck step from step 1 — both are free, no new tooling to install beyond what's
+   already in the workspace.
+4. Add a security step: `pnpm audit` on every run (free, built into the package manager). Add a
+   `.github/dependabot.yml` for automated dependency-update PRs, and enable GitHub's secret
+   scanning + push protection in the repo's settings (both free, no workflow file required for the
+   latter).
+5. Optionally add a GitHub CodeQL workflow (`github/codeql-action`) for static security analysis —
+   free for public repos; if this repo is private, check current GitHub plan entitlements before
+   assuming it's free.
+6. Add a build job that uses `docker/setup-qemu-action` + `docker/setup-buildx-action` to cross-build
+   each app's arm64 image, scans it with Trivy (`aquasecurity/trivy-action`, free) for known CVEs,
+   then pushes it to GHCR (`ghcr.io/<you>/<app>:<sha>`), authenticated via the automatically
+   provided `GITHUB_TOKEN`.
+7. Finish locking down the `deploy` user from Stage 8: add its SSH key to `authorized_keys` with a
    forced command, e.g.
    ```
    command="/opt/deploy/pull-and-restart.sh",no-port-forwarding,no-agent-forwarding,no-pty ssh-ed25519 AAAA...
    ```
    so that key can only ever run that one script.
-4. Write `/opt/deploy/pull-and-restart.sh` on the VPS to `docker compose pull && docker compose up -d`.
-5. Add a deploy job (e.g. using `appleboy/ssh-action` or a plain `ssh` step) that connects as
+8. Write `/opt/deploy/pull-and-restart.sh` on the VPS to `docker compose pull && docker compose up -d`.
+9. Add a deploy job (e.g. using `appleboy/ssh-action` or a plain `ssh` step) that connects as
    `deploy` using a private key stored in GitHub Actions encrypted secrets, running only the forced
-   command.
+   command. Gate this job so it only runs on `main`, and only after the lint/test/security/build
+   jobs have all succeeded.
+
+> 💡 **B1 explainer — why no Codecov/Coveralls/paid scanner?**
+> All of this pipeline's checks are either already bundled with tools you have (Vitest/Jest's
+> `--coverage` flag, `pnpm audit`) or a free GitHub-native feature (Actions artifacts and step
+> summaries, Dependabot, secret scanning, CodeQL on public repos) or a free open-source CLI/Action
+> (Trivy). A third-party SaaS coverage/security dashboard adds real value once a project has many
+> contributors and needs its own review UI — for a solo portfolio repo, GitHub's own Actions tab
+> already shows everything you need.
 
 > 💡 **B1 explainer — what is a container registry, and why GHCR?**
 > A container registry is like a storage locker for Docker images — CI builds an image and uploads
@@ -616,16 +643,19 @@ SSH without giving CI full access to your server.
 > building natively, but it works and costs nothing extra.
 >
 > 💡 **B1 explainer — what does that "forced command" SSH key do?**
-> Normally, an SSH key lets you run *anything* on the server. A forced command overrides that: no
+> Normally, an SSH key lets you run _anything_ on the server. A forced command overrides that: no
 > matter what the connecting side asks to run, the server always runs the one fixed command instead.
 > So even if this specific key/secret ever leaked, whoever has it could only ever trigger your
 > pull-and-restart script — not open a shell, read files, or do anything else.
 
 **Verify it worked:** pushing a small change to main triggers the workflow in GitHub's Actions tab,
-ends green, and the change is visible on the live site within a couple of minutes without you
-touching SSH yourself.
+ends green, shows a coverage summary in the run's step summary with a downloadable coverage
+artifact, and the change is visible on the live site within a couple of minutes without you
+touching SSH yourself. A PR with a deliberately introduced lint error, failing test, or known-
+vulnerable dependency fails the corresponding job instead of merging silently.
 
-**Reference:** architecture doc §13 (arm64 builds), §14 (Deployment / SSH push-deploy).
+**Reference:** architecture doc §13 (arm64 builds), §14 (Deployment / SSH push-deploy / CI quality
+gates).
 
 ---
 
@@ -647,7 +677,7 @@ touching SSH yourself.
    `pg_restore`/`psql` against it to confirm the dump is valid and complete.
 
 > 💡 **B1 explainer — why isn't the server's disk a backup?**
-> A backup's whole purpose is to survive the *original* being lost, damaged, or deleted. If your
+> A backup's whole purpose is to survive the _original_ being lost, damaged, or deleted. If your
 > only copy of the database sits on the same disk as the database itself, then anything that takes
 > out that disk (hardware failure, a bad command, the whole VPS being deleted) takes out your "backup"
 > at the same time. A real backup lives somewhere physically and logically separate — here, a
