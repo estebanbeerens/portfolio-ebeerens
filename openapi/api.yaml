@@ -158,6 +158,315 @@ paths:
         '404':
           description: No project with this id exists
       tags: *ref_2
+  /api/skills:
+    get:
+      operationId: SkillsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All skills used across projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+  /api/organizations:
+    get:
+      operationId: OrganizationsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationDto'
+      tags: &ref_3
+        - organizations
+    post:
+      operationId: OrganizationsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationDto'
+      responses:
+        '201':
+          description: The created organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '401':
+          description: No valid session
+        '409':
+          description: An organization with this name already exists
+      tags: *ref_3
+  /api/organizations/{id}:
+    get:
+      operationId: OrganizationsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The requested organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '404':
+          description: No organization with this id exists
+      tags: *ref_3
+    put:
+      operationId: OrganizationsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationDto'
+      responses:
+        '200':
+          description: The updated organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No organization with this id exists
+        '409':
+          description: An organization with this name already exists
+      tags: *ref_3
+    delete:
+      operationId: OrganizationsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The organization was deleted
+        '401':
+          description: No valid session
+        '404':
+          description: No organization with this id exists
+        '409':
+          description: The organization still has roles referencing it
+      tags: *ref_3
+  /api/roles:
+    get:
+      operationId: RolesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleDto'
+      tags: &ref_4
+        - roles
+    post:
+      operationId: RolesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleDto'
+      responses:
+        '201':
+          description: The created role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No organization with this id exists
+      tags: *ref_4
+  /api/roles/{id}:
+    get:
+      operationId: RolesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The requested role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+        '404':
+          description: No role with this id exists
+      tags: *ref_4
+    put:
+      operationId: RolesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleDto'
+      responses:
+        '200':
+          description: The updated role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No role, or no organization, with this id exists
+      tags: *ref_4
+    delete:
+      operationId: RolesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The role was deleted
+        '401':
+          description: No valid session
+        '404':
+          description: No role with this id exists
+      tags: *ref_4
+  /api/feature-flags:
+    get:
+      operationId: FeatureFlagsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All feature flags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeatureFlagDto'
+      tags: &ref_5
+        - feature-flags
+  /api/feature-flags/{key}:
+    put:
+      operationId: FeatureFlagsController_update
+      parameters:
+        - name: key
+          required: true
+          in: path
+          schema:
+            enum:
+              - CONTACT
+              - PROJECTS
+              - ROLES
+              - SKILLS
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFeatureFlagDto'
+      responses:
+        '200':
+          description: The updated feature flag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureFlagDto'
+        '401':
+          description: No valid session
+      tags: *ref_5
+  /api/contact:
+    post:
+      operationId: ContactController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactMessageDto'
+      responses:
+        '201':
+          description: The message was submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactMessageDto'
+        '400':
+          description: reCAPTCHA verification failed
+      tags: &ref_6
+        - contact
+    get:
+      operationId: ContactController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: All submitted contact messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactMessageDto'
+        '401':
+          description: No valid session
+      tags: *ref_6
+  /api/contact/{id}:
+    delete:
+      operationId: ContactController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The message was deleted
+        '401':
+          description: No valid session
+      tags: *ref_6
 info:
   title: Portfolio API
   description: API documentation for the portfolio backend
@@ -225,6 +534,19 @@ components:
           example: https://cdn.example.com/avatar.png
       required:
         - name
+    SkillDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the skill
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          example: Angular
+      required:
+        - id
+        - name
     ProjectDto:
       type: object
       properties:
@@ -250,6 +572,30 @@ components:
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
+        client:
+          type: string
+          example: Acme Corp
+        jobRole:
+          type: string
+          example: Lead Frontend Engineer
+        liveUrl:
+          type: string
+          example: https://portfolio.example.com
+        startDate:
+          format: date-time
+          type: string
+          description: When work on the project started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When work on the project ended — absent means still ongoing
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used on this project
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
         createdAt:
           format: date-time
           type: string
@@ -263,6 +609,8 @@ components:
         - title
         - slug
         - description
+        - startDate
+        - skills
         - createdAt
         - updatedAt
     CreateProjectDto:
@@ -283,10 +631,39 @@ components:
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
+        client:
+          type: string
+          example: Acme Corp
+        jobRole:
+          type: string
+          example: Lead Frontend Engineer
+        liveUrl:
+          type: string
+          example: https://portfolio.example.com
+        startDate:
+          type: string
+          description: When work on the project started
+          example: '2024-01-15'
+        endDate:
+          type: string
+          description: When work on the project ended — omit if still ongoing
+          example: '2024-06-30'
+        skills:
+          description: >-
+            Skill names used on this project (e.g. React, Angular, .NET, Figma)
+            — created if they do not already exist
+          example: &ref_7
+            - Angular
+            - NestJS
+            - Figma
+          type: array
+          items:
+            type: string
       required:
         - title
         - slug
         - description
+        - startDate
     UpdateProjectDto:
       type: object
       properties:
@@ -305,3 +682,308 @@ components:
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
+        client:
+          type: string
+          example: Acme Corp
+        jobRole:
+          type: string
+          example: Lead Frontend Engineer
+        liveUrl:
+          type: string
+          example: https://portfolio.example.com
+        startDate:
+          type: string
+          description: When work on the project started
+          example: '2024-01-15'
+        endDate:
+          type: string
+          description: When work on the project ended — omit if still ongoing
+          example: '2024-06-30'
+        skills:
+          description: >-
+            Skill names used on this project (e.g. React, Angular, .NET, Figma)
+            — created if they do not already exist
+          example: *ref_7
+          type: array
+          items:
+            type: string
+    OrganizationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the organization
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          example: Acme Corp
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/acme.png
+        website:
+          type: string
+          example: https://acme.example.com
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+    CreateOrganizationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Acme Corp
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/acme.png
+        website:
+          type: string
+          example: https://acme.example.com
+      required:
+        - name
+    UpdateOrganizationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Acme Corp
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/acme.png
+        website:
+          type: string
+          example: https://acme.example.com
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the role
+          example: cly1x8f9z0000abcd1234efgh
+        jobTitle:
+          type: string
+          example: Senior Frontend Engineer
+        organization:
+          description: The organization this role was held at
+          allOf:
+            - $ref: '#/components/schemas/OrganizationDto'
+        location:
+          type: string
+          example: Amsterdam, Netherlands
+        employmentType:
+          type: string
+          enum:
+            - FULL_TIME
+            - PART_TIME
+            - SELF_EMPLOYED
+            - FREELANCE
+            - INTERNSHIP
+            - TRAINEE
+            - APPRENTICESHIP
+            - SEASONAL
+          example: FULL_TIME
+        startDate:
+          format: date-time
+          type: string
+          description: When this role started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When this role ended — absent means still current
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used in this role
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - jobTitle
+        - organization
+        - startDate
+        - skills
+        - createdAt
+        - updatedAt
+    CreateRoleDto:
+      type: object
+      properties:
+        jobTitle:
+          type: string
+          example: Senior Frontend Engineer
+        organizationId:
+          type: string
+          description: Id of the organization this role was held at
+          example: cly1x8f9z0000abcd1234efgh
+        location:
+          type: string
+          example: Amsterdam, Netherlands
+        employmentType:
+          type: string
+          enum: &ref_8
+            - FULL_TIME
+            - PART_TIME
+            - SELF_EMPLOYED
+            - FREELANCE
+            - INTERNSHIP
+            - TRAINEE
+            - APPRENTICESHIP
+            - SEASONAL
+          example: FULL_TIME
+        startDate:
+          type: string
+          description: When this role started
+          example: '2024-01-15'
+        endDate:
+          type: string
+          description: When this role ended — omit if still current
+          example: '2024-06-30'
+        skills:
+          description: >-
+            Skill names used in this role (e.g. React, Angular, .NET, Figma) —
+            created if they do not already exist
+          example: &ref_9
+            - Angular
+            - NestJS
+            - Figma
+          type: array
+          items:
+            type: string
+      required:
+        - jobTitle
+        - organizationId
+        - startDate
+    UpdateRoleDto:
+      type: object
+      properties:
+        jobTitle:
+          type: string
+          example: Senior Frontend Engineer
+        organizationId:
+          type: string
+          description: Id of the organization this role was held at
+          example: cly1x8f9z0000abcd1234efgh
+        location:
+          type: string
+          example: Amsterdam, Netherlands
+        employmentType:
+          type: string
+          enum: *ref_8
+          example: FULL_TIME
+        startDate:
+          type: string
+          description: When this role started
+          example: '2024-01-15'
+        endDate:
+          type: string
+          description: When this role ended — omit if still current
+          example: '2024-06-30'
+        skills:
+          description: >-
+            Skill names used in this role (e.g. React, Angular, .NET, Figma) —
+            created if they do not already exist
+          example: *ref_9
+          type: array
+          items:
+            type: string
+    FeatureFlagDto:
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+            - CONTACT
+            - PROJECTS
+            - ROLES
+            - SKILLS
+          example: PROJECTS
+        enabled:
+          type: boolean
+          example: false
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - key
+        - enabled
+        - updatedAt
+    UpdateFeatureFlagDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          example: true
+      required:
+        - enabled
+    CreateContactMessageDto:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Jane Doe
+        email:
+          type: string
+          example: jane.doe@example.com
+        subject:
+          type: string
+          example: Freelance project inquiry
+        message:
+          type: string
+          example: Hi, I'd like to discuss a project with you.
+        recaptchaToken:
+          type: string
+          description: Token produced by the reCAPTCHA widget on the contact form
+      required:
+        - fullName
+        - email
+        - subject
+        - message
+        - recaptchaToken
+    ContactMessageDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the message
+          example: cly1x8f9z0000abcd1234efgh
+        fullName:
+          type: string
+          example: Jane Doe
+        email:
+          type: string
+          example: jane.doe@example.com
+        subject:
+          type: string
+          example: Freelance project inquiry
+        message:
+          type: string
+          example: Hi, I'd like to discuss a project with you.
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - fullName
+        - email
+        - subject
+        - message
+        - createdAt

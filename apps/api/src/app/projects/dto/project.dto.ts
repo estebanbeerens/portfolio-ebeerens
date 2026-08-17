@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { SkillDto } from '../../skills/dto/skill.dto';
 
 export class ProjectDto {
   @ApiProperty({
@@ -28,6 +29,31 @@ export class ProjectDto {
     example: 'https://cdn.example.com/projects/portfolio.png',
   })
   imageUrl?: string | null;
+
+  @ApiPropertyOptional({ example: 'Acme Corp' })
+  client?: string | null;
+
+  @ApiPropertyOptional({ example: 'Lead Frontend Engineer' })
+  jobRole?: string | null;
+
+  @ApiPropertyOptional({ example: 'https://portfolio.example.com' })
+  liveUrl?: string | null;
+
+  @ApiProperty({
+    description: 'When work on the project started',
+    example: '2024-01-15T00:00:00.000Z',
+  })
+  startDate: Date;
+
+  @ApiPropertyOptional({
+    description:
+      'When work on the project ended \u2014 absent means still ongoing',
+    example: '2024-06-30T00:00:00.000Z',
+  })
+  endDate?: Date | null;
+
+  @ApiProperty({ description: 'Skills used on this project', type: [SkillDto] })
+  skills: SkillDto[];
 
   @ApiProperty({ example: '2026-08-14T12:00:00.000Z' })
   createdAt: Date;

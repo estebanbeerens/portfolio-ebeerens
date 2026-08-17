@@ -34,6 +34,8 @@ moving on.
    - GitHub account (source control + GitHub Actions + OAuth provider + GHCR container registry)
    - Cloudflare account, with your domain's nameservers already delegated to Cloudflare
    - Oracle Cloud account (sign up for Always Free)
+   - Google account with a reCAPTCHA site registered (console.cloud.google.com/security/recaptcha)
+     for the contact form (Stage 3/6) — note the site key and secret key
 2. Install local tooling:
    - Node.js **22.x** (Prisma 7, used from Stage 2, requires Node ≥20.19 and recommends 22.x)
    - Docker Desktop (for local Postgres in Stage 2, and later for building images)
@@ -107,7 +109,8 @@ errors and are reachable in a browser/`curl` on their local ports.
 ## Stage 2 — Local database: Postgres + Prisma
 
 **Goal:** a Postgres database running in Docker on your machine, with Prisma migrations defined for
-the `profile`, `projects`, and `sessions` tables.
+the `profile`, `projects`, `skills`, `organizations`, `roles`, `sessions`, `contact_messages`, and
+`feature_flags` tables.
 
 **What you'll learn:** what containers/images/volumes actually are, and how to run a throwaway local
 database without installing Postgres directly on your machine.
@@ -148,8 +151,18 @@ database without installing Postgres directly on your machine.
    }
    ```
 6. Define the initial models: `Profile`, `Project` (with `description` as `Json`, matching
-   architecture doc §9/§10), and `Session` (`id`, `tokenHash`, `githubUserId`, `expiresAt`,
-   `createdAt`). Do **not** put `url` in the `datasource` block — that now lives in
+   architecture doc §9/§10, plus optional `client`/`jobRole`/`liveUrl`, a required `startDate` and
+   optional `endDate` (absent = ongoing/present), and a many-to-many relation to `Skill`), `Skill`
+   (`id`, unique `name`), `Organization` (`id`, unique `name`, optional `logoUrl`/`website`), `Role`
+   (`id`, `jobTitle`, required `organizationId` FK, optional `location`, optional
+   `employmentType` — the schema's first `enum`, values `FULL_TIME`/`PART_TIME`/`SELF_EMPLOYED`/
+   `FREELANCE`/`INTERNSHIP`/`TRAINEE`/`APPRENTICESHIP`/`SEASONAL` — a required `startDate`,
+   optional `endDate`, and a many-to-many relation to the same `Skill` table `Project` uses),
+   `Session` (`id`, `tokenHash`, `githubUserId`, `expiresAt`, `createdAt`), `ContactMessage`
+   (`id`, `fullName`, `email`, `subject`, `message`, `createdAt`), and `FeatureFlag` (`key` as the
+   `@id` directly — a `FeatureFlagKey` enum with values `CONTACT`/`PROJECTS`/`ROLES`/`SKILLS`, no
+   separate surrogate id since the enum already guarantees uniqueness — plus `enabled` defaulting
+   to `false`). Do **not** put `url` in the `datasource` block — that now lives in
    `prisma.config.ts` only.
 7. Run the first migration, then generate the client explicitly (v7's `migrate dev` no longer
    auto-generates or auto-seeds):
@@ -208,11 +221,37 @@ service/controller/repository layered structure.
 1. Add `@nestjs/swagger` and decorate your DTOs and controllers with `@ApiProperty`/`@ApiTags`/etc.
 2. Implement `GET/PUT /api/profile` and `GET/POST/PUT/DELETE /api/projects[/:id]` per architecture
    doc §7, using a service layer that calls Prisma (don't call Prisma directly from controllers).
-3. Add request validation with `class-validator`/`class-transformer` (NestJS's `ValidationPipe`).
-4. Serve Swagger UI at `/api/docs` for manual testing while you build.
+   Accept project `skills` as a list of names and `connectOrCreate` them against the `Skill` table
+   so the same skill is reused across projects instead of duplicated.
+3. Add a read-only `GET /api/skills` endpoint (list all skills, ordered by name) so the full set of
+   skills used across projects can be queried on its own.
+4. Implement `GET/POST/PUT/DELETE /api/organizations[/:id]` and `GET/POST/PUT/DELETE
+   /api/roles[/:id]` per architecture doc §7/§9 — the same public-GET/admin-mutation split as
+   `projects`. A `Role`'s `organizationId` is wired with a Prisma `connect` (not
+   `connectOrCreate` — organizations carry `logoUrl`/`website`, so they're created explicitly via
+   their own endpoint first); map a failed connect (Prisma `P2025`) to a 404, and map deleting an
+   `Organization` that still has `Role`s referencing it (Prisma `P2003`) to a 409 instead of a raw
+   500. `Role.skills` reuses the same `connectOrCreate`-by-name helper as `projects`.
+5. Add the public `POST /api/contact` endpoint. Verify the submitted reCAPTCHA token against
+   Google's `siteverify` API server-side before storing the message — reject with 400 if
+   verification fails. Add admin-only `GET /api/contact` and `DELETE /api/contact/{id}` (guarded by
+   the Stage 4 session guard) to review and clear submissions.
+6. Implement `GET /api/feature-flags` (public) and `PUT /api/feature-flags/{key}` (admin-only).
+   On module init, upsert a row for every `FeatureFlagKey` enum value that doesn't already exist
+   (defaulting `enabled` to `false`) so the table is always complete, even right after adding a new
+   flag — no separate seed script. Validate the `:key` path param with Nest's built-in
+   `ParseEnumPipe` (auto-returns 400 for an unknown key), and add an explicit `@ApiParam({ name:
+   'key', enum: FeatureFlagKey })` on the route — without it, `nest/swagger` won't document the
+   path parameter and the generated spec fails validation (`needs to be defined as a path
+   parameter`) when the Angular client is generated from it.
+7. Add request validation with `class-validator`/`class-transformer` (NestJS's `ValidationPipe`).
+8. Serve Swagger UI at `/api/docs` for manual testing while you build.
 
-**Verify it worked:** open `/api/docs` in a browser, create a project through the Swagger UI, and
-confirm the row appears via `npx prisma studio`.
+**Verify it worked:** open `/api/docs` in a browser, create a project (with skills) through the
+Swagger UI, and confirm the row (and its linked skills) appears via `npx prisma studio`; submit
+`POST /api/contact` with a valid reCAPTCHA token and confirm the row appears in `contact_messages`;
+restart the API and confirm `GET /api/feature-flags` always returns exactly one row per
+`FeatureFlagKey` value, each `enabled: false` until toggled.
 
 **Reference:** architecture doc §6 (Backend), §7 (OpenAPI), §9 (Database).
 
@@ -272,15 +311,28 @@ storage instead of through your API.
 **Steps:**
 
 1. Build the profile-edit form and project list/create/edit/delete screens in the `admin` app,
-   calling the API endpoints from Stage 3, gated behind the login flow from Stage 4.
+   calling the API endpoints from Stage 3, gated behind the login flow from Stage 4. Include the
+   optional `client`/`jobRole`/`liveUrl` fields and a tag-style input for `skills` (autocompleting
+   against `GET /api/skills`).
 2. Add TipTap as the rich-text editor for `project.description`. Configure it to output/accept a
    ProseMirror JSON document (not HTML) — this is what gets stored in the `Json` column.
-3. Create a Cloudflare R2 bucket (via the Cloudflare dashboard) for images. Add an endpoint
+3. Build a simple admin screen listing submitted contact messages (`GET /api/contact`) with a way
+   to delete them once handled (`DELETE /api/contact/{id}`).
+4. Build organization list/create/edit/delete screens (`GET/POST/PUT/DELETE /api/organizations[/:id]`)
+   and role list/create/edit/delete screens (`GET/POST/PUT/DELETE /api/roles[/:id]`), with an
+   organization picker (populated from `GET /api/organizations`) and an employment-type select
+   backed by the `EmploymentType` enum. Deleting an organization that still has roles will return
+   409 — surface that as a clear error rather than a generic failure.
+5. Build a simple feature-flags screen: list all flags (`GET /api/feature-flags`) with a toggle
+   switch per row that calls `PUT /api/feature-flags/{key}`. This is admin-only config, not
+   content the public site fetches at build time — every page load re-checks it (see Stage 6's
+   note on the still-unbuilt frontend consumption piece).
+6. Create a Cloudflare R2 bucket (via the Cloudflare dashboard) for images. Add an endpoint
    `POST /api/uploads/presign` that validates the requested content-type/size and returns a
    short-lived presigned PUT URL using the S3-compatible R2 API.
-4. In the admin UI, upload the selected file directly to the presigned URL (not through your API),
+7. In the admin UI, upload the selected file directly to the presigned URL (not through your API),
    then call a "confirm" endpoint that stores the resulting object key/URL against the project.
-5. When rendering the project description anywhere (admin preview or later, the public site),
+8. When rendering the project description anywhere (admin preview or later, the public site),
    serialize the ProseMirror JSON to HTML through a strict allowlisted serializer, then run it
    through `sanitize-html` before display — never trust stored JSON as safe-to-render HTML blindly.
 
@@ -308,12 +360,24 @@ SEO and accessibility basics.
 
 **Steps:**
 
-1. Build the home/about/projects/project-detail pages in `web`, fetching data from the read-only
-   API endpoints (no auth needed for these).
-2. Configure per-page `<title>`/meta description tags for SEO.
-3. Run an accessibility check (e.g. axe DevTools or Lighthouse) and fix obvious issues (alt text,
+1. Fetch `GET /api/feature-flags` once at application init (e.g. an `APP_INITIALIZER`/
+   `provideAppInitializer`-style hook shared between `web` and `admin`) and expose the result via a
+   small service so pages/nav items can check `CONTACT`/`PROJECTS`/`ROLES`/`SKILLS` before
+   rendering. This wasn't designed in Stage 3/5 beyond the API contract itself — this is the first
+   point in the guide where there's an actual page to gate.
+2. Build the home/about/projects/project-detail pages in `web`, fetching data from the read-only
+   API endpoints (no auth needed for these). Show a project's skills, client, job role, live URL,
+   and start/end date (render "Present" when `endDate` is absent) where present.
+3. Build an experience/resume section from `GET /api/roles` (each role includes its nested
+   `organization` and `skills`). Group consecutive roles that share the same organization under a
+   single heading (LinkedIn-style), and render "Present" when a role's `endDate` is absent.
+4. Build a contact page with a reCAPTCHA widget (using `RECAPTCHA_SITE_KEY`) that submits to
+   `POST /api/contact`; show a clear success/error state and don't reveal server-side details on
+   failure.
+5. Configure per-page `<title>`/meta description tags for SEO.
+6. Run an accessibility check (e.g. axe DevTools or Lighthouse) and fix obvious issues (alt text,
    color contrast, landmark regions, focus order).
-4. Confirm SSR is actually rendering server-side: view page source (not devtools' rendered DOM) and
+7. Confirm SSR is actually rendering server-side: view page source (not devtools' rendered DOM) and
    confirm the content is already present in the raw HTML.
 
 **Verify it worked:** `curl` the `web` app's URL and see project/profile content in the raw HTML

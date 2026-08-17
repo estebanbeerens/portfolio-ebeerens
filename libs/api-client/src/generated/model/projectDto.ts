@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { SkillDto } from './skillDto';
 
 
 export interface ProjectDto { 
@@ -24,6 +25,21 @@ export interface ProjectDto {
      */
     description: object;
     imageUrl?: string;
+    client?: string;
+    jobRole?: string;
+    liveUrl?: string;
+    /**
+     * When work on the project started
+     */
+    startDate: string;
+    /**
+     * When work on the project ended — absent means still ongoing
+     */
+    endDate?: string;
+    /**
+     * Skills used on this project
+     */
+    skills: Array<SkillDto>;
     createdAt: string;
     updatedAt: string;
 }

@@ -20,5 +20,20 @@ export interface CreateProjectDto {
      */
     description: object;
     imageUrl?: string;
+    client?: string;
+    jobRole?: string;
+    liveUrl?: string;
+    /**
+     * When work on the project started
+     */
+    startDate: string;
+    /**
+     * When work on the project ended — omit if still ongoing
+     */
+    endDate?: string;
+    /**
+     * Skill names used on this project (e.g. React, Angular, .NET, Figma) — created if they do not already exist
+     */
+    skills?: Array<string>;
 }
 

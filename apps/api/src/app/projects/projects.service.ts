@@ -13,11 +13,17 @@ export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.project.findMany({ orderBy: { createdAt: 'desc' } });
+    return this.prisma.project.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { skills: true },
+    });
   }
 
   async findOne(id: string) {
-    const project = await this.prisma.project.findUnique({ where: { id } });
+    const project = await this.prisma.project.findUnique({
+      where: { id },
+      include: { skills: true },
+    });
     if (!project) {
       throw new NotFoundException(`Project "${id}" not found`);
     }
@@ -25,9 +31,15 @@ export class ProjectsService {
   }
 
   async create(dto: CreateProjectDto) {
+    const { skills, description, ...rest } = dto;
     try {
       return await this.prisma.project.create({
-        data: { ...dto, description: dto.description as Prisma.InputJsonValue },
+        data: {
+          ...rest,
+          description: description as Prisma.InputJsonValue,
+          skills: this.buildSkillsInput(skills),
+        },
+        include: { skills: true },
       });
     } catch (error) {
       throw this.mapPrismaError(error, dto.slug);
@@ -36,13 +48,18 @@ export class ProjectsService {
 
   async update(id: string, dto: UpdateProjectDto) {
     await this.findOne(id);
+    const { skills, description, ...rest } = dto;
     try {
       return await this.prisma.project.update({
         where: { id },
         data: {
-          ...dto,
-          description: dto.description as Prisma.InputJsonValue | undefined,
+          ...rest,
+          description: description as Prisma.InputJsonValue | undefined,
+          skills: skills
+            ? { set: [], ...this.buildSkillsInput(skills) }
+            : undefined,
         },
+        include: { skills: true },
       });
     } catch (error) {
       throw this.mapPrismaError(error, dto.slug);
@@ -52,6 +69,19 @@ export class ProjectsService {
   async remove(id: string) {
     await this.findOne(id);
     await this.prisma.project.delete({ where: { id } });
+  }
+
+  // Reuses existing skills by name, creating new ones as needed.
+  private buildSkillsInput(skills?: string[]) {
+    if (!skills) {
+      return undefined;
+    }
+    return {
+      connectOrCreate: skills.map((name) => ({
+        where: { name },
+        create: { name },
+      })),
+    };
   }
 
   private mapPrismaError(error: unknown, slug?: string) {

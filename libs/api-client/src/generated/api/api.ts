@@ -1,7 +1,17 @@
 export * from './auth.service';
 import { AuthService } from './auth.service';
+export * from './contact.service';
+import { ContactService } from './contact.service';
+export * from './featureFlags.service';
+import { FeatureFlagsService } from './featureFlags.service';
+export * from './organizations.service';
+import { OrganizationsService } from './organizations.service';
 export * from './profile.service';
 import { ProfileService } from './profile.service';
 export * from './projects.service';
 import { ProjectsService } from './projects.service';
-export const APIS = [AuthService, ProfileService, ProjectsService];
+export * from './roles.service';
+import { RolesService } from './roles.service';
+export * from './skills.service';
+import { SkillsService } from './skills.service';
+export const APIS = [AuthService, ContactService, FeatureFlagsService, OrganizationsService, ProfileService, ProjectsService, RolesService, SkillsService];

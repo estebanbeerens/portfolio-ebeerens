@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { generateSessionToken, hashToken } from './token.util';
 
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+const SESSION_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours
 
 @Injectable()
 export class AuthService {

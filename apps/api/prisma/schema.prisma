@@ -17,13 +17,61 @@ model Profile {
 }
 
 model Project {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String    @unique
   description Json
   imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  client      String?
+  jobRole     String?
+  liveUrl     String?
+  startDate   DateTime
+  endDate     DateTime?
+  skills      Skill[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Skill {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  projects Project[]
+  roles    Role[]
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  logoUrl   String?
+  website   String?
+  roles     Role[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  SELF_EMPLOYED
+  FREELANCE
+  INTERNSHIP
+  TRAINEE
+  APPRENTICESHIP
+  SEASONAL
+}
+
+model Role {
+  id             String          @id @default(cuid())
+  jobTitle       String
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  location       String?
+  employmentType EmploymentType?
+  startDate      DateTime
+  endDate        DateTime?
+  skills         Skill[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Session {
@@ -32,4 +80,26 @@ model Session {
   githubUserId String
   expiresAt    DateTime
   createdAt    DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+enum FeatureFlagKey {
+  CONTACT
+  PROJECTS
+  ROLES
+  SKILLS
+}
+
+model FeatureFlag {
+  key       FeatureFlagKey @id
+  enabled   Boolean        @default(false)
+  updatedAt DateTime       @updatedAt
 }

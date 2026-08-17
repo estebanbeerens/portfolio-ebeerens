@@ -189,6 +189,8 @@ Potential frontend responsibilities:
 - Projects
 - Individual project pages
 - Project images
+- Experience/resume section (organizations and the roles held at each)
+- Contact page (public inquiry form, reCAPTCHA-protected)
 - Other portfolio content
 
 ### Admin site
@@ -200,8 +202,19 @@ Potential frontend responsibilities:
 - Edit project
 - Delete project
 - Image management
+- Manage organizations (create/edit/delete)
+- Manage roles (create/edit/delete, assigned to an organization)
+- Toggle feature flags
+- Review/delete submitted contact messages
 
-The public frontend should be read-only from the perspective of normal visitors.
+The public frontend should be read-only from the perspective of normal visitors, aside from
+submitting the contact form.
+
+Feature flags are fetched once from `GET /api/feature-flags` at application init and used to
+decide whether to render the corresponding section/nav item in both `web` and `admin`. The actual
+frontend fetch-at-init mechanism (e.g. an `APP_INITIALIZER`-style hook and a shared flags service)
+is intentionally not designed yet — `web`/`admin` don't have real feature pages to gate until
+Phase 3/5 build them; only the backend contract (§7, §9) exists so far.
 
 ---
 
@@ -216,7 +229,10 @@ The API should own:
 - Authentication/session handling
 - Authorization
 - Profile data
-- Project CRUD
+- Project CRUD (including the skills used on each project)
+- Organization and role CRUD (work experience/resume, sharing the same skills pool as projects)
+- Feature flag configuration (enum-backed toggles gating the contact/projects/roles/skills sections)
+- Contact message intake (reCAPTCHA-verified) and admin review
 - Image metadata
 - Database access
 - Validation
@@ -284,9 +300,33 @@ GET    /api/projects/{id}
 POST   /api/projects
 PUT    /api/projects/{id}
 DELETE /api/projects/{id}
+
+GET    /api/skills
+
+GET    /api/organizations
+GET    /api/organizations/{id}
+POST   /api/organizations
+PUT    /api/organizations/{id}
+DELETE /api/organizations/{id}
+
+GET    /api/roles
+GET    /api/roles/{id}
+POST   /api/roles
+PUT    /api/roles/{id}
+DELETE /api/roles/{id}
+
+GET    /api/feature-flags
+PUT    /api/feature-flags/{key}
+
+POST   /api/contact
+GET    /api/contact
+DELETE /api/contact/{id}
 ```
 
-Admin-only endpoints should explicitly require authentication.
+Admin-only endpoints should explicitly require authentication. `GET /api/skills`,
+`GET /api/organizations[/{id}]`, `GET /api/roles[/{id}]`, `GET /api/feature-flags`, and
+`POST /api/contact` are public; mutating `organizations`/`roles` routes,
+`PUT /api/feature-flags/{key}`, and `GET`/`DELETE /api/contact[/{id}]` are admin-only.
 
 ---
 
@@ -383,10 +423,66 @@ projects
 ├── title
 ├── description   (jsonb — TipTap/ProseMirror document, see §10)
 ├── image
+├── client        (optional)
+├── jobRole       (optional)
+├── liveUrl       (optional)
+├── startDate
+├── endDate       (optional — no end date means the project is still ongoing/present)
 ├── slug
 ├── createdAt
 └── updatedAt
 ```
+
+Projects relate to skills through a many-to-many join, so a skill can be reused across multiple
+projects rather than re-typed per project.
+
+### Skills
+
+```text
+skills
+├── id
+└── name   (unique, e.g. "React", "Angular", ".NET", "Figma")
+```
+
+Kept in their own table (rather than a free-text field on `projects`) specifically so skills can
+be queried/aggregated across all projects (e.g. "every skill I've used") instead of re-typed and
+inconsistently spelled per project. `roles` (below) reuse this same table, so it's one unified
+skill pool across the whole portfolio, not a separate list per feature.
+
+### Organizations
+
+```text
+organizations
+├── id
+├── name      (unique)
+├── logoUrl    (optional)
+├── website    (optional)
+├── createdAt
+└── updatedAt
+```
+
+### Roles
+
+```text
+roles
+├── id
+├── jobTitle
+├── organizationId  (FK → organizations — multiple roles can share one organization)
+├── location        (optional)
+├── employmentType  (optional — fixed enum, see below)
+├── startDate
+├── endDate         (optional — no end date means the role is current/present)
+├── createdAt
+└── updatedAt
+```
+
+`roles` relate to `skills` through the same many-to-many join `projects` uses, and to
+`organizations` through a required foreign key — this is the LinkedIn-style "experience" section:
+multiple roles can sit under one organization. An organization cannot be deleted while roles still
+reference it (a 409, not a cascading delete — consistent with not silently destroying data).
+`employmentType` is a fixed enum (`FULL_TIME`, `PART_TIME`, `SELF_EMPLOYED`, `FREELANCE`,
+`INTERNSHIP`, `TRAINEE`, `APPRENTICESHIP`, `SEASONAL`) — the first enum in this schema; everything
+else so far has preferred a free-text field.
 
 ### Sessions
 
@@ -399,12 +495,42 @@ sessions
 └── createdAt
 ```
 
+### Contact Messages
+
+```text
+contact_messages
+├── id
+├── fullName
+├── email
+├── subject
+├── message
+└── createdAt
+```
+
+Submitted through the public contact form. The reCAPTCHA token is verified against Google's
+`siteverify` API at submission time and is not itself persisted — only the message content is
+stored, for the admin to review.
+
+### Feature Flags
+
+```text
+feature_flags
+├── key        (primary key — fixed enum: CONTACT, PROJECTS, ROLES, SKILLS)
+├── enabled    (defaults to false)
+└── updatedAt
+```
+
+`key` is the primary key directly (no separate surrogate id) since the enum already guarantees
+uniqueness. On every app boot, a row is upserted for each `FeatureFlagKey` enum value that doesn't
+already exist yet, defaulting to `enabled: false` — so the table is always complete even right
+after adding a new enum value, without a separate seed script. The frontend fetches the full list
+once at application init and uses it to decide whether to show the corresponding section/page;
+there is no `DELETE` endpoint since flags are fixed by the enum, not admin-creatable.
+
 Potential future additions:
 
 ```text
-project_tags
 project_links
-project_technologies
 ```
 
 Do not introduce these until they are actually required.
@@ -720,7 +846,8 @@ Only add these when they provide a learning opportunity or solve a real problem.
 - Create backend application (NestJS)
 - Add PostgreSQL
 - Set up Prisma and its migrations
-- Define initial data model, including the `sessions` table (§9)
+- Define initial data model, including the `sessions` table (§9) and the enum-backed
+  `feature_flags` table (§9)
 - Create OpenAPI specification (`@nestjs/swagger`)
 - Implement basic API endpoints
 
@@ -731,6 +858,8 @@ Only add these when they provide a learning opportunity or solve a real problem.
 - Connect to API
 - Implement projects
 - Implement profile
+- Implement the experience/resume section (organizations and roles)
+- Implement the contact page (reCAPTCHA-protected submission)
 - Optimize SEO/accessibility/performance
 
 ### Phase 4 — Authentication
@@ -748,6 +877,9 @@ Only add these when they provide a learning opportunity or solve a real problem.
 - Project deletion
 - Image upload
 - Image deletion
+- Organization creation/editing/deletion
+- Role creation/editing/deletion
+- Toggle feature flags
 - Validation/error handling
 
 ### Phase 6 — Infrastructure
@@ -855,6 +987,7 @@ The exact choices can still be evaluated, but the target architecture is:
 | Session | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis) |
 | Rich text | TipTap, stored as ProseMirror JSON (`jsonb`), sanitized on render |
 | Image storage | Cloudflare R2 (presigned uploads) |
+| Contact form spam protection | Google reCAPTCHA (token verified server-side against Google's API) |
 | Containers | Docker (arm64/multi-arch) |
 | Orchestration | Docker Compose |
 | Reverse proxy | Nginx |
