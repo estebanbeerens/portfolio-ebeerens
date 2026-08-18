@@ -78,17 +78,20 @@ model Session {
   id           String   @id @default(cuid())
   tokenHash    String   @unique
   githubUserId String
+  displayName  String?
+  avatarUrl    String?
   expiresAt    DateTime
   createdAt    DateTime @default(now())
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
-  fullName  String
-  email     String
-  subject   String
-  message   String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String
+  organization String?
+  subject      String
+  message      String
+  createdAt    DateTime @default(now())
 }
 
 enum FeatureFlagKey {
@@ -102,4 +105,50 @@ model FeatureFlag {
   key       FeatureFlagKey @id
   enabled   Boolean        @default(false)
   updatedAt DateTime       @updatedAt
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+enum ActivityEntity {
+  PROFILE
+  PROJECT
+  ROLE
+  ORGANIZATION
+  RESUME
+}
+
+model ActivityLog {
+  id         String         @id @default(cuid())
+  entityType ActivityEntity
+  // Absent for DELETED entries — the referenced row no longer exists.
+  entityId   String?
+  action     ActivityAction
+  summary    String
+  actor      String?
+  createdAt  DateTime       @default(now())
+
+  @@index([createdAt])
+}
+
+model Resume {
+  id         String           @id @default(cuid())
+  fileName   String
+  objectKey  String
+  mimeType   String
+  fileSize   Int
+  uploadedAt DateTime         @default(now())
+  downloads  ResumeDownload[]
+}
+
+model ResumeDownload {
+  id        String   @id @default(cuid())
+  resumeId  String
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }

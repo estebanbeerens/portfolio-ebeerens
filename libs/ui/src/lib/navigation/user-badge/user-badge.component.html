@@ -1,0 +1,19 @@
+@if (avatarUrl(); as avatarUrl) {
+  <img class="size-9 shrink-0 rounded-full object-cover" [src]="avatarUrl" alt="" />
+} @else {
+  <span
+    class="bg-glass-active text-text flex size-9 shrink-0 items-center justify-center rounded-full font-semibold"
+    aria-hidden="true"
+    >{{ initials() }}</span
+  >
+}
+
+<span class="flex min-w-0 flex-1 flex-col gap-0.5">
+  <span class="font-display text-text truncate font-semibold">{{ name() }}</span>
+  @if (status(); as status) {
+    <span class="flex items-center gap-1.5">
+      <span class="bg-success size-1.5 shrink-0 rounded-full" aria-hidden="true"></span>
+      <span class="text-text-subtle text-sm">{{ status }}</span>
+    </span>
+  }
+</span>

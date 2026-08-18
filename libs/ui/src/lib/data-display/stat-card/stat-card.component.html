@@ -1,0 +1,17 @@
+<ui-card class="h-full" density="compact">
+  <div class="flex w-full items-center justify-between gap-3">
+    <p class="text-text-subtle font-semibold tracking-[0.04em] uppercase">{{ label() }}</p>
+    <svg class="text-text-muted size-4.5 shrink-0" [lucideIcon]="icon()" aria-hidden="true"></svg>
+  </div>
+  <div class="flex flex-col gap-1" [attr.aria-busy]="loading() || null">
+    @if (loading()) {
+      <p class="bg-glass-active h-9 w-16 animate-pulse rounded-sm" aria-hidden="true"></p>
+      <span class="sr-only">Loading {{ label() }}</span>
+    } @else {
+      <p class="font-display text-text text-4xl font-extrabold">{{ value() }}</p>
+      @if (hint(); as hint) {
+        <p class="text-accent">{{ hint }}</p>
+      }
+    }
+  </div>
+</ui-card>

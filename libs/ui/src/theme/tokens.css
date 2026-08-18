@@ -1,8 +1,36 @@
 /* Shared design tokens for admin & web, mapped into Tailwind's theme. */
 @theme {
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    'Noto Sans', sans-serif;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --color-neutral-950: #08071a;
+  --color-neutral-900: #0f0e23;
+  --color-neutral-800: #19182e;
+  --color-neutral-700: #282a40;
+  --color-neutral-600: #3e4357;
+  --color-neutral-500: #64748b;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-300: #bdc8d4;
+  --color-neutral-200: #e2e7ec;
+  --color-neutral-100: #f1f4f7;
+  --color-neutral-50: #f8fafc;
+  --color-neutral-0: #ffffff;
+
+  --color-cyan-100: #e0f4fe;
+  --color-cyan-300: #8ce0fc;
+  --color-cyan-400: #61cffa;
+  --color-cyan-500: #38bdf8;
+  --color-cyan-700: #0284c7;
+  --color-cyan-900: #026194;
+  --color-violet-100: #e0d0fc;
+  --color-violet-300: #a878f5;
+  --color-violet-500: #7c3aed;
+  --color-violet-700: #6022c1;
+  --color-blue-100: #c6d7f8;
+  --color-blue-300: #5180e9;
+  --color-blue-500: #1d4ed8;
+  --color-blue-700: #1538a9;
 
   --color-bg: var(--color-bg-value);
   --color-surface: var(--color-surface-value);
@@ -12,27 +40,76 @@
   --color-accent: var(--color-accent-value);
   --color-accent-hover: var(--color-accent-hover-value);
   --color-error: var(--color-error-value);
+  --color-success: var(--color-success-value);
+  --color-glass: var(--color-glass-value);
+  --color-glass-hover: var(--color-glass-hover-value);
+  --color-glass-active: var(--color-glass-active-value);
+  --color-overlay: var(--color-overlay-value);
+  --color-accent-secondary: var(--color-accent-secondary-value);
+  --color-accent-tertiary: var(--color-accent-tertiary-value);
+  --color-border-subtle: var(--color-border-subtle-value);
+  --color-border-strong: var(--color-border-strong-value);
+  --color-text-subtle: var(--color-text-subtle-value);
+
+  /* Ambient background blobs; identical in both themes. */
+  --color-glow-primary: rgb(2 132 199 / 0.12);
+  --color-glow-secondary: rgb(124 58 237 / 0.08);
+
+  /* Overrides Tailwind's default radius scale with the Figma radius tokens. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
+
+  --blur-glass: 32px;
+  --blur-glow: 120px;
+  --blur-glow-lg: 140px;
+  --shadow-elevation: 0 8px 32px rgb(0 0 0 / 0.24);
 }
 
 /* Semantic values swapped between light/dark; utilities above stay constant. */
 :root {
   --color-bg-value: #ffffff;
-  --color-surface-value: #f6f8fa;
-  --color-text-value: #1f2328;
-  --color-text-muted-value: #57606a;
-  --color-border-value: #d0d7de;
-  --color-accent-value: #1f883d;
-  --color-accent-hover-value: #1a7f37;
-  --color-error-value: #d1242f;
+  --color-surface-value: #f8fafc;
+  --color-text-value: #08071a;
+  --color-text-muted-value: #64748b;
+  --color-border-value: rgb(8 7 26 / 0.15);
+  --color-accent-value: #0284c7;
+  --color-accent-hover-value: #026194;
+  --color-error-value: #dc2626;
+  --color-success-value: #16a34a;
+  --color-glass-value: rgb(8 7 26 / 0.05);
+  --color-glass-hover-value: rgb(8 7 26 / 0.09);
+  --color-glass-active-value: rgb(8 7 26 / 0.15);
+  --color-overlay-value: rgb(248 250 252 / 0.7);
+  --color-accent-secondary-value: #7c3aed;
+  --color-accent-tertiary-value: #1d4ed8;
+  --color-border-subtle-value: rgb(8 7 26 / 0.1);
+  --color-border-strong-value: rgb(8 7 26 / 0.3);
+  /* Figma uses #64748b here; darkened to clear 4.5:1 against --color-bg. */
+  --color-text-subtle-value: #5b6779;
 }
 
 .dark {
-  --color-bg-value: #0d1117;
-  --color-surface-value: #161b22;
-  --color-text-value: #f0f6fc;
-  --color-text-muted-value: #8b949e;
-  --color-border-value: #30363d;
-  --color-accent-value: #238636;
-  --color-accent-hover-value: #2ea043;
-  --color-error-value: #f85149;
+  --color-bg-value: #08071a;
+  --color-surface-value: #0f0e23;
+  --color-text-value: #f8fafc;
+  --color-text-muted-value: #94a3b8;
+  --color-border-value: rgb(255 255 255 / 0.15);
+  --color-accent-value: #38bdf8;
+  --color-accent-hover-value: #61cffa;
+  --color-error-value: #f87171;
+  --color-success-value: #22c55e;
+  --color-glass-value: rgb(255 255 255 / 0.05);
+  --color-glass-hover-value: rgb(255 255 255 / 0.09);
+  --color-glass-active-value: rgb(255 255 255 / 0.15);
+  --color-overlay-value: rgb(8 7 26 / 0.7);
+  --color-accent-secondary-value: #7c3aed;
+  --color-accent-tertiary-value: #1d4ed8;
+  --color-border-subtle-value: rgb(255 255 255 / 0.1);
+  --color-border-strong-value: rgb(255 255 255 / 0.3);
+  /* Figma uses #64748b here; lightened to clear 4.5:1 against --color-bg. */
+  --color-text-subtle-value: #7c8aa0;
 }

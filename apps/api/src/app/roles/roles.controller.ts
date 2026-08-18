@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -18,7 +7,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { SessionAuthGuard } from '../auth/session-auth.guard';
+import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RoleDto } from './dto/role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -47,8 +36,8 @@ export class RolesController {
   @ApiCreatedResponse({ description: 'The created role', type: RoleDto })
   @ApiNotFoundResponse({ description: 'No organization with this id exists' })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  create(@Body() dto: CreateRoleDto) {
-    return this.rolesService.create(dto);
+  create(@Body() dto: CreateRoleDto, @Req() req: RequestWithGithubUser) {
+    return this.rolesService.create(dto, actorOf(req));
   }
 
   @Put(':id')
@@ -58,8 +47,8 @@ export class RolesController {
     description: 'No role, or no organization, with this id exists',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
-    return this.rolesService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateRoleDto, @Req() req: RequestWithGithubUser) {
+    return this.rolesService.update(id, dto, actorOf(req));
   }
 
   @Delete(':id')
@@ -68,7 +57,7 @@ export class RolesController {
   @ApiNoContentResponse({ description: 'The role was deleted' })
   @ApiNotFoundResponse({ description: 'No role with this id exists' })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithGithubUser) {
+    return this.rolesService.remove(id, actorOf(req));
   }
 }

@@ -1,0 +1,11 @@
+<div class="flex items-center gap-2.5">
+  <ng-content select="[sidenavBrand]" />
+</div>
+
+<nav class="flex w-full flex-col gap-2" [attr.aria-label]="label()">
+  <ng-content />
+</nav>
+
+<div class="flex w-full flex-1 flex-col justify-end">
+  <ng-content select="[sidenavFooter]" />
+</div>

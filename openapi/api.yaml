@@ -467,6 +467,83 @@ paths:
         '401':
           description: No valid session
       tags: *ref_6
+  /api/resume/upload-url:
+    post:
+      operationId: ResumeController_createUploadUrl
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResumeUploadUrlDto'
+      responses:
+        '200':
+          description: A short-lived presigned PUT url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeUploadUrlDto'
+        '401':
+          description: No valid session
+      tags: &ref_7
+        - resume
+  /api/resume:
+    put:
+      operationId: ResumeController_confirmUpload
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmResumeUploadDto'
+      responses:
+        '200':
+          description: The stored resume
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeDto'
+        '401':
+          description: No valid session
+      tags: *ref_7
+    get:
+      operationId: ResumeController_findResume
+      parameters: []
+      responses:
+        '200':
+          description: The current resume metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResumeDto'
+        '404':
+          description: No resume uploaded yet
+      tags: *ref_7
+  /api/resume/download:
+    get:
+      operationId: ResumeController_download
+      parameters: []
+      responses:
+        '404':
+          description: No resume uploaded yet
+      tags: *ref_7
+  /api/dashboard/summary:
+    get:
+      operationId: DashboardController_getSummary
+      parameters: []
+      responses:
+        '200':
+          description: Aggregated admin dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummaryDto'
+        '401':
+          description: No valid session
+      tags:
+        - dashboard
 info:
   title: Portfolio API
   description: API documentation for the portfolio backend
@@ -481,8 +558,13 @@ components:
       properties:
         githubUserId:
           type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
       required:
         - githubUserId
+        - displayName
     ProfileDto:
       type: object
       properties:
@@ -652,7 +734,7 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: &ref_7
+          example: &ref_8
             - Angular
             - NestJS
             - Figma
@@ -703,7 +785,7 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: *ref_7
+          example: *ref_8
           type: array
           items:
             type: string
@@ -837,7 +919,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_8
+          enum: &ref_9
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -859,7 +941,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: &ref_9
+          example: &ref_10
             - Angular
             - NestJS
             - Figma
@@ -885,7 +967,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_8
+          enum: *ref_9
           example: FULL_TIME
         startDate:
           type: string
@@ -899,7 +981,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: *ref_9
+          example: *ref_10
           type: array
           items:
             type: string
@@ -942,6 +1024,9 @@ components:
         email:
           type: string
           example: jane.doe@example.com
+        organization:
+          type: string
+          example: Acme Inc.
         subject:
           type: string
           example: Freelance project inquiry
@@ -970,6 +1055,9 @@ components:
         email:
           type: string
           example: jane.doe@example.com
+        organization:
+          type: string
+          example: Acme Inc.
         subject:
           type: string
           example: Freelance project inquiry
@@ -987,3 +1075,130 @@ components:
         - subject
         - message
         - createdAt
+    CreateResumeUploadUrlDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+          enum:
+            - application/pdf
+        fileSize:
+          type: number
+          maximum: 5242880
+      required:
+        - fileName
+        - mimeType
+        - fileSize
+    ResumeUploadUrlDto:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        objectKey:
+          type: string
+      required:
+        - uploadUrl
+        - objectKey
+    ConfirmResumeUploadDto:
+      type: object
+      properties:
+        objectKey:
+          type: string
+        fileName:
+          type: string
+        mimeType:
+          type: string
+          enum:
+            - application/pdf
+        fileSize:
+          type: number
+          maximum: 5242880
+      required:
+        - objectKey
+        - fileName
+        - mimeType
+        - fileSize
+    ResumeDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileSize:
+          type: number
+        uploadedAt:
+          format: date-time
+          type: string
+      required:
+        - fileName
+        - mimeType
+        - fileSize
+        - uploadedAt
+    ActivityEntity:
+      type: string
+      enum:
+        - PROFILE
+        - PROJECT
+        - ROLE
+        - ORGANIZATION
+        - RESUME
+    ActivityAction:
+      type: string
+      enum:
+        - CREATED
+        - UPDATED
+        - DELETED
+    ActivityEntryDto:
+      type: object
+      properties:
+        id:
+          type: string
+        entityType:
+          allOf:
+            - $ref: '#/components/schemas/ActivityEntity'
+        entityId:
+          type: string
+        action:
+          allOf:
+            - $ref: '#/components/schemas/ActivityAction'
+        summary:
+          type: string
+        actor:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - entityType
+        - action
+        - summary
+        - createdAt
+    DashboardSummaryDto:
+      type: object
+      properties:
+        totalProjects:
+          type: number
+        totalSkills:
+          type: number
+        yearsExperience:
+          type: number
+          description: Whole years since the earliest role start date
+        experienceStartDate:
+          format: date-time
+          type: string
+          description: Start date of the earliest role
+        resumeDownloadsLast30Days:
+          type: number
+        recentActivity:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityEntryDto'
+      required:
+        - totalProjects
+        - totalSkills
+        - resumeDownloadsLast30Days
+        - recentActivity

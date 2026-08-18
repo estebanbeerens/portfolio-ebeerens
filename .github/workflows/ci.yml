@@ -18,6 +18,20 @@ env:
 jobs:
   main:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v7
         with:
@@ -34,13 +48,17 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: "npm"
+          cache: 'npm'
 
       - run: npm ci
+      - run: npm install --global @fission-ai/openspec@1.9.0
+      - run: npm run spec:validate
+      - run: npx prisma migrate deploy
+      - run: npx playwright install --with-deps
 
       # Prepend any command with "nx record --" to record its logs to Nx Cloud
       # - run: npx nx record -- echo Hello World
-      - run: npx nx affected -t lint test build
+      - run: npx nx affected -t lint test build e2e
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
       - run: npx nx fix-ci
         if: always()

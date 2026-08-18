@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -19,7 +8,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { SessionAuthGuard } from '../auth/session-auth.guard';
+import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectDto } from './dto/project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -50,8 +39,8 @@ export class ProjectsController {
     description: 'A project with this slug already exists',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  create(@Body() dto: CreateProjectDto) {
-    return this.projectsService.create(dto);
+  create(@Body() dto: CreateProjectDto, @Req() req: RequestWithGithubUser) {
+    return this.projectsService.create(dto, actorOf(req));
   }
 
   @Put(':id')
@@ -62,8 +51,8 @@ export class ProjectsController {
     description: 'A project with this slug already exists',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
-    return this.projectsService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateProjectDto, @Req() req: RequestWithGithubUser) {
+    return this.projectsService.update(id, dto, actorOf(req));
   }
 
   @Delete(':id')
@@ -72,7 +61,7 @@ export class ProjectsController {
   @ApiNoContentResponse({ description: 'The project was deleted' })
   @ApiNotFoundResponse({ description: 'No project with this id exists' })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithGithubUser) {
+    return this.projectsService.remove(id, actorOf(req));
   }
 }

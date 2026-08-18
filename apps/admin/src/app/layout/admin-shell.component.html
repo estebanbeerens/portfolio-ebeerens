@@ -1,0 +1,70 @@
+<div class="bg-bg text-text relative flex min-h-dvh">
+  <ui-ambient-backdrop />
+
+  <a
+    href="#main"
+    class="bg-surface text-text focus-visible:outline-accent sr-only rounded-md px-4 py-2 focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus-visible:outline-2"
+  >
+    Skip to main content
+  </a>
+
+  @if (navOpen()) {
+    <button
+      type="button"
+      class="bg-overlay fixed inset-0 z-30 md:hidden"
+      aria-label="Close navigation"
+      (click)="closeNav()"
+    ></button>
+  }
+
+  <ui-sidenav label="Admin sections" [open]="navOpen()" (closed)="closeNav()">
+    <a
+      sidenavBrand
+      routerLink="/dashboard"
+      class="focus-visible:outline-accent flex items-center gap-2.5 no-underline focus-visible:outline-2 focus-visible:outline-offset-2"
+      (click)="closeNav()"
+    >
+      <span class="bg-accent size-2.5 shrink-0 rounded-full" aria-hidden="true"></span>
+      <span class="font-display text-text text-lg font-bold">{{ adminName() }}</span>
+    </a>
+
+    @for (item of navItems; track item.route) {
+      <a uiNavItem [routerLink]="item.route" [icon]="item.icon" [active]="isActive(item.route)" (click)="closeNav()">{{
+        item.label
+      }}</a>
+    }
+
+    <div sidenavFooter class="flex w-full flex-col gap-3">
+      <div class="flex items-center gap-2">
+        <ui-theme-toggle />
+        <button
+          type="button"
+          class="border-border bg-surface text-text hover:bg-bg focus-visible:outline-accent inline-flex h-full flex-1 items-center justify-center gap-2 rounded-md border px-3 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+          (click)="logout()"
+        >
+          <svg class="size-4" [lucideIcon]="logoutIcon" aria-hidden="true"></svg>
+          Log out
+        </button>
+      </div>
+      <ui-user-badge [name]="adminName()" [avatarUrl]="adminAvatarUrl()" status="Admin Session" />
+    </div>
+  </ui-sidenav>
+
+  <div class="relative z-10 flex min-w-0 flex-1 flex-col">
+    <div class="flex items-center gap-3 px-6 pt-6 md:hidden">
+      <button
+        type="button"
+        class="border-border bg-surface text-text focus-visible:outline-accent inline-flex items-center justify-center rounded-md border p-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+        aria-label="Open navigation"
+        [attr.aria-expanded]="navOpen()"
+        (click)="toggleNav()"
+      >
+        <svg class="size-4" [lucideIcon]="menuIcon" aria-hidden="true"></svg>
+      </button>
+    </div>
+
+    <main id="main" class="flex min-w-0 flex-1 flex-col gap-8 p-6 md:p-10">
+      <router-outlet />
+    </main>
+  </div>
+</div>

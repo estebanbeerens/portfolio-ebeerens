@@ -56,5 +56,6 @@ description: 'Build and modify Angular frontend code in this Nx workspace (admin
 - `effect()` over manual `.subscribe()` for reacting to signal/resource changes with a side effect
 - New control-flow (`@if`/`@for`/`@switch`) over structural directives
 - SSR-guard any direct browser API access — prefer gating a resource's `params` to `undefined` over an `isPlatformBrowser` early-return where the SSR-unsafe work is itself an async fetch
-- Selector prefix/casing must match `eslint.config.mjs` (`app-*` kebab-case elements, `app*` camelCase attributes) — don't fight the lint config, fix the name instead
+- Use `undefined`, not `null`, for "this value is simply not present". Optional inputs are `input<string>()` (defaults to `undefined`), never `input<string | null>(null)`; `computed()` accessors return `undefined` when there's nothing to show. Reserve `null` for the two cases where a framework or wire format demands it: Angular attribute bindings (`'[attr.aria-current]': "active() ? 'page' : null"` removes the attribute) and JSON payloads where `null` is a meaningful value. Normalize at the boundary with `?? undefined` as soon as a `null` enters from the API client
+- Selector prefix/casing must match the project's `eslint.config.mjs` — `ui-*`/`admin-*`/`web-*` kebab-case elements and `ui*`/`admin*`/`web*` camelCase attributes; don't fight the lint config, fix the name instead
 - Every component/service ships with a co-located spec file

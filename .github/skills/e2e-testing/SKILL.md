@@ -7,6 +7,11 @@ description: "Write, modify, and run end-to-end tests across this Nx workspace's
 
 ## When to Use
 
+- Treat e2e coverage as part of implementation, not a follow-up task. Changes affecting `api`, `admin`, or `web` must add or update the relevant e2e spec and run that target before completion.
+- Admin and web behavior requires a Playwright spec and Playwright validation; API HTTP behavior requires `api-e2e` validation.
+- Authenticated flows require a test fixture or test-only session setup. Never weaken the production auth guard to make e2e pass.
+- A unit test, lint, or build does not replace e2e validation for an affected application boundary.
+
 - Writing or modifying an e2e spec in `admin-e2e`, `web-e2e`, or `api-e2e`
 - Deciding how to structure a new e2e test (locators, fixtures, HTTP assertions)
 - Running e2e tests, debugging failures, or wiring up test infra (webServer, global-setup)
@@ -59,7 +64,7 @@ Quick steps:
 - API e2e specs assert on status code **and** response shape, not just "2xx"
 - Don't hardcode ports/hosts — reuse `process.env.HOST`/`PORT` (already wired in `api-e2e`'s setup) or Playwright's `baseURL`
 - Scaffolding a brand-new e2e project? Use the `nx-generate` skill rather than hand-rolling config
-- CI runs `nx affected -t e2e` on every push (see the `infrastructure-deployment` skill's CI quality gates) — keep specs green locally before pushing, since a flaky e2e spec blocks the pipeline for everyone
+- CI runs `nx affected -t e2e` on every push after the required services and Playwright browsers are installed — keep specs green locally before pushing, since a flaky e2e spec blocks the pipeline for everyone.
 
 ## Reference Files
 

@@ -41,6 +41,7 @@ description: 'Build and extend the NestJS backend in this Nx workspace (apps/api
 - Request DTOs combine `class-validator` decorators (`@IsString()`, `@IsOptional()`, ...) with `@ApiProperty()`; response DTOs are plain `@ApiProperty()` shapes
 - A global `ValidationPipe({ whitelist: true, transform: true })` is already enabled in `main.ts` — every request DTO's `class-validator` decorators are enforced automatically
 - Never return a Prisma model with sensitive fields directly from a controller (e.g. `Session.tokenHash`) — map it to a DTO
+- Use `undefined`, not `null`, for "this value is simply not present" in application code — optional DTO fields are `avatarUrl?: string` with `@ApiPropertyOptional()`, and helper methods return `undefined` rather than `null` when there is no result. `null` belongs only at the storage boundary: Prisma's nullable columns have no `undefined`, so convert with `?? null` when writing and `?? undefined` when reading a row back out
 - Read secrets via `process.env`; never hardcode connection strings or tokens
 - Every public route should carry Swagger decorators — an undocumented route is a review flag
 

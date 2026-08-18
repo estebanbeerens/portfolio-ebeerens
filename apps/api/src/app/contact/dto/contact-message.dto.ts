@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ContactMessageDto {
   @ApiProperty({
@@ -12,6 +12,9 @@ export class ContactMessageDto {
 
   @ApiProperty({ example: 'jane.doe@example.com' })
   email: string;
+
+  @ApiPropertyOptional({ example: 'Acme Inc.' })
+  organization?: string;
 
   @ApiProperty({ example: 'Freelance project inquiry' })
   subject: string;

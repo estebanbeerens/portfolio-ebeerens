@@ -1,8 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('/');
+test('shows the GitHub login entry point', async ({ page }) => {
+  await page.goto('/login');
 
-  // Expect h1 to contain a substring.
-  expect(await page.locator('h1').innerText()).toContain('Welcome');
+  await expect(page.getByRole('link', { name: 'Log in with GitHub' })).toBeVisible();
 });

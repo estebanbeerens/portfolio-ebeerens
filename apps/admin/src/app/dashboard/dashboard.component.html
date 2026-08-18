@@ -1,0 +1,48 @@
+<ui-page-header title="Dashboard" subtitle="Overview of your portfolio telemetry and content state." />
+
+<div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+  @for (stat of stats(); track stat.label) {
+    <ui-stat-card
+      [label]="stat.label"
+      [value]="stat.value"
+      [hint]="stat.hint"
+      [icon]="stat.icon"
+      [loading]="isLoading()"
+    />
+  }
+</div>
+
+<div class="flex w-full min-w-0 flex-1 flex-col gap-6 lg:flex-row">
+  <ui-card class="min-w-0 flex-1" heading="Recent Updates">
+    @if (hasError()) {
+      <p class="text-text-muted">
+        Couldn't load recent updates.
+        <button type="button" class="text-accent underline" (click)="reload()">Try again</button>
+      </p>
+    } @else if (isLoading()) {
+      <p class="text-text-muted">Loading recent updates…</p>
+    } @else if (activity().length === 0) {
+      <p class="text-text-muted">No changes recorded yet.</p>
+    } @else {
+      <ui-activity-list>
+        @for (entry of activity(); track entry.id) {
+          <ui-activity-item
+            [icon]="entry.icon"
+            [title]="entry.title"
+            [meta]="(entry.at | uiRelativeTime) + (entry.actor ? ' · ' + entry.actor : '')"
+          />
+        }
+      </ui-activity-list>
+    }
+  </ui-card>
+
+  <ui-card class="w-full lg:w-85 lg:shrink-0" heading="Quick Actions">
+    <div class="flex w-full flex-col gap-3">
+      @for (action of quickActions; track action.label) {
+        <a uiQuickAction [routerLink]="action.route" [icon]="action.icon" [description]="action.description">{{
+          action.label
+        }}</a>
+      }
+    </div>
+  </ui-card>
+</div>

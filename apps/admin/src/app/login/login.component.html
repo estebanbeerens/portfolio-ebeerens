@@ -1,0 +1,34 @@
+<main class="bg-bg text-text relative flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
+  <ui-ambient-backdrop />
+
+  <div class="relative z-10 flex flex-col items-center gap-4">
+    <ui-theme-toggle />
+
+    @switch (authState()) {
+      @case ('checking') {
+        <p>Checking session…</p>
+      }
+      @case ('loggedOut') {
+        @if (unauthorized) {
+          <p class="text-error max-w-96">This GitHub account isn't authorized to access this admin panel.</p>
+        }
+        <a
+          href="/api/auth/github"
+          class="bg-accent hover:bg-accent-hover focus-visible:outline-accent inline-block rounded-md px-6 py-3 font-semibold text-white no-underline focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Log in with GitHub
+        </a>
+      }
+      @case ('authenticated') {
+        <p>Logged in as {{ displayName() ?? 'Administrator' }}</p>
+        <a
+          routerLink="/dashboard"
+          class="bg-accent hover:bg-accent-hover focus-visible:outline-accent inline-block rounded-md px-6 py-3 font-semibold text-white no-underline focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Go to dashboard
+        </a>
+        <button type="button" class="text-text-muted hover:text-text underline" (click)="logout()">Log out</button>
+      }
+    }
+  </div>
+</main>

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -19,7 +8,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { SessionAuthGuard } from '../auth/session-auth.guard';
+import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { OrganizationDto } from './dto/organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -56,8 +45,8 @@ export class OrganizationsController {
     description: 'An organization with this name already exists',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  create(@Body() dto: CreateOrganizationDto) {
-    return this.organizationsService.create(dto);
+  create(@Body() dto: CreateOrganizationDto, @Req() req: RequestWithGithubUser) {
+    return this.organizationsService.create(dto, actorOf(req));
   }
 
   @Put(':id')
@@ -71,8 +60,8 @@ export class OrganizationsController {
     description: 'An organization with this name already exists',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  update(@Param('id') id: string, @Body() dto: UpdateOrganizationDto) {
-    return this.organizationsService.update(id, dto);
+  update(@Param('id') id: string, @Body() dto: UpdateOrganizationDto, @Req() req: RequestWithGithubUser) {
+    return this.organizationsService.update(id, dto, actorOf(req));
   }
 
   @Delete(':id')
@@ -84,7 +73,7 @@ export class OrganizationsController {
     description: 'The organization still has roles referencing it',
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  remove(@Param('id') id: string) {
-    return this.organizationsService.remove(id);
+  remove(@Param('id') id: string, @Req() req: RequestWithGithubUser) {
+    return this.organizationsService.remove(id, actorOf(req));
   }
 }

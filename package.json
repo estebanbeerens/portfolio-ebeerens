@@ -5,9 +5,14 @@
   "scripts": {
     "postinstall": "npx prisma generate",
     "studio": "npx prisma studio",
+    "spec:doctor": "openspec doctor --json",
+    "spec:validate": "openspec validate --all --strict --json",
     "build:openapispec": "npx nx run api:export-openapi",
     "generate:api-client": "npx openapi-generator-cli generate -i openapi/api.yaml -g typescript-angular -o libs/api-client/src/generated -c libs/api-client/openapi-generator-config.json && rm -f libs/api-client/src/generated/package.json libs/api-client/src/generated/tsconfig.json libs/api-client/src/generated/ng-package.json libs/api-client/src/generated/git_push.sh",
     "build:api-client": "npx npm run generate:api-client && nx build api-client",
+    "serve": "nx run-many --target=serve --all --maxParallel=10",
+    "serve:admin": "nx run-many --target=serve --projects=api,admin --maxParallel=10",
+    "serve:web": "nx run-many --target=serve --projects=api,web --maxParallel=10",
     "prepare": "husky"
   },
   "private": true,
@@ -93,6 +98,8 @@
     "@angular/platform-server": "~22.0.4",
     "@angular/router": "~22.0.4",
     "@angular/ssr": "~22.0.4",
+    "@aws-sdk/client-s3": "^3.1112.0",
+    "@aws-sdk/s3-request-presigner": "^3.1112.0",
     "@lucide/angular": "^1.31.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",

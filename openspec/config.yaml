@@ -1,0 +1,36 @@
+schema: spec-driven
+
+context: |
+  This is an npm-managed Nx 23 monorepo containing Angular 22 SSR apps in apps/admin and apps/web, a NestJS 11 API in apps/api, and shared libraries in libs/.
+  The backend uses Prisma 7 with PostgreSQL. The frontend uses standalone Angular components, signals, OnPush change detection, Tailwind CSS 4 tokens, and the shared UI library.
+  openapi/api.yaml is the committed API contract. Keep it synchronized with NestJS Swagger output, regenerate libs/api-client from it, and use the generated client in admin and web rather than handwritten API calls.
+  Use Nx through npm/npx commands. Relevant validation uses Nx lint, test, build, and e2e targets; API contract changes require api:export-openapi followed by client generation and build.
+  User-facing Angular changes must meet WCAG 2.2 AA, remain SSR-safe, and include focused co-located Vitest tests. API changes should include focused Jest or API e2e coverage where behavior crosses the HTTP boundary.
+  Any change affecting apps/api, apps/admin, or apps/web must add or update the relevant e2e coverage in the same change. Admin and web UI behavior requires Playwright validation; API HTTP behavior requires api-e2e validation, and authenticated flows must use a test fixture without weakening production guards.
+  Use undefined when a value is absent in application code and optional API properties; use null only when deliberate JSON null has meaning or a framework/storage boundary requires it.
+  The architecture and build guides in docs/ are background references and roadmaps. Do not replace them or backfill them wholesale into OpenSpec. OpenSpec captures behavioral intent and change deltas; OpenAPI remains the executable API contract.
+
+rules:
+  proposal:
+    - State the user-visible outcome, affected application boundaries, and explicit non-goals.
+    - Reference existing modules and contracts before proposing new abstractions.
+  specs:
+    - Use concrete SHALL requirements and GIVEN/WHEN/THEN scenarios.
+    - Describe behavior and acceptance criteria, not implementation details that belong in design.md.
+  design:
+    - Identify the owning Nx projects and existing abstractions to reuse.
+    - Include API contract, generated-client, accessibility, SSR, and test implications when relevant.
+  tasks:
+    - Keep tasks small, ordered by dependency, and name the owning project or file area.
+    - Include focused validation commands and any required OpenAPI/client regeneration steps.
+    - Include the affected e2e target and a Playwright run for admin/web behavior; do not treat unit tests or builds as a substitute.
+
+operations:
+  apply:
+    guidance:
+      - Preserve unrelated user changes in the worktree and keep implementation scoped to the active change.
+      - Run the narrowest executable validation after each substantive edit, then the relevant Nx targets.
+  archive:
+    guidance:
+      - Confirm the implementation and focused tests are complete before archiving.
+      - Preserve the resulting durable capability spec and keep archived change history reviewable.

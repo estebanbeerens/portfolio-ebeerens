@@ -35,6 +35,7 @@ description: 'Maintain openapi/api.yaml as the single source of truth for the AP
 
 - Every PR that changes an endpoint also changes `openapi/api.yaml` in the same diff — never let them fall out of sync
 - Never hand-edit generated client output — regenerate instead
+- Model an absent value as an **optional property that is omitted** (leave it out of `required`), not as `nullable: true`. `nullable: true` generates `string | null | undefined` in the client, which forces every consumer to handle three states and collides with the repo's "`undefined` means absent" rule. Reserve `nullable: true` for fields where `null` is a deliberate, meaningful JSON value (e.g. clearing a stored value in a PATCH body)
 - `web` and `admin` both import from the **one** shared `libs/api-client` library — no duplicated hand-written HTTP call code for API endpoints
 - The drift check (backend Swagger doc vs. committed `openapi/api.yaml`) should eventually run in CI, not just locally
 - Direct-to-storage requests (e.g. presigned R2 uploads from the `image-storage-r2` skill) are **not** part of this client — those aren't your API's endpoints

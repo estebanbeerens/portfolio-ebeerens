@@ -2,15 +2,13 @@
   "name": "web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "app",
+  "prefix": "web",
   "sourceRoot": "apps/web/src",
   "tags": [],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/web",
@@ -22,9 +20,7 @@
             "input": "apps/web/public"
           }
         ],
-        "styles": [
-          "apps/web/src/styles.css"
-        ],
+        "styles": ["apps/web/src/styles.css"],
         "server": "apps/web/src/main.server.ts",
         "ssr": {
           "entry": "apps/web/src/server.ts"

@@ -20,4 +20,10 @@
 - DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
+## End-to-end validation
+
+- Any change affecting `apps/api`, `apps/admin`, or `apps/web` must add or update the relevant e2e coverage in the same change.
+- Run the affected e2e target before considering the change complete: use Playwright for admin/web UI flows and the API e2e target for HTTP behavior.
+- User-facing admin and web changes require a Playwright validation run using semantic locators; a unit test or build alone is not sufficient.
+
 <!-- nx configuration end-->

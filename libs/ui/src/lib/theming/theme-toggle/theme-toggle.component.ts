@@ -3,7 +3,7 @@ import { ThemeService } from '../theme.service';
 import { LucideDynamicIcon, LucideSun, LucideMoon } from '@lucide/angular';
 
 @Component({
-  selector: 'lib-theme-toggle',
+  selector: 'ui-theme-toggle',
   imports: [LucideDynamicIcon],
   templateUrl: './theme-toggle.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

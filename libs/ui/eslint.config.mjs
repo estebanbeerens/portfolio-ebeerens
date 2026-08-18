@@ -12,7 +12,7 @@ export default [
         'error',
         {
           type: 'attribute',
-          prefix: 'lib',
+          prefix: 'ui',
           style: 'camelCase',
         },
       ],
@@ -20,8 +20,22 @@ export default [
         'error',
         {
           type: 'element',
-          prefix: 'lib',
+          prefix: 'ui',
           style: 'kebab-case',
+        },
+      ],
+    },
+  },
+  {
+    // Components that render onto a host <a>/<button> so the app can own routerLink/href.
+    files: ['**/nav-item/*.ts', '**/quick-action/*.ts'],
+    rules: {
+      '@angular-eslint/component-selector': [
+        'error',
+        {
+          type: 'attribute',
+          prefix: 'ui',
+          style: 'camelCase',
         },
       ],
     },

@@ -23,9 +23,9 @@ export class ContactService {
   async create(dto: CreateContactMessageDto) {
     await this.verifyRecaptcha(dto.recaptchaToken);
 
-    const { fullName, email, subject, message } = dto;
+    const { fullName, email, organization, subject, message } = dto;
     return this.prisma.contactMessage.create({
-      data: { fullName, email, subject, message },
+      data: { fullName, email, organization: organization ?? null, subject, message },
     });
   }
 

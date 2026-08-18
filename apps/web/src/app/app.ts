@@ -4,7 +4,7 @@ import { ThemeToggle } from '@portfolio-ebeerens/ui';
 
 @Component({
   imports: [RouterModule, ThemeToggle],
-  selector: 'app-root',
+  selector: 'web-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

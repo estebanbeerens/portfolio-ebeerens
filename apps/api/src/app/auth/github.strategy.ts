@@ -17,12 +17,16 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   validate(
     accessToken: string,
     refreshToken: string,
-    profile: Profile,
-  ): { githubUserId: string } | null {
+    profile: Profile
+  ): { githubUserId: string; displayName: string; avatarUrl?: string } | undefined {
     const githubUserId = profile.id;
     if (githubUserId !== process.env.ADMIN_GITHUB_ID) {
-      return null;
+      return undefined;
     }
-    return { githubUserId };
+    return {
+      githubUserId,
+      displayName: profile.displayName || profile.username || githubUserId,
+      avatarUrl: profile.photos?.[0]?.value,
+    };
   }
 }

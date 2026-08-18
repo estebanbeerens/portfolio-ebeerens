@@ -8,21 +8,27 @@ describe('Auth-guarded routes without a session cookie', () => {
   });
 
   it('PUT /api/profile returns 401', async () => {
-    const res = await axios.put(
-      '/api/profile',
-      {},
-      { validateStatus: () => true },
-    );
+    const res = await axios.put('/api/profile', {}, { validateStatus: () => true });
 
     expect(res.status).toBe(401);
   });
 
   it('POST /api/projects returns 401', async () => {
-    const res = await axios.post(
-      '/api/projects',
-      {},
-      { validateStatus: () => true },
-    );
+    const res = await axios.post('/api/projects', {}, { validateStatus: () => true });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('GET /api/dashboard/summary returns 401', async () => {
+    const res = await axios.get('/api/dashboard/summary', {
+      validateStatus: () => true,
+    });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /api/resume/upload-url returns 401', async () => {
+    const res = await axios.post('/api/resume/upload-url', {}, { validateStatus: () => true });
 
     expect(res.status).toBe(401);
   });

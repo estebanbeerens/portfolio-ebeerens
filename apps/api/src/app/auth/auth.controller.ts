@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiExcludeEndpoint,
@@ -40,8 +31,11 @@ export class AuthController {
   @ApiExcludeEndpoint()
   @UseGuards(GithubAuthGuard)
   async githubCallback(
-    @Req() req: RequestWithGithubUser & { user?: { githubUserId: string } },
-    @Res() res: Response,
+    @Req()
+    req: RequestWithGithubUser & {
+      user?: { githubUserId: string; displayName: string; avatarUrl?: string };
+    },
+    @Res() res: Response
   ) {
     const adminAppUrl = process.env.ADMIN_APP_URL;
     if (!req.user) {
@@ -50,6 +44,8 @@ export class AuthController {
 
     const { token, expiresAt } = await this.authService.createSession(
       req.user.githubUserId,
+      req.user.displayName,
+      req.user.avatarUrl
     );
     res.cookie(SESSION_COOKIE, token, {
       httpOnly: true,
@@ -79,6 +75,10 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
   me(@Req() req: RequestWithGithubUser): MeResponseDto {
-    return { githubUserId: req.githubUserId as string };
+    return {
+      githubUserId: req.githubUserId as string,
+      displayName: req.displayName ?? (req.githubUserId as string),
+      avatarUrl: req.avatarUrl,
+    };
   }
 }
