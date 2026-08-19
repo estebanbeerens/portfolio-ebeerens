@@ -1,0 +1,131 @@
+<ui-card
+  class="w-full origin-top transition-all duration-300 ease-out xl:w-152 xl:shrink-0 starting:-translate-y-2 starting:opacity-0"
+  [heading]="isEditing() ? 'Edit project' : 'New project'"
+>
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="text-text-muted text-xs"><span aria-hidden="true" class="text-error">*</span> Required field</p>
+
+    <ui-input
+      controlId="project-title"
+      label="Title"
+      formControlName="title"
+      [required]="true"
+      [error]="fieldInvalid('title') ? 'Enter a title.' : undefined"
+    />
+
+    <ui-input
+      controlId="project-slug"
+      label="Slug"
+      formControlName="slug"
+      [required]="true"
+      hint="Lowercase words separated by hyphens."
+      [error]="fieldInvalid('slug') ? 'Use a lowercase, hyphen-separated slug.' : undefined"
+    />
+
+    <ui-textarea
+      controlId="project-short-description"
+      label="Short description"
+      formControlName="shortDescription"
+      [required]="true"
+      [maxlength]="255"
+      hint="A concise summary, up to 255 characters."
+      [error]="fieldInvalid('shortDescription') ? 'Enter a short description of 255 characters or fewer.' : undefined"
+    />
+
+    <div>
+      <label class="text-sm font-medium" for="project-description">
+        Description <span aria-hidden="true" class="text-error">*</span><span class="sr-only"> required</span>
+      </label>
+      <p class="text-text-muted mt-1 text-xs">Markdown is supported (headings, bold, lists, links...).</p>
+      <div class="border-border mt-1 flex gap-1 border-b" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="rounded-t px-3 py-2 text-xs font-semibold"
+          [class.text-accent]="descriptionView() === 'markdown'"
+          [class.border-accent]="descriptionView() === 'markdown'"
+          [class.border-b-2]="descriptionView() === 'markdown'"
+          [class.text-text-muted]="descriptionView() !== 'markdown'"
+          [attr.aria-selected]="descriptionView() === 'markdown'"
+          aria-controls="project-description-panel"
+          (click)="descriptionView.set('markdown')"
+        >
+          Markdown
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="rounded-t px-3 py-2 text-xs font-semibold"
+          [class.text-accent]="descriptionView() === 'preview'"
+          [class.border-accent]="descriptionView() === 'preview'"
+          [class.border-b-2]="descriptionView() === 'preview'"
+          [class.text-text-muted]="descriptionView() !== 'preview'"
+          [attr.aria-selected]="descriptionView() === 'preview'"
+          aria-controls="project-description-panel"
+          (click)="descriptionView.set('preview')"
+        >
+          Preview
+        </button>
+      </div>
+      <div id="project-description-panel" role="tabpanel">
+        @if (descriptionView() === 'markdown') {
+          <textarea
+            id="project-description"
+            class="border-border bg-surface min-h-48 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm"
+            formControlName="description"
+            required
+          ></textarea>
+        } @else {
+          <div class="border-border bg-surface-raised min-h-48 overflow-auto rounded-b border border-t-0 p-3">
+            <markdown [data]="form.controls.description.value" ngPreserveWhitespaces />
+          </div>
+        }
+      </div>
+      @if (fieldInvalid('description')) {
+        <p class="text-error mt-1 text-xs">Enter a description.</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <ui-input
+        controlId="project-start-date"
+        label="Start date"
+        type="date"
+        formControlName="startDate"
+        [required]="true"
+        [error]="fieldInvalid('startDate') ? 'Enter a start date.' : undefined"
+      />
+      <ui-input controlId="project-end-date" label="End date" type="date" formControlName="endDate" />
+    </div>
+
+    <div>
+      <ui-tag-combobox
+        formControlName="skills"
+        label="Skills"
+        placeholder="Select or add a skill..."
+        [options]="skillOptions()"
+      />
+      <p class="text-text-muted mt-1 text-xs">Pick an existing skill or type a new one and press Enter.</p>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <ui-input controlId="project-client" label="Client" formControlName="client" />
+      <ui-input controlId="project-role" label="Job role" formControlName="jobRole" />
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <ui-input controlId="project-image-url" label="Image URL" type="url" formControlName="imageUrl" />
+      <ui-input controlId="project-live-url" label="Live URL" type="url" formControlName="liveUrl" />
+    </div>
+
+    @if (formError(); as error) {
+      <p class="text-error text-xs" role="alert">{{ error }}</p>
+    }
+    <div class="flex justify-end gap-2">
+      <button uiButton variant="outlined" type="button" (click)="cancelled.emit()">Cancel</button>
+      <button uiButton type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Save project' }}
+      </button>
+    </div>
+  </form>
+</ui-card>

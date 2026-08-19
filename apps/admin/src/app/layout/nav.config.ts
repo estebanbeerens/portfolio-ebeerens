@@ -1,4 +1,11 @@
-import { LucideBriefcase, LucideFolder, LucideLayoutGrid, LucideUser, type LucideIconInput } from '@lucide/angular';
+import {
+  LucideBriefcase,
+  LucideFlag,
+  LucideFolder,
+  LucideLayoutGrid,
+  LucideUser,
+  type LucideIconInput,
+} from '@lucide/angular';
 
 export interface AdminNavItem {
   readonly label: string;
@@ -11,4 +18,5 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   { label: 'Basic Info', route: '/basic-info', icon: LucideUser },
   { label: 'Professional Journey', route: '/professional-journey', icon: LucideBriefcase },
   { label: 'Projects', route: '/projects', icon: LucideFolder },
+  { label: 'Feature Flags', route: '/feature-flags', icon: LucideFlag },
 ];

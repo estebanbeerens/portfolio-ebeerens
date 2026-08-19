@@ -92,4 +92,24 @@ describe('Dashboard', () => {
       DASHBOARD_QUICK_ACTIONS.length
     );
   });
+
+  it('fetches fresh data on every navigation to the route instead of reusing a stale singleton', async () => {
+    const getSummary = vi
+      .fn()
+      .mockReturnValueOnce(of(summary))
+      .mockReturnValueOnce(of({ ...summary, totalProjects: 9 }));
+    configure({ dashboardControllerGetSummary: getSummary as never });
+
+    const first = TestBed.createComponent(Dashboard);
+    await first.whenStable();
+    expect((first.nativeElement as HTMLElement).textContent).toContain('8');
+    first.destroy();
+
+    // Simulates navigating away and back: a new routed component instance gets its own DashboardDataService.
+    const second = TestBed.createComponent(Dashboard);
+    await second.whenStable();
+
+    expect(getSummary).toHaveBeenCalledTimes(2);
+    expect((second.nativeElement as HTMLElement).textContent).toContain('9');
+  });
 });

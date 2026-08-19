@@ -74,11 +74,14 @@
   --color-bg-value: #ffffff;
   --color-surface-value: #f8fafc;
   --color-text-value: #08071a;
-  --color-text-muted-value: #64748b;
+  /* Figma uses #64748b here; darkened to clear 4.5:1 against the glass Card background near the ambient glow blobs. */
+  --color-text-muted-value: #596980;
   --color-border-value: rgb(8 7 26 / 0.15);
-  --color-accent-value: #0284c7;
+  /* Figma uses #0284c7 here; darkened so white filled-button text clears 4.5:1 (was 4.09:1). */
+  --color-accent-value: #026fa8;
   --color-accent-hover-value: #026194;
-  --color-error-value: #dc2626;
+  /* Figma uses #dc2626 here; darkened so danger-outlined button text clears 4.5:1 over the tinted glass background. */
+  --color-error-value: #b91c1c;
   --color-success-value: #16a34a;
   --color-glass-value: rgb(8 7 26 / 0.05);
   --color-glass-hover-value: rgb(8 7 26 / 0.09);

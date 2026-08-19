@@ -33,12 +33,14 @@ description: 'Build and modify Angular frontend code in this Nx workspace (admin
 9. **New control-flow syntax.** Use `@if`/`@for`/`@switch` in templates — never `*ngIf`/`*ngFor`. Drop `CommonModule` from `imports` if nothing else in it is used.
 10. **File conventions.** `templateUrl`/`styleUrl` (singular — this repo doesn't use inline templates or `styleUrls` arrays).
 11. **SSR-safety.** Since both apps render on the server, never touch `window`/`document`/`localStorage` directly in a component/service without an `isPlatformBrowser()` guard (`@angular/common`) — it will crash SSR rendering.
-12. **Write the spec.** See [Vitest testing conventions](./references/vitest-testing.md) — every component/service gets a co-located `*.spec.ts`.
-13. **Verify:** `npx nx test <admin|web>`, `npx nx build <admin|web>`, `npx nx lint <admin|web>`
+12. **Split container vs. presentational when a component grows.** If a component both fetches/mutates data _and_ owns a nontrivial form or list, split it into a container (state, API calls, business logic) plus presentational children (`input()`/`output()`, no `libs/api-client` injection). See [Container vs. presentational components](./references/component-composition.md).
+13. **Write the spec.** See [Vitest testing conventions](./references/vitest-testing.md) — every component/service gets a co-located `*.spec.ts`.
+14. **Verify:** `npx nx test <admin|web>`, `npx nx build <admin|web>`, `npx nx lint <admin|web>`
 
 ## Reference Files
 
 - [Angular 22 patterns](./references/angular-patterns.md) — signals, control flow, inputs/outputs, SSR guards with code examples
+- [Container vs. presentational components](./references/component-composition.md) — when to split, responsibilities, output naming, form-reset pattern
 - [Vitest testing conventions](./references/vitest-testing.md) — TestBed setup, globals, async rendering, running tests
 
 ## Related Skills
@@ -59,3 +61,4 @@ description: 'Build and modify Angular frontend code in this Nx workspace (admin
 - Use `undefined`, not `null`, for "this value is simply not present". Optional inputs are `input<string>()` (defaults to `undefined`), never `input<string | null>(null)`; `computed()` accessors return `undefined` when there's nothing to show. Reserve `null` for the two cases where a framework or wire format demands it: Angular attribute bindings (`'[attr.aria-current]': "active() ? 'page' : null"` removes the attribute) and JSON payloads where `null` is a meaningful value. Normalize at the boundary with `?? undefined` as soon as a `null` enters from the API client
 - Selector prefix/casing must match the project's `eslint.config.mjs` — `ui-*`/`admin-*`/`web-*` kebab-case elements and `ui*`/`admin*`/`web*` camelCase attributes; don't fight the lint config, fix the name instead
 - Every component/service ships with a co-located spec file
+- Split container (state/API/business logic) from presentational (`input()`/`output()`, no data-fetching) components once a component owns both a data fetch/mutation _and_ a nontrivial form or list — see [component-composition.md](./references/component-composition.md)

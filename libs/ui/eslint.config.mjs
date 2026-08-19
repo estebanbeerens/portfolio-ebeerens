@@ -28,7 +28,7 @@ export default [
   },
   {
     // Components that render onto a host <a>/<button> so the app can own routerLink/href.
-    files: ['**/nav-item/*.ts', '**/quick-action/*.ts'],
+    files: ['**/nav-item/*.ts', '**/quick-action/*.ts', '**/button/*.ts'],
     rules: {
       '@angular-eslint/component-selector': [
         'error',

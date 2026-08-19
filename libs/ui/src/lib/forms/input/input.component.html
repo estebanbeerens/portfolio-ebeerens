@@ -1,0 +1,17 @@
+<ui-form-field [label]="label()" [for]="controlId()" [hint]="hint()" [error]="error()" [required]="required()">
+  <input
+    [id]="controlId()"
+    class="border-border bg-surface hover:border-border-strong focus-visible:outline-accent mt-1 w-full rounded border px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [autocomplete]="autocomplete()"
+    [required]="required()"
+    [disabled]="disabled()"
+    [value]="value()"
+    [style.color-scheme]="colorScheme()"
+    [attr.aria-invalid]="error() ? true : null"
+    [attr.aria-describedby]="error() ? controlId() + '-error' : hint() ? controlId() + '-hint' : null"
+    (input)="onInput($any($event.target).value)"
+    (blur)="onBlur()"
+  />
+</ui-form-field>

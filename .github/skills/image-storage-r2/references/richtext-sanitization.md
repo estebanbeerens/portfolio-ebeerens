@@ -1,59 +1,56 @@
 # Rich Text: Storage & Sanitization
 
-## Why JSON, Not HTML
-A ProseMirror/TipTap document is a structured tree of known node/mark types — it cannot smuggle an arbitrary `<script>` tag or `onclick` attribute the way a free-form HTML string can. Storing raw HTML from a rich-text editor and trusting it at render time is a stored-XSS risk; storing the structured document and controlling serialization server-side isn't.
+## Why Markdown, Not HTML or a Structured Document
 
-## Editor Side (Admin UI, TipTap)
+Markdown source is plain text — easy to author in a plain `<textarea>`, easy to diff/store, and (unlike raw HTML) it doesn't carry executable markup by default. Storing raw HTML from a rich-text editor and trusting it at render time is a stored-XSS risk; storing Markdown and controlling the render pipeline (parser + sanitizer) isn't.
+
+## Editor Side (Admin UI)
+
+No dedicated editor library is needed — a plain `<textarea>` bound to the `description` form control holds the Markdown source directly. Pair it with a live preview pane using `ngx-markdown`'s `MarkdownComponent` so authors can see the rendered result as they type:
+
+```html
+<textarea formControlName="description"></textarea>
+<markdown [data]="form.controls.description.value" ngPreserveWhitespaces />
 ```
-npm install @tiptap/core @tiptap/starter-kit @tiptap/angular
+
+Persist the raw markdown string to `Project.description` (`String`/`text` column) — not any HTML/JSON transformation of it.
+
+## Rendering: `ngx-markdown` (Client + SSR)
+
 ```
-Use an **explicit** extension list — don't reach for a kitchen-sink config:
+npm install ngx-markdown marked@^18.0.0
+```
+
+Wire it once per app via `provideMarkdown()` in `app.config.ts` (inherited by the SSR `app.config.server.ts` through `mergeApplicationConfig`):
+
 ```ts
-import { StarterKit } from '@tiptap/starter-kit';
-import { Link } from '@tiptap/extension-link';
+import { provideMarkdown } from 'ngx-markdown';
 
-const extensions = [StarterKit, Link.configure({ openOnClick: false })];
+export const appConfig: ApplicationConfig = {
+  providers: [provideMarkdown() /* ...other providers */],
+};
 ```
-Persist `editor.getJSON()` (the ProseMirror document) to the `Project.description` field — not `editor.getHTML()`.
 
-## Server-Side Serialization
-Use the **same extension list** on the server to turn the stored JSON back into HTML, via `@tiptap/html`'s `generateHTML`:
-```
-npm install @tiptap/html
-```
+Then render anywhere (admin preview, public SSR) with the `<markdown [data]="...">` component or `MarkdownService`/`MarkdownPipe`. Since `marked` is plain JS, this renders identically during SSR — no special server-side pipeline is needed.
+
+## Sanitize by Default
+
+`ngx-markdown` sanitizes by default using Angular's `DomSanitizer` with `SecurityContext.HTML`, stripping tags/attributes Angular considers unsafe (script tags, inline event handlers, etc.) before the HTML is bound to the DOM:
+
 ```ts
-import { generateHTML } from '@tiptap/html';
-import { StarterKit } from '@tiptap/starter-kit';
-import { Link } from '@tiptap/extension-link';
+// default — sanitization enabled
+provideMarkdown();
 
-const extensions = [StarterKit, Link.configure({ openOnClick: false })]; // must match the editor's list
+// do NOT do this for client-authored content
+provideMarkdown({
+  sanitize: { provide: SANITIZE, useValue: SecurityContext.NONE },
+});
+```
 
-function renderDescription(doc: unknown): string {
-  return generateHTML(doc as JSONContent, extensions);
-}
-```
-If the editor's extension list and this list drift apart, content created with a newer editor extension either fails to serialize or serializes incorrectly — keep them in one shared location (e.g. a small shared constant) rather than duplicating the array in both places.
-
-## Sanitize as Defense in Depth
-Even though `generateHTML` only emits tags from the known extension set, run the result through `sanitize-html` before it reaches any response — a bug in the serializer or an extension misconfiguration shouldn't be the only thing standing between stored content and the rendered page:
-```
-npm install sanitize-html
-npm install -D @types/sanitize-html
-```
-```ts
-import sanitizeHtml from 'sanitize-html';
-
-function safeRenderDescription(doc: unknown): string {
-  const html = generateHTML(doc as JSONContent, extensions);
-  return sanitizeHtml(html, {
-    allowedTags: ['p', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'h2', 'h3', 'blockquote', 'code'],
-    allowedAttributes: { a: ['href', 'rel', 'target'] },
-  });
-}
-```
-Keep `allowedTags`/`allowedAttributes` a subset of (or equal to) what the TipTap extension list can actually produce.
+Never set `disableSanitizer` on a `<markdown>` binding that renders client-authored (i.e. admin-entered) content. If stricter control is ever needed, `SANITIZE` also accepts a custom sanitize function (e.g. backed by DOMPurify) — but the default Angular sanitizer is the baseline and should stay enabled.
 
 ## Where This Runs
-- **Public SSR (`web`)**: call `safeRenderDescription()` server-side before the page is sent — this is the highest-stakes render path since it's public and unauthenticated.
-- **Admin preview (`admin`)**: same function, same guarantees — don't build a second, looser rendering path "just for preview."
-- Never render the raw stored JSON as HTML directly in a template with `[innerHTML]`/`bypassSecurityTrustHtml` without going through this pipeline first.
+
+- **Public SSR (`web`)**: `provideMarkdown()` is wired into `apps/web/src/app/app.config.ts`; render project descriptions with the `<markdown>` component once that UI is built — this is the highest-stakes render path since it's public and unauthenticated.
+- **Admin preview (`admin`)**: same component/config, same sanitizer guarantees — the live preview pane is not a separate, looser rendering path.
+- Never render the raw stored markdown string as HTML directly via `[innerHTML]`/`bypassSecurityTrustHtml` — always go through `ngx-markdown`'s pipeline first.

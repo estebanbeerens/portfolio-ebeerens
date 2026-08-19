@@ -587,6 +587,30 @@ components:
           type: string
           description: URL of the profile avatar image
           example: https://cdn.example.com/avatar.png
+        location:
+          type: string
+          description: Residence location shown on the portfolio
+          example: Amsterdam, Netherlands
+        linkedinUrl:
+          type: string
+          description: LinkedIn profile URL
+          example: https://www.linkedin.com/in/jane-doe
+        githubUrl:
+          type: string
+          description: GitHub profile URL
+          example: https://github.com/jane-doe
+        instagramUrl:
+          type: string
+          description: Instagram profile URL
+          example: https://www.instagram.com/jane-doe
+        xUrl:
+          type: string
+          description: X profile URL
+          example: https://x.com/jane-doe
+        youtubeUrl:
+          type: string
+          description: YouTube channel URL
+          example: https://www.youtube.com/@jane-doe
         updatedAt:
           format: date-time
           type: string
@@ -609,11 +633,35 @@ components:
           example: Full-stack developer
         bio:
           type: string
-          description: Longer biography text
+          description: Markdown source for the public biography
         avatarUrl:
           type: string
           description: URL of the profile avatar image
           example: https://cdn.example.com/avatar.png
+        location:
+          type: string
+          description: Residence location shown on the portfolio
+          example: Amsterdam, Netherlands
+        linkedinUrl:
+          type: string
+          description: LinkedIn profile URL
+          example: https://www.linkedin.com/in/jane-doe
+        githubUrl:
+          type: string
+          description: GitHub profile URL
+          example: https://github.com/jane-doe
+        instagramUrl:
+          type: string
+          description: Instagram profile URL
+          example: https://www.instagram.com/jane-doe
+        xUrl:
+          type: string
+          description: X profile URL
+          example: https://x.com/jane-doe
+        youtubeUrl:
+          type: string
+          description: YouTube channel URL
+          example: https://www.youtube.com/@jane-doe
       required:
         - name
     SkillDto:
@@ -643,14 +691,20 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
+        shortDescription:
+          type: string
+          description: Short summary shown alongside the project
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
         description:
-          type: object
+          type: string
           description: >-
-            ProseMirror JSON document — see the image-storage-r2 skill for how
-            this is produced/rendered
-          example:
-            type: doc
-            content: []
+            Markdown source for the project description, rendered client-side
+            with ngx-markdown
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -690,6 +744,7 @@ components:
         - id
         - title
         - slug
+        - shortDescription
         - description
         - startDate
         - skills
@@ -705,11 +760,20 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
+        shortDescription:
+          type: string
+          description: Short summary shown alongside the project
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
         description:
-          type: object
+          type: string
           description: >-
-            ProseMirror JSON document — see the image-storage-r2 skill for how
-            this is produced/rendered
+            Markdown source for the project description, rendered client-side
+            with ngx-markdown
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -744,6 +808,7 @@ components:
       required:
         - title
         - slug
+        - shortDescription
         - description
         - startDate
     UpdateProjectDto:
@@ -756,11 +821,20 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
+        shortDescription:
+          type: string
+          description: Short summary shown alongside the project
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
         description:
-          type: object
+          type: string
           description: >-
-            ProseMirror JSON document — see the image-storage-r2 skill for how
-            this is produced/rendered
+            Markdown source for the project description, rendered client-side
+            with ngx-markdown
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png

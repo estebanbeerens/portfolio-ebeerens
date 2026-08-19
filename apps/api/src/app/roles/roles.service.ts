@@ -31,11 +31,13 @@ export class RolesService {
   }
 
   async create(dto: CreateRoleDto, actor?: string) {
-    const { skills, organizationId, ...rest } = dto;
+    const { skills, organizationId, startDate, endDate, ...rest } = dto;
     try {
       const role = await this.prisma.role.create({
         data: {
           ...rest,
+          startDate: new Date(startDate),
+          endDate: endDate ? new Date(endDate) : undefined,
           organization: { connect: { id: organizationId } },
           skills: this.buildSkillsInput(skills),
         },
@@ -56,12 +58,14 @@ export class RolesService {
 
   async update(id: string, dto: UpdateRoleDto, actor?: string) {
     await this.findOne(id);
-    const { skills, organizationId, ...rest } = dto;
+    const { skills, organizationId, startDate, endDate, ...rest } = dto;
     try {
       const role = await this.prisma.role.update({
         where: { id },
         data: {
           ...rest,
+          startDate: startDate ? new Date(startDate) : undefined,
+          endDate: endDate ? new Date(endDate) : undefined,
           organization: organizationId ? { connect: { id: organizationId } } : undefined,
           skills: skills ? { set: [], ...this.buildSkillsInput(skills) } : undefined,
         },

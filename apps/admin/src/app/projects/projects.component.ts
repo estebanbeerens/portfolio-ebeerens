@@ -1,24 +1,33 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CreateProjectDto, ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
-import { Card, PageHeader } from '@portfolio-ebeerens/ui';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { CreateProjectDto, ProjectDto, ProjectsService, SkillsService } from '@portfolio-ebeerens/api-client';
+import { PageHeader, ToastService } from '@portfolio-ebeerens/ui';
+import { map } from 'rxjs';
+import { ProjectDeleteDialog } from './project-delete-dialog/project-delete-dialog.component';
+import { ProjectForm, ProjectFormValue } from './project-form/project-form.component';
+import { ProjectList } from './project-list/project-list.component';
 
 type Mutation = 'idle' | 'saving' | 'deleting';
 
 @Component({
   selector: 'admin-projects',
-  imports: [Card, DatePipe, PageHeader, ReactiveFormsModule],
+  imports: [PageHeader, ProjectDeleteDialog, ProjectForm, ProjectList],
   templateUrl: './projects.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-w-0 flex-1 flex-col gap-8' },
 })
 export class Projects {
   private readonly api = inject(ProjectsService);
-  private readonly formBuilder = inject(FormBuilder);
+  private readonly skillsApi = inject(SkillsService);
+  private readonly toast = inject(ToastService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  protected readonly skillOptions = toSignal(
+    this.skillsApi.skillsControllerFindAll().pipe(map((skills) => skills.map((skill) => skill.name))),
+    { initialValue: [] as string[] }
+  );
 
   protected readonly projects = rxResource({
     params: () => (this.isBrowser ? true : undefined),
@@ -29,22 +38,10 @@ export class Projects {
   protected readonly selectedProject = signal<ProjectDto | undefined>(undefined);
   protected readonly pendingDelete = signal<ProjectDto | undefined>(undefined);
   protected readonly mutation = signal<Mutation>('idle');
-  protected readonly feedback = signal<string | undefined>(undefined);
   protected readonly formError = signal<string | undefined>(undefined);
-  protected readonly form = this.formBuilder.nonNullable.group({
-    title: ['', [Validators.required, Validators.maxLength(200)]],
-    slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
-    description: ['{"type":"doc","content":[]}', Validators.required],
-    imageUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
-    client: ['', Validators.maxLength(200)],
-    jobRole: ['', Validators.maxLength(200)],
-    liveUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
-    startDate: ['', Validators.required],
-    endDate: [''],
-    skills: [''],
-  });
+  // Bumped on every begin-create/begin-edit so `ProjectForm` always resets, even create -> create.
+  protected readonly formResetToken = signal(0);
 
-  protected readonly isEditing = computed(() => this.selectedProject() !== undefined);
   protected readonly isSaving = computed(() => this.mutation() === 'saving');
   protected readonly isDeleting = computed(() => this.mutation() === 'deleting');
   protected readonly requestError = computed(() => {
@@ -59,39 +56,15 @@ export class Projects {
   protected beginCreate(): void {
     this.formOpen.set(true);
     this.selectedProject.set(undefined);
-    this.feedback.set(undefined);
     this.formError.set(undefined);
-    this.form.reset({
-      title: '',
-      slug: '',
-      description: '{"type":"doc","content":[]}',
-      imageUrl: '',
-      client: '',
-      jobRole: '',
-      liveUrl: '',
-      startDate: '',
-      endDate: '',
-      skills: '',
-    });
+    this.formResetToken.update((token) => token + 1);
   }
 
   protected beginEdit(project: ProjectDto): void {
     this.formOpen.set(true);
     this.selectedProject.set(project);
-    this.feedback.set(undefined);
     this.formError.set(undefined);
-    this.form.reset({
-      title: project.title,
-      slug: project.slug,
-      description: JSON.stringify(project.description, null, 2),
-      imageUrl: project.imageUrl ?? '',
-      client: project.client ?? '',
-      jobRole: project.jobRole ?? '',
-      liveUrl: project.liveUrl ?? '',
-      startDate: project.startDate.slice(0, 10),
-      endDate: project.endDate?.slice(0, 10) ?? '',
-      skills: project.skills.map((skill) => skill.name).join(', '),
-    });
+    this.formResetToken.update((token) => token + 1);
   }
 
   protected cancelEdit(): void {
@@ -100,41 +73,24 @@ export class Projects {
     this.formError.set(undefined);
   }
 
-  protected save(): void {
-    this.feedback.set(undefined);
+  protected save(value: ProjectFormValue): void {
     this.formError.set(undefined);
-    if (this.form.invalid || this.mutation() !== 'idle') {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const value = this.form.getRawValue();
-    let description: object;
-    try {
-      description = JSON.parse(value.description) as object;
-    } catch {
-      this.formError.set('Description must be valid JSON.');
+    if (this.mutation() !== 'idle') {
       return;
     }
 
     const payload: CreateProjectDto = {
       title: value.title,
       slug: value.slug,
-      description,
+      shortDescription: value.shortDescription,
+      description: value.description,
       startDate: value.startDate,
       ...(value.imageUrl ? { imageUrl: value.imageUrl } : {}),
       ...(value.client ? { client: value.client } : {}),
       ...(value.jobRole ? { jobRole: value.jobRole } : {}),
       ...(value.liveUrl ? { liveUrl: value.liveUrl } : {}),
       ...(value.endDate ? { endDate: value.endDate } : {}),
-      ...(value.skills
-        ? {
-            skills: value.skills
-              .split(',')
-              .map((skill) => skill.trim())
-              .filter(Boolean),
-          }
-        : {}),
+      ...(value.skills.length > 0 ? { skills: value.skills } : {}),
     };
 
     this.mutation.set('saving');
@@ -145,19 +101,21 @@ export class Projects {
     request.subscribe({
       next: () => {
         this.mutation.set('idle');
-        this.feedback.set(project ? 'Project updated.' : 'Project created.');
+        this.toast.success(project ? 'Project updated.' : 'Project created.');
+        this.formOpen.set(false);
         this.selectedProject.set(undefined);
         this.projects.reload();
       },
       error: (error: unknown) => {
         this.mutation.set('idle');
-        this.formError.set(this.mutationError(error));
+        const message = this.mutationError(error);
+        this.formError.set(message);
+        this.toast.error(message);
       },
     });
   }
 
   protected askToDelete(project: ProjectDto): void {
-    this.feedback.set(undefined);
     this.pendingDelete.set(project);
   }
 
@@ -177,24 +135,19 @@ export class Projects {
       next: () => {
         this.mutation.set('idle');
         this.pendingDelete.set(undefined);
-        this.feedback.set('Project deleted.');
+        this.toast.success('Project deleted.');
         this.projects.reload();
       },
       error: (error: unknown) => {
         this.mutation.set('idle');
         this.pendingDelete.set(undefined);
-        this.feedback.set(this.mutationError(error));
+        this.toast.error(this.mutationError(error));
       },
     });
   }
 
   protected retry(): void {
     this.projects.reload();
-  }
-
-  protected fieldInvalid(name: string): boolean {
-    const control = this.form.get(name);
-    return control !== null && control.invalid && control.touched;
   }
 
   private mutationError(error: unknown): string {

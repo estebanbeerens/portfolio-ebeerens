@@ -421,7 +421,7 @@ profile
 projects
 ├── id
 ├── title
-├── description   (jsonb — TipTap/ProseMirror document, see §10)
+├── description   (text — Markdown source, rendered client-side with ngx-markdown, see §10)
 ├── image
 ├── client        (optional)
 ├── jobRole       (optional)
@@ -583,11 +583,11 @@ Backend stores the object key + public URL in PostgreSQL
 
 ### Rich-text project descriptions
 
-Store the project `description` as a **TipTap/ProseMirror JSON document** (`jsonb` column), not a
-raw HTML string — schema-constrained content can't smuggle arbitrary tags or attributes the way a
-free-form HTML string can. At render time (including SSR), the backend serializes the JSON to HTML
-through a strict, allowlisted serializer, then still runs the result through a sanitizer (e.g.
-`sanitize-html`/DOMPurify) as defense in depth before it reaches the public site.
+Store the project `description` as **Markdown source** (`text` column), not a raw HTML string or a
+structured document format — the admin UI edits it directly in a plain textarea with a live preview
+(rendered via `ngx-markdown`). At render time (including SSR), the markdown is parsed to HTML by
+`ngx-markdown`/`marked`; Angular's `DomSanitizer` (ngx-markdown's default `SANITIZE` provider)
+strips disallowed tags/attributes as the primary XSS defense before the HTML reaches the page.
 
 ---
 
@@ -1033,7 +1033,7 @@ The exact choices can still be evaluated, but the target architecture is:
 | Database                     | PostgreSQL                                                                                                                                                                                       |
 | Authentication               | GitHub OAuth (Passport)                                                                                                                                                                          |
 | Session                      | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis)                                                                                 |
-| Rich text                    | TipTap, stored as ProseMirror JSON (`jsonb`), sanitized on render                                                                                                                                |
+| Rich text                    | Markdown source (`text` column), rendered client-side (incl. SSR) with `ngx-markdown`/`marked`, sanitized via Angular `DomSanitizer`                                                             |
 | Image storage                | Cloudflare R2 (presigned uploads)                                                                                                                                                                |
 | Contact form spam protection | Google reCAPTCHA (token verified server-side against Google's API)                                                                                                                               |
 | Containers                   | Docker (arm64/multi-arch)                                                                                                                                                                        |

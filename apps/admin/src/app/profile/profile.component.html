@@ -1,0 +1,20 @@
+<ui-page-header title="Basic Info" subtitle="Your public identity and profile biography." />
+
+@if (requestError(); as error) {
+  <div class="border-error bg-surface flex items-center justify-between gap-4 border p-4" role="alert">
+    <p class="text-sm">{{ error }}</p>
+    <button
+      type="button"
+      class="text-accent focus-visible:outline-accent focus-visible:outline-2 focus-visible:outline-offset-2"
+      (click)="retry()"
+    >
+      Retry
+    </button>
+  </div>
+}
+
+@if (isLoading()) {
+  <p class="text-text-muted" role="status">Loading Basic Info...</p>
+}
+
+<admin-profile-form [profile]="profile()" [saving]="saving()" [formError]="formError()" (saved)="save($event)" />

@@ -26,10 +26,7 @@
       "dependsOn": ["build"],
       "cache": true,
       "executor": "@nx/js:prune-lockfile",
-      "outputs": [
-        "{workspaceRoot}/dist/apps/api/package.json",
-        "{workspaceRoot}/dist/apps/api/package-lock.json"
-      ],
+      "outputs": ["{workspaceRoot}/dist/apps/api/package.json", "{workspaceRoot}/dist/apps/api/package-lock.json"],
       "options": {
         "buildTarget": "build"
       }
@@ -62,6 +59,28 @@
         },
         "production": {
           "buildTarget": "api:build:production"
+        }
+      }
+    },
+    "prepare-e2e-db": {
+      "cache": false,
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "docker compose up -d --force-recreate postgres-e2e",
+          "DATABASE_URL=postgresql://portfolio_e2e:portfolio_e2e@localhost:5434/portfolio_e2e npx prisma migrate deploy"
+        ],
+        "parallel": false
+      }
+    },
+    "serve-e2e": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["prepare-e2e-db", "build"],
+      "options": {
+        "command": "node dist/apps/api/main.js",
+        "env": {
+          "DATABASE_URL": "postgresql://portfolio_e2e:portfolio_e2e@localhost:5434/portfolio_e2e"
         }
       }
     },

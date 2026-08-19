@@ -22,3 +22,19 @@ export const ActivityEntity = {
   ORGANIZATION: 'ORGANIZATION',
   RESUME: 'RESUME',
 } as const;
+
+// Minimal stand-in for Prisma's known-error class so services' `instanceof` checks work under mocked PrismaService.
+export class PrismaClientKnownRequestError extends Error {
+  code: string;
+  clientVersion: string;
+
+  constructor(message: string, params: { code: string; clientVersion: string }) {
+    super(message);
+    this.code = params.code;
+    this.clientVersion = params.clientVersion;
+  }
+}
+
+export const Prisma = {
+  PrismaClientKnownRequestError,
+};

@@ -18,12 +18,17 @@ export class ProjectDto {
   slug: string;
 
   @ApiProperty({
-    description:
-      'ProseMirror JSON document \u2014 see the image-storage-r2 skill for how this is produced/rendered',
-    type: Object,
-    example: { type: 'doc', content: [] },
+    description: 'Short summary shown alongside the project',
+    example: 'A fast, accessible portfolio built with Angular and NestJS.',
+    maxLength: 255,
   })
-  description: Record<string, unknown>;
+  shortDescription: string;
+
+  @ApiProperty({
+    description: 'Markdown source for the project description, rendered client-side with ngx-markdown',
+    example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
+  })
+  description: string;
 
   @ApiPropertyOptional({
     example: 'https://cdn.example.com/projects/portfolio.png',
@@ -46,8 +51,7 @@ export class ProjectDto {
   startDate: Date;
 
   @ApiPropertyOptional({
-    description:
-      'When work on the project ended \u2014 absent means still ongoing',
+    description: 'When work on the project ended \u2014 absent means still ongoing',
     example: '2024-06-30T00:00:00.000Z',
   })
   endDate?: Date | null;

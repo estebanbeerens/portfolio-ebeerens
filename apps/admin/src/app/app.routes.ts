@@ -18,17 +18,21 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'basic-info',
-        loadComponent: () => import('./layout/placeholder-page.component').then((m) => m.PlaceholderPage),
-        data: { title: 'Basic Info', subtitle: 'Your profile, headline, bio and resume.' },
+        loadComponent: () => import('./profile/profile.component').then((m) => m.Profile),
       },
       {
         path: 'professional-journey',
-        loadComponent: () => import('./layout/placeholder-page.component').then((m) => m.PlaceholderPage),
+        loadComponent: () =>
+          import('./professional-journey/professional-journey.component').then((m) => m.ProfessionalJourney),
         data: { title: 'Professional Journey', subtitle: 'Organizations and the roles you held.' },
       },
       {
         path: 'projects',
         loadComponent: () => import('./projects/projects.component').then((m) => m.Projects),
+      },
+      {
+        path: 'feature-flags',
+        loadComponent: () => import('./feature-flags/feature-flags.component').then((m) => m.FeatureFlags),
       },
     ],
   },

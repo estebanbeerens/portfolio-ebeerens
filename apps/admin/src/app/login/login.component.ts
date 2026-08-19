@@ -1,12 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AmbientBackdrop, ThemeToggle } from '@portfolio-ebeerens/ui';
+import { AmbientBackdrop, Button } from '@portfolio-ebeerens/ui';
 import { SessionService } from '../auth/session.service';
 
 @Component({
   selector: 'admin-login',
-  imports: [AmbientBackdrop, RouterLink, ThemeToggle],
+  imports: [AmbientBackdrop, Button, RouterLink],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

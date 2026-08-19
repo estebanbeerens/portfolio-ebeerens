@@ -1,0 +1,66 @@
+<span class="text-sm font-medium" [id]="id + '-label'">{{ label() }}</span>
+
+<div
+  class="border-border bg-surface focus-within:outline-accent mt-1 flex w-full flex-wrap items-center gap-2 rounded border px-2 py-2 focus-within:outline-2 focus-within:outline-offset-2"
+>
+  @for (value of values(); track value; let i = $index) {
+    <span class="bg-glass text-text flex items-center gap-1 rounded px-2 py-1 text-sm">
+      {{ value }}
+      <button
+        type="button"
+        class="text-text-muted hover:text-text active:text-text focus-visible:outline-accent cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2"
+        [attr.aria-label]="'Remove ' + value"
+        (click)="removeValue(i)"
+      >
+        &times;
+      </button>
+    </span>
+  }
+
+  <input
+    type="text"
+    class="bg-surface min-w-32 flex-1 outline-none"
+    role="combobox"
+    [attr.aria-labelledby]="id + '-label'"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listboxId"
+    [attr.aria-activedescendant]="activeOptionId()"
+    aria-autocomplete="list"
+    [attr.placeholder]="values().length === 0 ? placeholder() : ''"
+    [disabled]="disabled()"
+    [value]="query()"
+    (input)="onQueryInput($any($event.target).value)"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    (keydown)="onKeydown($event)"
+  />
+</div>
+
+@if (open() && (filteredOptions().length > 0 || showCreateOption())) {
+  <ul [id]="listboxId" role="listbox" class="border-border bg-surface mt-1 max-h-48 overflow-auto rounded border">
+    @for (option of filteredOptions(); track option; let i = $index) {
+      <li
+        [id]="id + '-option-' + i"
+        role="option"
+        [attr.aria-selected]="i === activeIndex()"
+        class="hover:bg-glass-hover active:bg-glass-active cursor-pointer px-3 py-2 text-sm"
+        [class.bg-glass-active]="i === activeIndex()"
+        (mousedown)="selectOption(option)"
+      >
+        {{ option }}
+      </li>
+    }
+    @if (showCreateOption()) {
+      <li
+        [id]="id + '-option-' + filteredOptions().length"
+        role="option"
+        [attr.aria-selected]="filteredOptions().length === activeIndex()"
+        class="text-text-muted hover:bg-glass-hover active:bg-glass-active cursor-pointer px-3 py-2 text-sm"
+        [class.bg-glass-active]="filteredOptions().length === activeIndex()"
+        (mousedown)="createFromQuery()"
+      >
+        Add "{{ query() }}"
+      </li>
+    }
+  </ul>
+}

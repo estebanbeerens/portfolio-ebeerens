@@ -1,0 +1,13 @@
+<label class="text-sm font-medium" [for]="for()">
+  {{ label() }}
+  @if (required()) {
+    <span aria-hidden="true" class="text-error">*</span><span class="sr-only"> required</span>
+  }
+</label>
+<ng-content />
+@if (hint()) {
+  <p [id]="for() + '-hint'" class="text-text-muted mt-1 text-xs">{{ hint() }}</p>
+}
+@if (error()) {
+  <p [id]="for() + '-error'" class="text-error mt-1 text-xs" role="alert">{{ error() }}</p>
+}

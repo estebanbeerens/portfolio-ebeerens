@@ -1,14 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
+import { ProjectDto, ProjectsService, SkillsService } from '@portfolio-ebeerens/api-client';
+import { provideMarkdown } from 'ngx-markdown';
 import { Projects } from './projects.component';
 
 const project: ProjectDto = {
   id: 'project-1',
   title: 'Portfolio site',
   slug: 'portfolio-site',
-  description: { type: 'doc', content: [] },
+  shortDescription: 'A concise portfolio project summary.',
+  description: '## Overview\n\nA concise portfolio project summary.',
   startDate: '2024-01-15',
   skills: [{ id: 'skill-1', name: 'Angular' }],
   createdAt: '2024-01-15T00:00:00.000Z',
@@ -19,7 +21,12 @@ describe('Projects', () => {
   function configure(api: Partial<ProjectsService>) {
     TestBed.configureTestingModule({
       imports: [Projects],
-      providers: [provideRouter([]), { provide: ProjectsService, useValue: api }],
+      providers: [
+        provideMarkdown(),
+        provideRouter([]),
+        { provide: ProjectsService, useValue: api },
+        { provide: SkillsService, useValue: { skillsControllerFindAll: () => of([]) } },
+      ],
     });
   }
 

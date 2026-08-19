@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { AmbientBackdrop, NavItem, Sidenav, ThemeToggle, UserBadge } from '@portfolio-ebeerens/ui';
+import { AmbientBackdrop, NavItem, Sidenav, Toast, ThemeToggle, UserBadge } from '@portfolio-ebeerens/ui';
 import { LucideDynamicIcon, LucideLogOut, LucideMenu } from '@lucide/angular';
 import { filter, map } from 'rxjs';
 import { SessionService } from '../auth/session.service';
@@ -9,7 +9,17 @@ import { ADMIN_NAV } from './nav.config';
 
 @Component({
   selector: 'admin-shell',
-  imports: [AmbientBackdrop, LucideDynamicIcon, NavItem, RouterLink, RouterOutlet, Sidenav, ThemeToggle, UserBadge],
+  imports: [
+    AmbientBackdrop,
+    LucideDynamicIcon,
+    NavItem,
+    RouterLink,
+    RouterOutlet,
+    Sidenav,
+    Toast,
+    ThemeToggle,
+    UserBadge,
+  ],
   templateUrl: './admin-shell.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

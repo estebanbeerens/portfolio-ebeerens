@@ -15,7 +15,7 @@ The admin route currently maps `projects` to the shared placeholder page. The AP
 **Non-Goals:**
 
 - Changing the project database model or adding new project endpoints without a demonstrated contract gap.
-- Implementing GitHub OAuth/session behavior, R2 uploads, TipTap editing, or public project rendering.
+- Implementing GitHub OAuth/session behavior, R2 uploads, or public project rendering.
 - Replacing the generated API client or hand-editing generated files.
 
 ## Decisions
@@ -26,7 +26,7 @@ The admin route currently maps `projects` to the shared placeholder page. The AP
 
 3. **Separate read state from imperative mutations.** Use `rxResource` for the project collection read and signals for selected project, form mode, validation/submission state, and feedback. Use one-off observable subscriptions only for create, update, and delete commands, with duplicate-action guards and reload after successful mutations.
 
-4. **Use a shared form model for create and edit.** The form maps API response fields into editable values and omits absent optional values as `undefined`. It validates required fields and the API's slug/URL/date constraints before calling the generated client. Description remains a JSON editor-compatible field or a clearly scoped structured input for this pilot; rich-text authoring is deliberately deferred.
+4. **Use a shared form model for create and edit.** The form maps API response fields into editable values and omits absent optional values as `undefined`. It validates required fields, the 255-character short description, and the API's slug/URL/date constraints before calling the generated client. TipTap produces the existing ProseMirror JSON document; image upload remains deferred.
 
 5. **Use explicit confirmation for destructive actions.** Delete confirmation will be a semantic dialog or existing shared dialog primitive if available, with focus handling, keyboard escape/cancel behavior, and clear confirm/cancel labels. A canceled confirmation makes no HTTP request.
 
@@ -35,7 +35,7 @@ The admin route currently maps `projects` to the shared placeholder page. The AP
 ## Risks / Trade-offs
 
 - **[Risk] The current admin e2e setup may not provide an authenticated session.** -> Inspect the existing fixture and add only the smallest test-only authentication arrangement needed for this flow; do not weaken production guards.
-- **[Risk] Project descriptions are ProseMirror JSON but rich-text editing is out of scope.** -> Preserve the API shape and use a bounded structured input or fixture-friendly editor representation, documenting the limitation in the UI until the image-storage/Tiptap work is implemented.
+- **[Risk] TipTap editor output must remain compatible with the ProseMirror JSON render/sanitization path.** -> Keep the editor on StarterKit and preserve the existing JSON storage contract until the shared rich-text serializer is implemented.
 - **[Risk] Existing user changes may overlap route, auth, or generated-client files.** -> Review current content before edits and limit changes to the pilot files; never revert unrelated worktree changes.
 - **[Risk] API export requires the local database environment.** -> Do not regenerate unless the contract changes; if it does, start the required Postgres service and run the documented export/client sequence.
 

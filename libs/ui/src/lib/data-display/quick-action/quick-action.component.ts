@@ -9,7 +9,7 @@ import { LucideChevronRight, LucideDynamicIcon, type LucideIconInput } from '@lu
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class:
-      'border-border-subtle bg-glass-active hover:border-accent focus-visible:outline-accent flex w-full items-center gap-3 rounded-md border p-3 text-left no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+      'border-border-subtle bg-glass-active hover:border-accent active:border-accent active:bg-glass focus-visible:outline-accent flex w-full cursor-pointer items-center gap-3 rounded-md border p-3 text-left no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
   },
 })
 export class QuickAction {

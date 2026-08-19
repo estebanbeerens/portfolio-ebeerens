@@ -302,12 +302,12 @@ and retrying the same cookie returns 401.
 
 ---
 
-## Stage 5 — Admin UI: CRUD forms, WYSIWYG, image upload
+## Stage 5 — Admin UI: CRUD forms, Markdown editor, image upload
 
 **Goal:** a working admin screen to edit the profile and manage projects, including rich-text
 descriptions and image uploads.
 
-**What you'll learn:** integrating a WYSIWYG editor safely, and uploading files directly to object
+**What you'll learn:** integrating a Markdown editor/preview safely, and uploading files directly to object
 storage instead of through your API.
 
 **Steps:**
@@ -316,8 +316,9 @@ storage instead of through your API.
    calling the API endpoints from Stage 3, gated behind the login flow from Stage 4. Include the
    optional `client`/`jobRole`/`liveUrl` fields and a tag-style input for `skills` (autocompleting
    against `GET /api/skills`).
-2. Add TipTap as the rich-text editor for `project.description`. Configure it to output/accept a
-   ProseMirror JSON document (not HTML) — this is what gets stored in the `Json` column.
+2. Add a Markdown editor for `project.description`: a plain textarea bound to the markdown source,
+   with a live preview pane rendered via `ngx-markdown` (`provideMarkdown()`) — this is what gets
+   stored in the `String`/`text` column.
 3. Build a simple admin screen listing submitted contact messages (`GET /api/contact`) with a way
    to delete them once handled (`DELETE /api/contact/{id}`).
 4. Build organization list/create/edit/delete screens (`GET/POST/PUT/DELETE /api/organizations[/:id]`)
@@ -334,9 +335,9 @@ storage instead of through your API.
    short-lived presigned PUT URL using the S3-compatible R2 API.
 7. In the admin UI, upload the selected file directly to the presigned URL (not through your API),
    then call a "confirm" endpoint that stores the resulting object key/URL against the project.
-8. When rendering the project description anywhere (admin preview or later, the public site),
-   serialize the ProseMirror JSON to HTML through a strict allowlisted serializer, then run it
-   through `sanitize-html` before display — never trust stored JSON as safe-to-render HTML blindly.
+8. When rendering the project description anywhere (admin preview or later, the public site), parse
+   the stored Markdown to HTML with `ngx-markdown`/`marked` and rely on its built-in sanitizer
+   (Angular's `DomSanitizer`) — never bypass sanitization to render stored markdown as trusted HTML.
 
 > 💡 **B1 explainer — what is a "presigned URL"?**
 > Normally, uploading a file means: browser → your server → storage. A presigned URL lets you skip

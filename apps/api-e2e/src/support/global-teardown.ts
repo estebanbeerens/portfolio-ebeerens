@@ -1,10 +1,9 @@
-import { killPort } from '@nx/node/utils';
+import { execFileSync } from 'node:child_process';
 /* eslint-disable */
 
 module.exports = async function () {
-  // Put clean up logic here (e.g. stopping services, docker-compose, etc.).
-  // Hint: `globalThis` is shared between setup and teardown.
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  await killPort(port);
+  execFileSync('docker', ['compose', 'rm', '--stop', '--force', 'postgres-e2e'], {
+    stdio: 'inherit',
+  });
   console.log(globalThis.__TEARDOWN_MESSAGE__);
 };

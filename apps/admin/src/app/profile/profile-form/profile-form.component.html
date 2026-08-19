@@ -1,0 +1,114 @@
+<ui-card class="w-full xl:max-w-4xl" heading="Profile details">
+  <form class="flex flex-col gap-5" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="text-text text-sm"><span aria-hidden="true" class="text-error">*</span> Required field</p>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <ui-input
+        controlId="profile-name"
+        label="Name"
+        formControlName="name"
+        [required]="true"
+        [error]="fieldInvalid('name') ? 'Enter your name.' : undefined"
+      />
+      <ui-input controlId="profile-headline" label="Professional headline" formControlName="headline" />
+      <ui-input controlId="profile-location" label="Residence location" formControlName="location" />
+      <ui-input
+        controlId="profile-avatar-url"
+        label="Avatar URL"
+        type="url"
+        formControlName="avatarUrl"
+        [error]="fieldInvalid('avatarUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+    </div>
+
+    <div>
+      <label class="text-sm font-medium" for="profile-biography">Biography</label>
+      <p class="text-text mt-1 text-sm">Markdown is supported and sanitized when previewed or published.</p>
+      <div class="border-border mt-2 flex gap-1 border-b" role="tablist" aria-label="Biography view">
+        <button
+          type="button"
+          role="tab"
+          class="text-text rounded-t px-3 py-2 text-sm font-semibold"
+          [class.border-accent]="!biographyIsPreview()"
+          [class.border-b-2]="!biographyIsPreview()"
+          [attr.aria-selected]="!biographyIsPreview()"
+          aria-controls="profile-biography-panel"
+          (click)="biographyView.set('markdown')"
+        >
+          Markdown
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="text-text rounded-t px-3 py-2 text-sm font-semibold"
+          [class.border-accent]="biographyIsPreview()"
+          [class.border-b-2]="biographyIsPreview()"
+          [attr.aria-selected]="biographyIsPreview()"
+          aria-controls="profile-biography-panel"
+          (click)="biographyView.set('preview')"
+        >
+          Preview
+        </button>
+      </div>
+      <div id="profile-biography-panel" role="tabpanel">
+        @if (!biographyIsPreview()) {
+          <textarea
+            id="profile-biography"
+            class="border-border bg-surface min-h-56 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm"
+            formControlName="bio"
+          ></textarea>
+        } @else {
+          <div class="border-border bg-surface-raised min-h-56 overflow-auto rounded-b border border-t-0 p-4">
+            <markdown [data]="form.controls.bio.value" ngPreserveWhitespaces />
+          </div>
+        }
+      </div>
+    </div>
+
+    <fieldset class="border-border grid gap-4 border p-4 md:grid-cols-2">
+      <legend class="px-1 text-sm font-medium">Social profiles</legend>
+      <ui-input
+        controlId="profile-linkedin-url"
+        label="LinkedIn URL"
+        type="url"
+        formControlName="linkedinUrl"
+        [error]="fieldInvalid('linkedinUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+      <ui-input
+        controlId="profile-github-url"
+        label="GitHub URL"
+        type="url"
+        formControlName="githubUrl"
+        [error]="fieldInvalid('githubUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+      <ui-input
+        controlId="profile-instagram-url"
+        label="Instagram URL"
+        type="url"
+        formControlName="instagramUrl"
+        [error]="fieldInvalid('instagramUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+      <ui-input
+        controlId="profile-x-url"
+        label="X URL"
+        type="url"
+        formControlName="xUrl"
+        [error]="fieldInvalid('xUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+      <ui-input
+        controlId="profile-youtube-url"
+        label="YouTube URL"
+        type="url"
+        formControlName="youtubeUrl"
+        [error]="fieldInvalid('youtubeUrl') ? 'Enter a valid HTTP or HTTPS URL.' : undefined"
+      />
+    </fieldset>
+
+    @if (formError(); as error) {
+      <p class="text-error text-sm" role="alert">{{ error }}</p>
+    }
+    <div class="flex justify-end">
+      <button uiButton type="submit" [disabled]="saving()">{{ saving() ? 'Saving...' : 'Save Basic Info' }}</button>
+    </div>
+  </form>
+</ui-card>

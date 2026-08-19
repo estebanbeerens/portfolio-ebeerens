@@ -1,0 +1,15 @@
+<button
+  type="button"
+  role="switch"
+  [attr.aria-checked]="checked()"
+  [attr.aria-label]="label()"
+  [disabled]="disabled()"
+  [class]="buttonClass()"
+  (click)="onClick()"
+>
+  <span
+    class="bg-neutral-0 relative inline-block size-5 rounded-full border border-neutral-500 shadow transition-transform dark:border-neutral-300"
+    [class.translate-x-6]="checked()"
+    [class.translate-x-1]="!checked()"
+  ></span>
+</button>

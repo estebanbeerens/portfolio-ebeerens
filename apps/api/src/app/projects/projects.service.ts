@@ -31,12 +31,13 @@ export class ProjectsService {
   }
 
   async create(dto: CreateProjectDto, actor?: string) {
-    const { skills, description, ...rest } = dto;
+    const { skills, startDate, endDate, ...rest } = dto;
     try {
       const project = await this.prisma.project.create({
         data: {
           ...rest,
-          description: description as Prisma.InputJsonValue,
+          startDate: new Date(startDate),
+          endDate: endDate ? new Date(endDate) : undefined,
           skills: this.buildSkillsInput(skills),
         },
         include: { skills: true },
@@ -56,13 +57,14 @@ export class ProjectsService {
 
   async update(id: string, dto: UpdateProjectDto, actor?: string) {
     await this.findOne(id);
-    const { skills, description, ...rest } = dto;
+    const { skills, startDate, endDate, ...rest } = dto;
     try {
       const project = await this.prisma.project.update({
         where: { id },
         data: {
           ...rest,
-          description: description as Prisma.InputJsonValue | undefined,
+          startDate: startDate ? new Date(startDate) : undefined,
+          endDate: endDate ? new Date(endDate) : undefined,
           skills: skills ? { set: [], ...this.buildSkillsInput(skills) } : undefined,
         },
         include: { skills: true },
@@ -91,16 +93,16 @@ export class ProjectsService {
     });
   }
 
-  // Reuses existing skills by name, creating new ones as needed.
+  // Reuses existing skills by name (case-insensitively normalized), creating new ones as needed.
   private buildSkillsInput(skills?: string[]) {
     if (!skills) {
       return undefined;
     }
     return {
-      connectOrCreate: skills.map((name) => ({
-        where: { name },
-        create: { name },
-      })),
+      connectOrCreate: skills.map((skill) => {
+        const name = skill.trim().toLowerCase();
+        return { where: { name }, create: { name } };
+      }),
     };
   }
 

@@ -3,7 +3,8 @@ import { Injectable, PLATFORM_ID, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DashboardService as DashboardApi } from '@portfolio-ebeerens/api-client';
 
-@Injectable({ providedIn: 'root' })
+// Provided per-component (see Dashboard), not root, so each navigation to the route gets a fresh resource.
+@Injectable()
 export class DashboardDataService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly api = inject(DashboardApi);

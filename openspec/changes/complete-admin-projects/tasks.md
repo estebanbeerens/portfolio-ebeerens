@@ -10,9 +10,9 @@
 
 ## 3. Implement create and edit workflow
 
-- [x] 3.1 Add a shared create/edit form model for all existing project API fields, using `undefined` for absent optional values and accessible labels/errors.
+- [x] 3.1 Add a shared create/edit form model for all project API fields, including the required 255-character short description, using `undefined` for absent optional values and accessible labels/errors.
 - [x] 3.2 Implement client-backed create and edit mutations with validation, duplicate-submit prevention, pending/success feedback, conflict handling, and recoverable form input.
-- [x] 3.3 Add the bounded description input appropriate for the current JSON contract without introducing TipTap or rich-text/upload scope.
+- [x] 3.3 Add a TipTap WYSIWYG editor that stores the existing ProseMirror JSON contract without introducing image-upload scope.
 
 ## 4. Implement delete workflow
 
@@ -24,8 +24,8 @@
 - [x] 5.1 Add co-located admin Vitest coverage for list states, validation, create/edit/delete client calls, conflict/error handling, and confirmation cancellation.
 - [x] 5.2 Add or update focused API tests only if backend behavior changes; existing project endpoints were reused without backend changes.
 - [ ] 5.3 Add an authenticated `admin-e2e` Playwright journey for viewing, creating or editing, and deleting a project using semantic locators. Blocked: the repository has no authenticated admin-e2e fixture or session setup yet.
-- [x] 5.4 If the API shape changed, run `npx nx run api:export-openapi`, inspect `openapi/api.yaml`, then run `npm run build:api-client` and `npx nx build api-client`; no API shape changed, and the existing generated client built as an admin dependency.
-- [x] 5.5 Run focused validation: `npx nx test admin`, `npx nx lint admin`, and `npx nx build admin`; API and e2e execution were not expanded because the backend contract was unchanged and e2e lacks authentication setup.
+- [x] 5.4 Add and apply the Prisma migration, run `npx nx run api:export-openapi`, inspect `openapi/api.yaml`, then run `npm run build:api-client` and `npx nx build api-client`.
+- [x] 5.5 Run focused validation: admin/API tests, admin lint/build, API e2e, and the admin Chromium Playwright smoke test; the full authenticated project-management journey remains blocked by the missing auth fixture.
 
 ## 6. Complete the OpenSpec change
 

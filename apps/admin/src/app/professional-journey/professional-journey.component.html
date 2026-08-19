@@ -1,0 +1,34 @@
+<ui-page-header title="Professional Journey" subtitle="Organizations and the roles you held." />
+
+<div class="flex flex-col gap-6 transition-all duration-300 xl:flex-row">
+  <admin-role-group-list
+    [groups]="roleGroups()"
+    [loading]="roles.isLoading()"
+    [error]="requestError()"
+    (create)="beginCreate()"
+    (edit)="beginEdit($event)"
+    (delete)="askToDelete($event)"
+    (retry)="retry()"
+    (updateOrganization)="updateOrganization($event)"
+  />
+
+  @if (formOpen()) {
+    <admin-role-form
+      [role]="selectedRole()"
+      [organizations]="organizationList()"
+      [skillOptions]="skillOptions()"
+      [saving]="isSaving()"
+      [formError]="formError()"
+      [resetToken]="formResetToken()"
+      (saved)="save($event)"
+      (cancelled)="cancelEdit()"
+    />
+  }
+</div>
+
+<admin-role-delete-dialog
+  [role]="pendingDelete()"
+  [deleting]="isDeleting()"
+  (confirm)="deleteRole()"
+  (dismiss)="cancelDelete()"
+/>

@@ -28,7 +28,7 @@ The system SHALL provide an admin Projects view that loads the current projects 
 
 ### Requirement: Create and edit projects
 
-The system SHALL allow an authenticated administrator to create a project and edit an existing project using the fields supported by the project API: title, slug, description, image URL, client, job role, live URL, start date, end date, and skills.
+The system SHALL allow an authenticated administrator to create a project and edit an existing project using the fields supported by the project API: title, slug, short description, rich-text description, image URL, client, job role, live URL, start date, end date, and skills. The short description SHALL be limited to 255 characters, and the rich-text description SHALL be authored through a WYSIWYG editor and stored as ProseMirror JSON.
 
 #### Scenario: Administrator creates a valid project
 
@@ -47,6 +47,18 @@ The system SHALL allow an authenticated administrator to create a project and ed
 - **GIVEN** the project form contains a missing required field or an invalid slug, URL, or date
 - **WHEN** the administrator submits the form
 - **THEN** the system identifies the invalid field, provides an accessible error message, and does not send an API mutation request
+
+#### Scenario: Short description exceeds the limit
+
+- **GIVEN** the administrator enters more than 255 characters in the short description
+- **WHEN** the administrator submits the form
+- **THEN** the system prevents submission and identifies the character-limit error
+
+#### Scenario: Administrator formats the rich-text description
+
+- **GIVEN** the administrator is editing a project description
+- **WHEN** the administrator uses the WYSIWYG formatting controls
+- **THEN** the editor reflects the formatting and the saved API payload contains the resulting ProseMirror JSON
 
 #### Scenario: Project slug conflicts with an existing project
 
@@ -78,7 +90,7 @@ The system SHALL allow an authenticated administrator to delete an existing proj
 
 ### Requirement: Accessible and resilient project workflow
 
-The system SHALL expose all project-management actions through keyboard-accessible, semantically labelled controls and SHALL represent loading, submitting, success, empty, and failure states without overlapping content or relying on color alone.
+The system SHALL expose all project-management actions through keyboard-accessible, semantically labelled controls and SHALL represent loading, submitting, success, empty, and failure states without overlapping content or relying on color alone. The start and end date controls SHALL use a calendar icon with contrast appropriate to the active light or dark theme, and the form SHALL keep client, job role, image URL, and live URL as separate full-width fields.
 
 #### Scenario: Keyboard navigation reaches project actions
 

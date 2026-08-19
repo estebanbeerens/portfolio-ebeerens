@@ -9,7 +9,7 @@ The admin application exposes a Projects navigation entry, but it currently rout
 - Provide loading, empty, validation, conflict, authorization, and general error states.
 - Preserve the existing session guard and project API contract unless implementation exposes a concrete contract gap.
 - Add focused Angular/API tests and an authenticated admin Playwright journey.
-- **Non-goals:** redesign authentication, add image upload or rich-text editing, change public portfolio rendering, or backfill unrelated roadmap capabilities.
+- **Non-goals:** redesign authentication, add image upload, change public portfolio rendering, or backfill unrelated roadmap capabilities.
 
 ## Capabilities
 

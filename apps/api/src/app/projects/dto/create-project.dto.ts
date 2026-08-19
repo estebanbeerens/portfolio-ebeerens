@@ -1,15 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsDateString,
-  IsObject,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Matches,
-  MaxLength,
-} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { ArrayMaxSize, IsArray, IsDateString, IsOptional, IsString, IsUrl, Matches, MaxLength } from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({ example: 'Personal Portfolio' })
@@ -28,12 +19,21 @@ export class CreateProjectDto {
   slug: string;
 
   @ApiProperty({
-    description:
-      'ProseMirror JSON document \u2014 see the image-storage-r2 skill for how this is produced/rendered',
-    type: Object,
+    description: 'Short summary shown alongside the project',
+    example: 'A fast, accessible portfolio built with Angular and NestJS.',
+    maxLength: 255,
   })
-  @IsObject()
-  description: Record<string, unknown>;
+  @IsString()
+  @MaxLength(255)
+  shortDescription: string;
+
+  @ApiProperty({
+    description: 'Markdown source for the project description, rendered client-side with ngx-markdown',
+    example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
+  })
+  @IsString()
+  @MaxLength(20000)
+  description: string;
 
   @ApiPropertyOptional({
     example: 'https://cdn.example.com/projects/portfolio.png',
@@ -84,5 +84,8 @@ export class CreateProjectDto {
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
+  @Transform(({ value }: { value?: unknown[] }) =>
+    Array.isArray(value) ? value.map((skill) => String(skill).trim().toLowerCase()) : value
+  )
   skills?: string[];
 }

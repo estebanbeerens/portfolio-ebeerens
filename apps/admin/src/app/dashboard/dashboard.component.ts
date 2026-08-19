@@ -20,6 +20,8 @@ import { DASHBOARD_QUICK_ACTIONS, activityIcon } from './dashboard.config';
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-w-0 flex-1 flex-col gap-8' },
+  // Component-scoped so a fresh DashboardDataService (and its resource) is created on every navigation here.
+  providers: [DashboardDataService],
 })
 export class Dashboard {
   private readonly dashboard = inject(DashboardDataService);

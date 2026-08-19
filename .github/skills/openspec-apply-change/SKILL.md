@@ -99,6 +99,8 @@ Implement tasks from an OpenSpec change.
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
    - Continue to next task
 
+   After a task's focused validation succeeds, immediately begin the next pending task or phase. Do not pause for confirmation, provide a final response, or wait for a new user request when the implementation remains within the approved change scope and no blocker is present.
+
    **Pause if:**
    - Task is unclear → ask for clarification
    - Implementation reveals a design issue → suggest updating artifacts
@@ -167,7 +169,7 @@ What would you like to do?
 
 **Guardrails**
 
-- Keep going through tasks until done or blocked
+- Keep going through tasks and phases automatically until done or blocked. Only pause for user input when a blocker, ambiguity, required plan deviation, or explicit user interruption occurs.
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates

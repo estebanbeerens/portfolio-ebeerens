@@ -21,10 +21,10 @@ export class NavItem {
 
   protected readonly hostClass = computed(() =>
     [
-      'focus-visible:outline-accent flex w-full items-center gap-3 rounded-md border px-4 py-3 text-left no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+      'focus-visible:outline-accent flex w-full cursor-pointer items-center gap-3 rounded-md border px-4 py-3 text-left no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
       this.active()
         ? 'border-border-subtle bg-glass-active text-text font-semibold'
-        : 'border-transparent text-text-muted hover:bg-glass hover:text-text font-medium',
+        : 'border-transparent text-text-muted hover:bg-glass hover:text-text active:bg-glass-active font-medium',
     ].join(' ')
   );
 }
