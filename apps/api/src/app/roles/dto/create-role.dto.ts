@@ -1,13 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  ArrayMaxSize,
-  IsArray,
-  IsDateString,
-  IsEnum,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { ArrayMaxSize, IsArray, IsDateString, IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { EmploymentType } from '../../../generated/prisma/enums';
 
 export class CreateRoleDto {
@@ -22,6 +14,14 @@ export class CreateRoleDto {
   })
   @IsString()
   organizationId: string;
+
+  @ApiPropertyOptional({
+    description: 'Markdown source describing responsibilities and achievements in this role',
+    example: 'Built **accessible** Angular interfaces and mentored frontend engineers.',
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @ApiPropertyOptional({ example: 'Amsterdam, Netherlands' })
   @IsOptional()

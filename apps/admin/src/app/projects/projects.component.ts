@@ -90,7 +90,7 @@ export class Projects {
       ...(value.jobRole ? { jobRole: value.jobRole } : {}),
       ...(value.liveUrl ? { liveUrl: value.liveUrl } : {}),
       ...(value.endDate ? { endDate: value.endDate } : {}),
-      ...(value.skills.length > 0 ? { skills: value.skills } : {}),
+      skills: value.skills,
     };
 
     this.mutation.set('saving');

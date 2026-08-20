@@ -19,6 +19,12 @@ export class RoleDto {
   })
   organization: OrganizationDto;
 
+  @ApiPropertyOptional({
+    description: 'Markdown source describing responsibilities and achievements in this role',
+    example: 'Built **accessible** Angular interfaces and mentored frontend engineers.',
+  })
+  description?: string;
+
   @ApiPropertyOptional({ example: 'Amsterdam, Netherlands' })
   location?: string | null;
 

@@ -1,10 +1,24 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -23,6 +37,14 @@ export class ProjectsController {
   @ApiOkResponse({ description: 'All projects', type: [ProjectDto] })
   findAll() {
     return this.projectsService.findAll();
+  }
+
+  @Get(':id/related')
+  @ApiOkResponse({ description: 'Other projects related by shared skills', type: [ProjectDto] })
+  @ApiNotFoundResponse({ description: 'No project with this id exists' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max related projects to return (default 3)' })
+  findRelated(@Param('id') id: string, @Query('limit') limit?: string) {
+    return this.projectsService.findRelated(id, limit ? Number(limit) : undefined);
   }
 
   @Get(':id')

@@ -54,6 +54,7 @@
   /* Ambient background blobs; identical in both themes. */
   --color-glow-primary: rgb(2 132 199 / 0.12);
   --color-glow-secondary: rgb(124 58 237 / 0.08);
+  --color-glow-tertiary: rgb(29 78 216 / 0.1);
 
   /* Overrides Tailwind's default radius scale with the Figma radius tokens. */
   --radius-xs: 4px;

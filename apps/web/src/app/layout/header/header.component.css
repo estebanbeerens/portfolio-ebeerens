@@ -1,0 +1,40 @@
+.nav-link {
+  border-radius: 0.25rem;
+  color: var(--color-text-muted-value);
+  display: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-height: 2.75rem;
+  padding: 0.75rem 0.25rem;
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link:active,
+.nav-link-active {
+  color: var(--color-text-value);
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--color-accent-value);
+  outline-offset: 4px;
+}
+
+.nav-link-active::after {
+  background: var(--color-accent-value);
+  border-radius: 999px;
+  bottom: 0.35rem;
+  content: '';
+  height: 2px;
+  left: 0.25rem;
+  position: absolute;
+  width: 1rem;
+}
+
+@media (width >= 640px) {
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+  }
+}

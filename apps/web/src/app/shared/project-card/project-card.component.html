@@ -1,0 +1,33 @@
+<a
+  class="project-card-link"
+  [routerLink]="['/projects', project().slug]"
+  [attr.aria-label]="'View project ' + project().title"
+>
+  <ui-card
+    density="compact"
+    class="shadow-elevation hover:bg-glass-hover active:bg-glass-active h-full transition-colors"
+  >
+    @if (project().imageUrl) {
+      <img
+        class="h-44 w-full rounded-md object-cover"
+        [src]="project().imageUrl"
+        [alt]="project().title + ' project preview'"
+      />
+    } @else {
+      <div
+        class="h-44 w-full rounded-md bg-gradient-to-r to-transparent opacity-90"
+        [class.from-cyan-500]="isCyanTone()"
+        [class.from-violet-500]="!isCyanTone()"
+        aria-hidden="true"
+      ></div>
+    }
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-4 font-mono text-xs">
+        <p class="dark:text-accent truncate text-cyan-900">{{ skillSummary(project()) }}</p>
+        <p class="text-text-subtle">{{ projectYear(project()) }}</p>
+      </div>
+      <h3 class="font-display text-text text-xl font-bold">{{ project().title }}</h3>
+      <p class="text-text-muted line-clamp-3 text-sm leading-6">{{ project().shortDescription }}</p>
+    </div>
+  </ui-card>
+</a>

@@ -8,6 +8,7 @@ import {
   RolesService,
   SkillsService,
 } from '@portfolio-ebeerens/api-client';
+import { provideMarkdown } from 'ngx-markdown';
 import { ProfessionalJourney } from './professional-journey.component';
 
 const organization: OrganizationDto = {
@@ -44,6 +45,7 @@ describe('ProfessionalJourney', () => {
       imports: [ProfessionalJourney],
       providers: [
         provideRouter([]),
+        provideMarkdown(),
         { provide: RolesService, useValue: rolesApi },
         {
           provide: OrganizationsService,
@@ -125,6 +127,9 @@ describe('ProfessionalJourney', () => {
     const organizationSelect = fixture.nativeElement.querySelector('#role-organization') as HTMLSelectElement;
     organizationSelect.value = 'org-1';
     organizationSelect.dispatchEvent(new Event('change'));
+    const descriptionInput = fixture.nativeElement.querySelector('#role-description') as HTMLTextAreaElement;
+    descriptionInput.value = 'Built **accessible** interfaces.';
+    descriptionInput.dispatchEvent(new Event('input'));
     const startDateInput = fixture.nativeElement.querySelector('#role-start-date') as HTMLInputElement;
     startDateInput.value = '2024-05-01';
     startDateInput.dispatchEvent(new Event('input'));
@@ -140,7 +145,30 @@ describe('ProfessionalJourney', () => {
     await fixture.whenStable();
 
     expect(createOrganization).not.toHaveBeenCalled();
-    expect(createRole).toHaveBeenCalledWith(expect.objectContaining({ organizationId: 'org-1' }));
+    expect(createRole).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org-1', description: 'Built **accessible** interfaces.' })
+    );
+  });
+
+  it('switches the optional role description to a sanitized preview with semantic tab state', async () => {
+    configure({ rolesControllerFindAll: vi.fn(() => of([])) as never });
+
+    const fixture = TestBed.createComponent(ProfessionalJourney);
+    await fixture.whenStable();
+    (
+      Array.from(fixture.nativeElement.querySelectorAll('button')).find(
+        (button) => (button as HTMLButtonElement).textContent?.trim() === 'New role'
+      ) as HTMLButtonElement
+    ).click();
+    fixture.detectChanges();
+
+    const tabs = fixture.nativeElement.querySelectorAll('[role="tab"]') as NodeListOf<HTMLButtonElement>;
+    expect(tabs[0].getAttribute('aria-selected')).toBe('true');
+    tabs[1].click();
+    await fixture.whenStable();
+
+    expect(tabs[1].getAttribute('aria-selected')).toBe('true');
+    expect(fixture.nativeElement.querySelector('#role-description-panel ui-markdown')).not.toBeNull();
   });
 
   it('creates the organization first when "+ New organization" is chosen, then creates the role', async () => {

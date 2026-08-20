@@ -95,6 +95,33 @@ paths:
         '409':
           description: A project with this slug already exists
       tags: *ref_2
+  /api/projects/{id}/related:
+    get:
+      operationId: ProjectsController_findRelated
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Max related projects to return (default 3)
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Other projects related by shared skills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+        '404':
+          description: No project with this id exists
+      tags: *ref_2
   /api/projects/{id}:
     get:
       operationId: ProjectsController_findOne
@@ -932,6 +959,14 @@ components:
           description: The organization this role was held at
           allOf:
             - $ref: '#/components/schemas/OrganizationDto'
+        description:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role
+          example: >-
+            Built **accessible** Angular interfaces and mentored frontend
+            engineers.
         location:
           type: string
           example: Amsterdam, Netherlands
@@ -988,6 +1023,14 @@ components:
           type: string
           description: Id of the organization this role was held at
           example: cly1x8f9z0000abcd1234efgh
+        description:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role
+          example: >-
+            Built **accessible** Angular interfaces and mentored frontend
+            engineers.
         location:
           type: string
           example: Amsterdam, Netherlands
@@ -1036,6 +1079,14 @@ components:
           type: string
           description: Id of the organization this role was held at
           example: cly1x8f9z0000abcd1234efgh
+        description:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role
+          example: >-
+            Built **accessible** Angular interfaces and mentored frontend
+            engineers.
         location:
           type: string
           example: Amsterdam, Netherlands

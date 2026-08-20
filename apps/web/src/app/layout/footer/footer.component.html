@@ -1,0 +1,32 @@
+<footer
+  id="contact"
+  class="border-border-subtle text-text-muted relative z-10 border-t px-6 py-12 text-center text-sm lg:px-10"
+>
+  <div class="mx-auto flex max-w-7xl flex-col items-center gap-6">
+    <div class="flex flex-wrap justify-center gap-6 font-mono text-xs tracking-normal uppercase">
+      @if (profile()?.githubUrl; as githubUrl) {
+        <a class="footer-link" [href]="githubUrl" target="_blank" rel="noreferrer">GitHub</a>
+      }
+      @if (profile()?.linkedinUrl; as linkedinUrl) {
+        <a class="footer-link" [href]="linkedinUrl" target="_blank" rel="noreferrer">LinkedIn</a>
+      }
+      @if (profile()?.instagramUrl; as instagramUrl) {
+        <a class="footer-link" [href]="instagramUrl" target="_blank" rel="noreferrer">Instagram</a>
+      }
+      @if (profile()?.youtubeUrl; as youtubeUrl) {
+        <a class="footer-link" [href]="youtubeUrl" target="_blank" rel="noreferrer">YouTube</a>
+      }
+      @if (profile()?.xUrl; as xUrl) {
+        <a class="footer-link" [href]="xUrl" target="_blank" rel="noreferrer">Twitter</a>
+      }
+      <a class="footer-link" routerLink="/resume">Resume</a>
+    </div>
+    <p class="text-text-subtle text-xs">
+      © {{ currentYear }}
+      @if (profile()?.name; as name) {
+        {{ ' ' + name }}
+      }
+      . Designed with Apple Liquid Glass aesthetic.
+    </p>
+  </div>
+</footer>

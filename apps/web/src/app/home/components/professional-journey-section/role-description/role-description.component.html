@@ -1,0 +1,13 @@
+<div #content class="text-text-muted mt-3 text-sm" [class.line-clamp-2]="!expanded()" [attr.data-expanded]="expanded()">
+  <ui-markdown class="w-[95%]" [source]="description()" />
+</div>
+@if (overflows() && !expanded()) {
+  <button
+    type="button"
+    class="text-text-muted hover:text-text focus-visible:outline-accent mt-1 cursor-pointer text-sm underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+    [attr.aria-label]="'Show full description for ' + roleTitle()"
+    (click)="expand()"
+  >
+    Read more
+  </button>
+}

@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OrganizationDto, RoleDto } from '@portfolio-ebeerens/api-client';
-import { Button, Card, Select, SelectOption, TagCombobox, TextInput } from '@portfolio-ebeerens/ui';
+import { Button, Card, Markdown, Select, SelectOption, TagCombobox, TextInput } from '@portfolio-ebeerens/ui';
 import { EMPLOYMENT_TYPE_OPTIONS } from '../employment-type';
 
 export const NEW_ORGANIZATION_VALUE = '__new__';
@@ -11,6 +11,7 @@ export interface RoleFormValue {
   jobTitle: string;
   organizationId: string;
   newOrganizationName: string;
+  description: string;
   location: string;
   employmentType: string;
   startDate: string;
@@ -23,7 +24,7 @@ export interface RoleFormValue {
  */
 @Component({
   selector: 'admin-role-form',
-  imports: [Button, Card, ReactiveFormsModule, Select, TagCombobox, TextInput],
+  imports: [Button, Card, Markdown, ReactiveFormsModule, Select, TagCombobox, TextInput],
   templateUrl: './role-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -44,6 +45,7 @@ export class RoleForm {
 
   protected readonly newOrganizationValue = NEW_ORGANIZATION_VALUE;
   protected readonly isEditing = computed(() => this.role() !== undefined);
+  protected readonly descriptionView = signal<'markdown' | 'preview'>('markdown');
   protected readonly employmentTypeOptions = EMPLOYMENT_TYPE_OPTIONS;
   protected readonly organizationOptions = computed<SelectOption[]>(() => [
     ...this.organizations().map((organization) => ({ value: organization.id, label: organization.name })),
@@ -54,6 +56,7 @@ export class RoleForm {
     jobTitle: ['', [Validators.required, Validators.maxLength(200)]],
     organizationId: ['', Validators.required],
     newOrganizationName: [''],
+    description: [''],
     location: ['', Validators.maxLength(200)],
     employmentType: [''],
     startDate: ['', Validators.required],
@@ -95,6 +98,7 @@ export class RoleForm {
   }
 
   private resetForm(): void {
+    this.descriptionView.set('markdown');
     const role = this.role();
     this.form.reset(
       role
@@ -102,6 +106,7 @@ export class RoleForm {
             jobTitle: role.jobTitle,
             organizationId: role.organization.id,
             newOrganizationName: '',
+            description: role.description ?? '',
             location: role.location ?? '',
             employmentType: role.employmentType ?? '',
             startDate: role.startDate.slice(0, 10),
@@ -112,6 +117,7 @@ export class RoleForm {
             jobTitle: '',
             organizationId: '',
             newOrganizationName: '',
+            description: '',
             location: '',
             employmentType: '',
             startDate: '',

@@ -1,0 +1,52 @@
+<ui-card class="shadow-elevation" density="comfortable">
+  <div class="flex items-center gap-5">
+    @if (profile()?.avatarUrl; as avatar) {
+      <img
+        class="border-border size-[72px] rounded-full border object-cover"
+        [src]="avatar"
+        [alt]="(profile()?.name ?? 'Profile') + ' photo'"
+        width="72"
+        height="72"
+      />
+    }
+    <div class="min-w-0">
+      @if (profile()?.name; as name) {
+        <p class="font-display text-text text-2xl font-bold">{{ name }}</p>
+      }
+      @if (profile()?.location; as location) {
+        <p class="dark:text-accent font-mono text-sm text-cyan-900 uppercase">{{ location }}</p>
+      }
+    </div>
+  </div>
+
+  <dl class="border-border-subtle grid gap-4 border-t pt-6 text-sm">
+    @if (profile()?.headline; as headline) {
+      <div class="flex items-center justify-between gap-6">
+        <dt class="text-text">Role</dt>
+        <dd class="text-text text-right font-mono">{{ headline }}</dd>
+      </div>
+    }
+    @if (profile()?.location; as location) {
+      <div class="flex items-center justify-between gap-6">
+        <dt class="text-text">Residence</dt>
+        <dd class="text-text text-right font-mono">{{ location }}</dd>
+      </div>
+    }
+  </dl>
+
+  @if (socialLinks().length > 0) {
+    <div class="border-border-subtle flex flex-wrap gap-2 border-t pt-6" aria-label="Social profiles">
+      @for (link of socialLinks(); track link.platform) {
+        <a
+          class="social-link"
+          [href]="link.url"
+          target="_blank"
+          rel="noreferrer"
+          [attr.aria-label]="link.label + ' profile'"
+        >
+          <web-social-icon [platform]="link.platform" />
+        </a>
+      }
+    </div>
+  }
+</ui-card>

@@ -1,0 +1,42 @@
+import { isPlatformBrowser } from '@angular/common';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  PLATFORM_ID,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { Markdown } from '@portfolio-ebeerens/ui';
+
+@Component({
+  selector: 'web-role-description',
+  imports: [Markdown],
+  templateUrl: './role-description.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class RoleDescription {
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');
+
+  readonly description = input.required<string>();
+  readonly roleTitle = input.required<string>();
+  protected readonly expanded = signal(false);
+  protected readonly overflows = signal(false);
+
+  constructor() {
+    if (this.isBrowser) {
+      afterNextRender(() => {
+        const content = this.content().nativeElement;
+        this.overflows.set(content.scrollHeight > content.clientHeight);
+      });
+    }
+  }
+
+  protected expand(): void {
+    this.expanded.set(true);
+  }
+}

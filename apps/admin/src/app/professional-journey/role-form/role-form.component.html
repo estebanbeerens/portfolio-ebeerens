@@ -33,6 +33,54 @@
       />
     }
 
+    <div>
+      <label class="text-sm font-medium" for="role-description">Description</label>
+      <p class="text-text-muted mt-1 text-xs">Markdown is supported (headings, bold, lists, links...).</p>
+      <div class="border-border mt-1 flex gap-1 border-b" role="tablist" aria-label="Role description editor">
+        <button
+          type="button"
+          role="tab"
+          class="hover:bg-glass-hover focus-visible:outline-accent rounded-t px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+          [class.text-accent]="descriptionView() === 'markdown'"
+          [class.border-accent]="descriptionView() === 'markdown'"
+          [class.border-b-2]="descriptionView() === 'markdown'"
+          [class.text-text-muted]="descriptionView() !== 'markdown'"
+          [attr.aria-selected]="descriptionView() === 'markdown'"
+          aria-controls="role-description-panel"
+          (click)="descriptionView.set('markdown')"
+        >
+          Markdown
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="hover:bg-glass-hover focus-visible:outline-accent rounded-t px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+          [class.text-accent]="descriptionView() === 'preview'"
+          [class.border-accent]="descriptionView() === 'preview'"
+          [class.border-b-2]="descriptionView() === 'preview'"
+          [class.text-text-muted]="descriptionView() !== 'preview'"
+          [attr.aria-selected]="descriptionView() === 'preview'"
+          aria-controls="role-description-panel"
+          (click)="descriptionView.set('preview')"
+        >
+          Preview
+        </button>
+      </div>
+      <div id="role-description-panel" role="tabpanel">
+        @if (descriptionView() === 'markdown') {
+          <textarea
+            id="role-description"
+            class="border-border bg-surface focus-visible:outline-accent min-h-40 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
+            formControlName="description"
+          ></textarea>
+        } @else {
+          <div class="border-border bg-surface-raised min-h-40 overflow-auto rounded-b border border-t-0 p-3">
+            <ui-markdown [source]="form.controls.description.value" />
+          </div>
+        }
+      </div>
+    </div>
+
     <ui-input controlId="role-location" label="Location" formControlName="location" />
 
     <ui-select

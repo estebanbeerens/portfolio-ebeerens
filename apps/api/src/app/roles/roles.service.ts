@@ -12,11 +12,12 @@ export class RolesService {
     private readonly activity: ActivityService
   ) {}
 
-  findAll() {
-    return this.prisma.role.findMany({
+  async findAll() {
+    const roles = await this.prisma.role.findMany({
       orderBy: { startDate: 'desc' },
       include: { organization: true, skills: true },
     });
+    return roles.map((role) => this.normalizeDescription(role));
   }
 
   async findOne(id: string) {
@@ -27,7 +28,7 @@ export class RolesService {
     if (!role) {
       throw new NotFoundException(`Role "${id}" not found`);
     }
-    return role;
+    return this.normalizeDescription(role);
   }
 
   async create(dto: CreateRoleDto, actor?: string) {
@@ -50,7 +51,7 @@ export class RolesService {
         summary: `Added ${role.jobTitle} position at ${role.organization.name}`,
         actor,
       });
-      return role;
+      return this.normalizeDescription(role);
     } catch (error) {
       throw this.mapPrismaError(error, organizationId);
     }
@@ -64,8 +65,12 @@ export class RolesService {
         where: { id },
         data: {
           ...rest,
+          // Cleared optional fields are omitted by the client, so null them explicitly rather than leaving them unchanged.
+          description: rest.description || null,
+          location: rest.location || null,
+          employmentType: rest.employmentType || null,
           startDate: startDate ? new Date(startDate) : undefined,
-          endDate: endDate ? new Date(endDate) : undefined,
+          endDate: endDate ? new Date(endDate) : null,
           organization: organizationId ? { connect: { id: organizationId } } : undefined,
           skills: skills ? { set: [], ...this.buildSkillsInput(skills) } : undefined,
         },
@@ -78,7 +83,7 @@ export class RolesService {
         summary: `Updated ${role.jobTitle} position at ${role.organization.name}`,
         actor,
       });
-      return role;
+      return this.normalizeDescription(role);
     } catch (error) {
       throw this.mapPrismaError(error, organizationId);
     }
@@ -115,5 +120,14 @@ export class RolesService {
       }
     }
     return error;
+  }
+
+  private normalizeDescription<T extends { description: string | null }>(
+    role: T
+  ): Omit<T, 'description'> & {
+    description?: string;
+  } {
+    const { description, ...rest } = role;
+    return description === null ? rest : { ...rest, description };
   }
 }

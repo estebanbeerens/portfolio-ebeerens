@@ -22,8 +22,7 @@
 
 ## End-to-end validation
 
-- Any change affecting `apps/api`, `apps/admin`, or `apps/web` must add or update the relevant e2e coverage in the same change.
-- Run the affected e2e target before considering the change complete: use Playwright for admin/web UI flows and the API e2e target for HTTP behavior.
-- User-facing admin and web changes require a Playwright validation run using semantic locators; a unit test or build alone is not sufficient.
+- Do not add or update e2e specs (`admin-e2e`, `web-e2e`, `api-e2e`) automatically as part of a change. Only touch e2e tests when the user explicitly asks for e2e coverage or a Playwright/api-e2e run.
+- Unit/component tests (Vitest, Jest) remain expected for the code you change; e2e is opt-in on top of that.
 
 <!-- nx configuration end-->

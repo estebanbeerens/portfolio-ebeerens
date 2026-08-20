@@ -1,0 +1,108 @@
+<section class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-8 p-6 lg:px-10" aria-labelledby="project-title">
+  @if (project(); as project) {
+    <a uiButton variant="outlined" class="w-fit" routerLink="/projects">
+      <svg [lucideIcon]="backIcon" class="size-4" aria-hidden="true"></svg>
+      Go back to project directory
+    </a>
+
+    <div
+      class="border-border shadow-elevation relative flex h-64 w-full items-end overflow-hidden rounded-2xl border sm:h-80 lg:h-120"
+    >
+      @if (project.imageUrl) {
+        <img
+          class="absolute inset-0 h-full w-full object-cover"
+          [src]="project.imageUrl"
+          [alt]="project.title + ' project preview'"
+        />
+      } @else {
+        <div class="absolute inset-0 bg-linear-to-br from-cyan-500 to-violet-500 opacity-90" aria-hidden="true"></div>
+      }
+      <div class="absolute inset-0 bg-black/40" aria-hidden="true"></div>
+      <div
+        class="bg-glass backdrop-blur-glass border-border relative m-6 flex w-[calc(100%-3rem)] items-center justify-between gap-4 rounded-xl border p-6"
+      >
+        <h1 id="project-title" class="font-display text-2xl font-extrabold text-white sm:text-4xl">
+          {{ project.title }}
+        </h1>
+        <p class="dark:text-accent hidden shrink-0 font-mono text-sm text-cyan-300 sm:block">
+          PROJECT OVERVIEW // {{ projectYear(project) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_25rem]">
+      <div
+        class="border-border bg-glass backdrop-blur-glass shadow-elevation flex flex-col gap-6 rounded-xl border p-8 sm:p-10"
+      >
+        @if (project.client || project.jobRole) {
+          <div class="flex flex-wrap gap-12">
+            @if (project.client) {
+              <div class="flex flex-col gap-1.5">
+                <p class="text-text-subtle font-mono text-xs uppercase">Client</p>
+                <p class="text-text text-base font-semibold">{{ project.client }}</p>
+              </div>
+            }
+            @if (project.jobRole) {
+              <div class="flex flex-col gap-1.5">
+                <p class="text-text-subtle font-mono text-xs uppercase">Role</p>
+                <p class="text-text text-base font-semibold">{{ project.jobRole }}</p>
+              </div>
+            }
+            <div class="flex flex-col gap-1.5">
+              <p class="text-text-subtle font-mono text-xs uppercase">Duration</p>
+              <p class="text-text text-base font-semibold">{{ projectDuration(project) }}</p>
+            </div>
+          </div>
+          <div class="border-border border-t"></div>
+        }
+        <markdown class="project-markdown text-text-muted" [data]="project.description" />
+      </div>
+      <aside
+        class="border-border bg-glass backdrop-blur-glass shadow-elevation flex h-fit flex-col gap-6 rounded-xl border p-8"
+      >
+        <p class="font-display text-text text-xl font-bold">Engineered Stack</p>
+        @if (project.skills.length > 0) {
+          <ul class="flex flex-wrap gap-2.5" aria-label="Project skills">
+            @for (skill of project.skills; track skill.id) {
+              <li class="border-border bg-glass text-text rounded-full border px-4 py-2 font-mono text-xs">
+                {{ skill.name }}
+              </li>
+            }
+          </ul>
+        }
+        @if (project.liveUrl; as liveUrl) {
+          <div class="border-border border-t"></div>
+          <a
+            uiButton
+            variant="filled"
+            class="w-full justify-center rounded-xl py-4"
+            [href]="liveUrl"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <svg [lucideIcon]="externalLinkIcon" class="size-4" aria-hidden="true"></svg>
+            Visit Live Project
+          </a>
+        }
+      </aside>
+    </div>
+
+    @if (relatedProjectsList().length > 0) {
+      <div class="flex flex-col gap-8">
+        <h2 class="font-display text-text text-2xl font-bold sm:text-3xl">More Projects</h2>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          @for (relatedProject of relatedProjectsList(); track relatedProject.id; let index = $index) {
+            <web-project-card [project]="relatedProject" [index]="index" />
+          }
+        </div>
+      </div>
+    }
+  } @else if (content.projectsLoaded()) {
+    <h1 id="project-title" class="font-display text-text text-4xl font-bold">Project not found</h1>
+    <p class="text-text-muted">That project could not be found.</p>
+    <a uiButton variant="outlined" class="w-fit" routerLink="/projects">
+      <svg [lucideIcon]="backIcon" class="size-4" aria-hidden="true"></svg>
+      Go back to project directory
+    </a>
+  }
+</section>

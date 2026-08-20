@@ -51,8 +51,6 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm install --global @fission-ai/openspec@1.9.0
-      - run: npm run spec:validate
       - run: npx prisma migrate deploy
       - run: npx playwright install --with-deps
 

@@ -132,10 +132,11 @@ export class ProfessionalJourney {
       jobTitle: value.jobTitle,
       organizationId,
       startDate: value.startDate,
+      ...(value.description ? { description: value.description } : {}),
       ...(value.location ? { location: value.location } : {}),
       ...(value.employmentType ? { employmentType: value.employmentType as CreateRoleDto.EmploymentTypeEnum } : {}),
       ...(value.endDate ? { endDate: value.endDate } : {}),
-      ...(value.skills.length > 0 ? { skills: value.skills } : {}),
+      skills: value.skills,
     };
 
     const role = this.selectedRole();

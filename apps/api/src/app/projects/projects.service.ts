@@ -30,6 +30,28 @@ export class ProjectsService {
     return project;
   }
 
+  // Ranks by shared-skill count then recency, padding with other recent projects if too few overlap.
+  async findRelated(id: string, limit = 3) {
+    const project = await this.findOne(id);
+    const skillIds = new Set(project.skills.map((skill) => skill.id));
+
+    const others = await this.prisma.project.findMany({
+      where: { id: { not: id } },
+      orderBy: { createdAt: 'desc' },
+      include: { skills: true },
+    });
+
+    const ranked = [...others].sort((a, b) => {
+      const overlapDiff = sharedSkillCount(b, skillIds) - sharedSkillCount(a, skillIds);
+      if (overlapDiff !== 0) {
+        return overlapDiff;
+      }
+      return recencyValue(b) - recencyValue(a);
+    });
+
+    return ranked.slice(0, limit);
+  }
+
   async create(dto: CreateProjectDto, actor?: string) {
     const { skills, startDate, endDate, ...rest } = dto;
     try {
@@ -63,8 +85,13 @@ export class ProjectsService {
         where: { id },
         data: {
           ...rest,
+          // Cleared optional fields are omitted by the client, so null them explicitly rather than leaving them unchanged.
+          imageUrl: rest.imageUrl || null,
+          client: rest.client || null,
+          jobRole: rest.jobRole || null,
+          liveUrl: rest.liveUrl || null,
           startDate: startDate ? new Date(startDate) : undefined,
-          endDate: endDate ? new Date(endDate) : undefined,
+          endDate: endDate ? new Date(endDate) : null,
           skills: skills ? { set: [], ...this.buildSkillsInput(skills) } : undefined,
         },
         include: { skills: true },
@@ -112,4 +139,19 @@ export class ProjectsService {
     }
     return error;
   }
+}
+
+interface RankableProject {
+  skills: { id: string }[];
+  createdAt: Date;
+  startDate: Date;
+  endDate?: Date | null;
+}
+
+function sharedSkillCount(project: RankableProject, skillIds: Set<string>): number {
+  return project.skills.filter((skill) => skillIds.has(skill.id)).length;
+}
+
+function recencyValue(project: RankableProject): number {
+  return (project.endDate ?? project.startDate).getTime();
 }

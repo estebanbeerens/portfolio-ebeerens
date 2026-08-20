@@ -1,2 +1,11 @@
-<ui-theme-toggle />
-<router-outlet></router-outlet>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<ui-ambient-backdrop />
+
+<web-header [profile]="content.profileValue()" />
+
+<main class="text-text relative z-10 flex-1 pt-24" id="main-content" tabindex="-1">
+  <router-outlet></router-outlet>
+</main>
+
+<web-footer [profile]="content.profileValue()" />

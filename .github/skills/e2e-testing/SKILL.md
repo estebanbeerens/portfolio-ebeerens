@@ -7,10 +7,9 @@ description: "Write, modify, and run end-to-end tests across this Nx workspace's
 
 ## When to Use
 
-- Treat e2e coverage as part of implementation, not a follow-up task. Changes affecting `api`, `admin`, or `web` must add or update the relevant e2e spec and run that target before completion.
-- Admin and web behavior requires a Playwright spec and Playwright validation; API HTTP behavior requires `api-e2e` validation.
+- Only touch e2e specs when the user explicitly asks for e2e coverage, a Playwright run, or an api-e2e run. Do not add or update e2e tests automatically as a side effect of an unrelated code change.
 - Authenticated flows require a test fixture or test-only session setup. Never weaken the production auth guard to make e2e pass.
-- A unit test, lint, or build does not replace e2e validation for an affected application boundary.
+- Unit/component tests remain expected for the code you change; e2e is an opt-in, separate ask.
 
 - Writing or modifying an e2e spec in `admin-e2e`, `web-e2e`, or `api-e2e`
 - Deciding how to structure a new e2e test (locators, fixtures, HTTP assertions)

@@ -72,6 +72,7 @@ model Role {
   jobTitle       String
   organizationId String
   organization   Organization    @relation(fields: [organizationId], references: [id])
+  description    String?         @db.Text
   location       String?
   employmentType EmploymentType?
   startDate      DateTime

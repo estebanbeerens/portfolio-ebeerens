@@ -1,0 +1,25 @@
+<div class="relative min-h-screen overflow-hidden" id="home">
+  <div class="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-20 px-6 pt-6 pb-14 sm:gap-24 sm:pb-20 lg:px-10">
+    @if (content.loadError(); as message) {
+      <div class="border-error bg-glass text-error rounded-lg border px-5 py-4" role="status" aria-live="polite">
+        {{ message }}
+      </div>
+    }
+
+    <web-hero-section [profile]="content.profileValue()" />
+
+    @if (content.rolesEnabled()) {
+      <web-professional-journey-section [groups]="content.roleCompanyGroups()" />
+    }
+
+    @if (content.projectsEnabled()) {
+      <web-engineered-artifacts-section [projects]="selectedProjects()" />
+
+      @if (selectedProjects().length > 0) {
+        <div class="-mt-12 flex justify-center">
+          <a uiButton variant="outlined" routerLink="/projects">View All Projects</a>
+        </div>
+      }
+    }
+  </div>
+</div>

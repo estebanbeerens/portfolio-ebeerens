@@ -47,7 +47,12 @@ export class OrganizationsService {
     try {
       const organization = await this.prisma.organization.update({
         where: { id },
-        data: dto,
+        // Cleared optional fields are omitted by the client, so null them explicitly rather than leaving them unchanged.
+        data: {
+          ...dto,
+          logoUrl: dto.logoUrl || null,
+          website: dto.website || null,
+        },
       });
       await this.activity.record({
         entityType: 'ORGANIZATION',
