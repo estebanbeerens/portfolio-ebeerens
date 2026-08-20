@@ -15,7 +15,7 @@ export interface CreateContactMessageDto {
   subject: string;
   message: string;
   /**
-   * Token produced by the reCAPTCHA widget on the contact form
+   * Token produced by the Cloudflare Turnstile widget on the contact form
    */
-  recaptchaToken: string;
+  turnstileToken: string;
 }

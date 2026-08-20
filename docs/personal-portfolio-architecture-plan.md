@@ -190,7 +190,7 @@ Potential frontend responsibilities:
 - Individual project pages
 - Project images
 - Experience/resume section (organizations and the roles held at each)
-- Contact page (public inquiry form, reCAPTCHA-protected)
+- Contact page (public inquiry form, Cloudflare Turnstile-protected)
 - Other portfolio content
 
 ### Admin site
@@ -232,7 +232,7 @@ The API should own:
 - Project CRUD (including the skills used on each project)
 - Organization and role CRUD (work experience/resume, sharing the same skills pool as projects)
 - Feature flag configuration (enum-backed toggles gating the contact/projects/roles/skills sections)
-- Contact message intake (reCAPTCHA-verified) and admin review
+- Contact message intake (Cloudflare Turnstile-verified) and admin review
 - Image metadata
 - Database access
 - Validation
@@ -507,9 +507,10 @@ contact_messages
 └── createdAt
 ```
 
-Submitted through the public contact form. The reCAPTCHA token is verified against Google's
-`siteverify` API at submission time and is not itself persisted — only the message content is
-stored, for the admin to review.
+Submitted through the public contact form. The Cloudflare Turnstile token is verified against
+Cloudflare's `siteverify` API at submission time and is not itself persisted — only the message
+content is stored, for the admin to review. The backend validates the token server-side because the
+client widget alone is not trusted, and it does not forward the visitor IP to Cloudflare by default.
 
 ### Feature Flags
 
@@ -907,7 +908,7 @@ Only add these when they provide a learning opportunity or solve a real problem.
 - Implement projects
 - Implement profile
 - Implement the experience/resume section (organizations and roles)
-- Implement the contact page (reCAPTCHA-protected submission)
+- Implement the contact page (Cloudflare Turnstile-protected submission)
 - Optimize SEO/accessibility/performance
 
 ### Phase 4 — Authentication
@@ -1035,7 +1036,7 @@ The exact choices can still be evaluated, but the target architecture is:
 | Session                      | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis)                                                                                 |
 | Rich text                    | Markdown source (`text` column), rendered client-side (incl. SSR) with `ngx-markdown`/`marked`, sanitized via Angular `DomSanitizer`                                                             |
 | Image storage                | Cloudflare R2 (presigned uploads)                                                                                                                                                                |
-| Contact form spam protection | Google reCAPTCHA (token verified server-side against Google's API)                                                                                                                               |
+| Contact form spam protection | Cloudflare Turnstile (token verified server-side against Cloudflare Siteverify; visitor IP not forwarded by default)                                                                             |
 | Containers                   | Docker (arm64/multi-arch)                                                                                                                                                                        |
 | Orchestration                | Docker Compose                                                                                                                                                                                   |
 | Reverse proxy                | Nginx                                                                                                                                                                                            |

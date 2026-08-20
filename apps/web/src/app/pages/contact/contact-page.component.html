@@ -1,0 +1,90 @@
+<section class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-8 p-6 lg:px-10" aria-labelledby="contact-title">
+  <div class="max-w-3xl">
+    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase">Contact</p>
+    <h1 id="contact-title" class="font-display text-text mt-3 text-4xl font-bold">Get In Touch</h1>
+    <p class="text-text-muted mt-4 max-w-2xl">
+      Send a project inquiry, collaboration idea, or a note about the portfolio.
+    </p>
+  </div>
+
+  <div class="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-12">
+    <ui-card heading="Send a message" class="shadow-elevation" density="comfortable">
+      <form class="grid gap-5" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="grid gap-4 md:grid-cols-2">
+          <ui-input
+            controlId="contact-full-name"
+            label="Full name"
+            autocomplete="name"
+            [required]="true"
+            [error]="fieldError('fullName', 'Enter your name')"
+            formControlName="fullName"
+          />
+          <ui-input
+            controlId="contact-email"
+            label="Email"
+            type="email"
+            autocomplete="email"
+            [required]="true"
+            [error]="fieldError('email', 'Enter a valid email address')"
+            formControlName="email"
+          />
+        </div>
+
+        <ui-input
+          controlId="contact-organization"
+          label="Organization"
+          autocomplete="organization"
+          [error]="fieldError('organization', 'Keep organization under 200 characters')"
+          formControlName="organization"
+        />
+
+        <ui-input
+          controlId="contact-subject"
+          label="Subject"
+          [required]="true"
+          [error]="fieldError('subject', 'Enter a subject under 200 characters')"
+          formControlName="subject"
+        />
+
+        <ui-textarea
+          controlId="contact-message"
+          label="Message"
+          [required]="true"
+          [rows]="7"
+          [maxlength]="5000"
+          [error]="fieldError('message', 'Enter a message under 5000 characters')"
+          formControlName="message"
+        />
+
+        <div class="grid gap-2">
+          @if (turnstileSiteKey(); as siteKey) {
+            <ngx-turnstile
+              #turnstile
+              [siteKey]="siteKey"
+              action="contact"
+              theme="auto"
+              size="flexible"
+              [tabIndex]="0"
+              [responseField]="false"
+              (resolved)="onTurnstileResolved($event)"
+              (errored)="onTurnstileProblem()"
+              (timeout)="onTurnstileProblem()"
+              (unsupported)="onTurnstileProblem()"
+            />
+          } @else {
+            <p class="text-error text-sm" role="alert">Contact verification is not configured.</p>
+          }
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button uiButton type="submit" [disabled]="submissionState() === 'submitting'">
+            {{ submissionState() === 'submitting' ? 'Sending...' : 'Send message' }}
+          </button>
+          <p class="text-text-muted text-sm" aria-live="polite">{{ statusMessage() }}</p>
+        </div>
+      </form>
+    </ui-card>
+
+    <web-basic-info-card [profile]="content.profileValue()" />
+  </div>
+</section>

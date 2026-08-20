@@ -29,8 +29,10 @@ export class CreateContactMessageDto {
   message: string;
 
   @ApiProperty({
-    description: 'Token produced by the reCAPTCHA widget on the contact form',
+    description: 'Token produced by the Cloudflare Turnstile widget on the contact form',
+    maxLength: 2048,
   })
   @IsString()
-  recaptchaToken: string;
+  @MaxLength(2048)
+  turnstileToken: string;
 }

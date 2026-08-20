@@ -461,7 +461,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ContactMessageDto'
         '400':
-          description: reCAPTCHA verification failed
+          description: Turnstile verification failed
       tags: &ref_6
         - contact
     get:
@@ -1158,15 +1158,18 @@ components:
         message:
           type: string
           example: Hi, I'd like to discuss a project with you.
-        recaptchaToken:
+        turnstileToken:
           type: string
-          description: Token produced by the reCAPTCHA widget on the contact form
+          description: >-
+            Token produced by the Cloudflare Turnstile widget on the contact
+            form
+          maxLength: 2048
       required:
         - fullName
         - email
         - subject
         - message
-        - recaptchaToken
+        - turnstileToken
     ContactMessageDto:
       type: object
       properties:

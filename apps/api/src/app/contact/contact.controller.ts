@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -32,7 +22,7 @@ export class ContactController {
     description: 'The message was submitted',
     type: ContactMessageDto,
   })
-  @ApiBadRequestResponse({ description: 'reCAPTCHA verification failed' })
+  @ApiBadRequestResponse({ description: 'Turnstile verification failed' })
   create(@Body() dto: CreateContactMessageDto) {
     return this.contactService.create(dto);
   }

@@ -34,8 +34,8 @@ moving on.
    - GitHub account (source control + GitHub Actions + OAuth provider + GHCR container registry)
    - Cloudflare account, with your domain's nameservers already delegated to Cloudflare
    - Oracle Cloud account (sign up for Always Free)
-   - Google account with a reCAPTCHA site registered (console.cloud.google.com/security/recaptcha)
-     for the contact form (Stage 3/6) — note the site key and secret key
+   - Cloudflare Turnstile widget registered for the contact form (Stage 3/6) — note the public site
+     key and server-side secret key
 2. Install local tooling:
    - Node.js **22.x** (Prisma 7, used from Stage 2, requires Node ≥20.19 and recommends 22.x)
    - Docker Desktop (for local Postgres in Stage 2, and later for building images)
@@ -234,10 +234,12 @@ service/controller/repository layered structure.
    `connectOrCreate` — organizations carry `logoUrl`/`website`, so they're created explicitly via
    their own endpoint first); map a failed connect (Prisma `P2025`) to a 404, and map deleting an
    `Organization` that still has `Role`s referencing it (Prisma `P2003`) to a 409 instead of a raw 500. `Role.skills` reuses the same `connectOrCreate`-by-name helper as `projects`.
-5. Add the public `POST /api/contact` endpoint. Verify the submitted reCAPTCHA token against
-   Google's `siteverify` API server-side before storing the message — reject with 400 if
-   verification fails. Add admin-only `GET /api/contact` and `DELETE /api/contact/{id}` (guarded by
-   the Stage 4 session guard) to review and clear submissions.
+5. Add the public `POST /api/contact` endpoint. Verify the submitted Cloudflare Turnstile token
+   against Cloudflare's `siteverify` API server-side before storing the message — reject with 400 if
+   verification fails. Keep the secret key server-side, validate the expected `contact` action, and
+   avoid forwarding the visitor IP by default to reduce personal data sharing. Add admin-only
+   `GET /api/contact` and `DELETE /api/contact/{id}` (guarded by the Stage 4 session guard) to
+   review and clear submissions.
 6. Implement `GET /api/feature-flags` (public) and `PUT /api/feature-flags/{key}` (admin-only).
    On module init, upsert a row for every `FeatureFlagKey` enum value that doesn't already exist
    (defaulting `enabled` to `false`) so the table is always complete, even right after adding a new
@@ -251,7 +253,7 @@ parameter`) when the Angular client is generated from it.
 
 **Verify it worked:** open `/api/docs` in a browser, create a project (with skills) through the
 Swagger UI, and confirm the row (and its linked skills) appears via `npx prisma studio`; submit
-`POST /api/contact` with a valid reCAPTCHA token and confirm the row appears in `contact_messages`;
+`POST /api/contact` with a valid Turnstile token and confirm the row appears in `contact_messages`;
 restart the API and confirm `GET /api/feature-flags` always returns exactly one row per
 `FeatureFlagKey` value, each `enabled: false` until toggled.
 
@@ -374,9 +376,10 @@ SEO and accessibility basics.
 3. Build an experience/resume section from `GET /api/roles` (each role includes its nested
    `organization` and `skills`). Group consecutive roles that share the same organization under a
    single heading (LinkedIn-style), and render "Present" when a role's `endDate` is absent.
-4. Build a contact page with a reCAPTCHA widget (using `RECAPTCHA_SITE_KEY`) that submits to
-   `POST /api/contact`; show a clear success/error state and don't reveal server-side details on
-   failure.
+4. Build a contact page with a Cloudflare Turnstile widget. Serve the public site key through
+   `apps/web/public/runtime-config.json` as `turnstileSiteKey`, keep `TURNSTILE_SECRET_KEY`
+   server-side only, submit the resulting `turnstileToken` to `POST /api/contact`, show a clear
+   success/error state, and don't reveal server-side details on failure.
 5. Configure per-page `<title>`/meta description tags for SEO.
 6. Run an accessibility check (e.g. axe DevTools or Lighthouse) and fix obvious issues (alt text,
    color contrast, landmark regions, focus order).

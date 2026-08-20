@@ -2,7 +2,15 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
 
-const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const CONTACT_TURNSTILE_ACTION = 'contact';
+
+type TurnstileSiteverifyResponse = {
+  success: boolean;
+  action?: string;
+  hostname?: string;
+  'error-codes'?: string[];
+};
 
 @Injectable()
 export class ContactService {
@@ -21,7 +29,7 @@ export class ContactService {
   }
 
   async create(dto: CreateContactMessageDto) {
-    await this.verifyRecaptcha(dto.recaptchaToken);
+    await this.verifyTurnstile(dto.turnstileToken);
 
     const { fullName, email, organization, subject, message } = dto;
     return this.prisma.contactMessage.create({
@@ -29,23 +37,34 @@ export class ContactService {
     });
   }
 
-  // Verifies the token with Google rather than trusting the client.
-  private async verifyRecaptcha(token: string) {
-    const secret = process.env.RECAPTCHA_SECRET_KEY;
+  private async verifyTurnstile(token: string) {
+    const secret = process.env.TURNSTILE_SECRET_KEY;
     if (!secret) {
-      this.logger.error('RECAPTCHA_SECRET_KEY is not configured');
-      throw new BadRequestException('reCAPTCHA verification is unavailable');
+      this.logger.error('TURNSTILE_SECRET_KEY is not configured');
+      throw new BadRequestException('Turnstile verification is unavailable');
     }
 
-    const response = await fetch(RECAPTCHA_VERIFY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ secret, response: token }),
-    });
+    let result: TurnstileSiteverifyResponse;
+    try {
+      const response = await fetch(TURNSTILE_VERIFY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ secret, response: token }),
+      });
+      result = (await response.json()) as TurnstileSiteverifyResponse;
+    } catch (error) {
+      this.logger.error('Turnstile verification request failed', error);
+      throw new BadRequestException('Turnstile verification failed');
+    }
 
-    const result = (await response.json()) as { success: boolean };
     if (!result.success) {
-      throw new BadRequestException('reCAPTCHA verification failed');
+      this.logger.warn(`Turnstile verification failed: ${result['error-codes']?.join(', ') ?? 'unknown error'}`);
+      throw new BadRequestException('Turnstile verification failed');
+    }
+
+    if (result.action !== CONTACT_TURNSTILE_ACTION) {
+      this.logger.warn(`Turnstile action mismatch: ${result.action ?? 'missing'}`);
+      throw new BadRequestException('Turnstile verification failed');
     }
   }
 }
