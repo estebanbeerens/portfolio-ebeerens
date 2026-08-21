@@ -17,7 +17,11 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 // @ts-ignore
 import { CreateProjectDto } from '../model/createProjectDto';
 // @ts-ignore
+import { CreateProjectImageUploadUrlDto } from '../model/createProjectImageUploadUrlDto';
+// @ts-ignore
 import { ProjectDto } from '../model/projectDto';
+// @ts-ignore
+import { ProjectImageUploadUrlDto } from '../model/projectImageUploadUrlDto';
 // @ts-ignore
 import { UpdateProjectDto } from '../model/updateProjectDto';
 
@@ -110,6 +114,87 @@ export class ProjectsService extends BaseService {
     return this.httpClient.request<ProjectDto>('post', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
       body: createProjectDto,
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * @endpoint post /api/projects/upload-url
+   * @param createProjectImageUploadUrlDto
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public projectsControllerCreateImageUploadUrl(
+    createProjectImageUploadUrlDto: CreateProjectImageUploadUrlDto,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<ProjectImageUploadUrlDto>;
+  public projectsControllerCreateImageUploadUrl(
+    createProjectImageUploadUrlDto: CreateProjectImageUploadUrlDto,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpResponse<ProjectImageUploadUrlDto>>;
+  public projectsControllerCreateImageUploadUrl(
+    createProjectImageUploadUrlDto: CreateProjectImageUploadUrlDto,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpEvent<ProjectImageUploadUrlDto>>;
+  public projectsControllerCreateImageUploadUrl(
+    createProjectImageUploadUrlDto: CreateProjectImageUploadUrlDto,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<any> {
+    if (createProjectImageUploadUrlDto === null || createProjectImageUploadUrlDto === undefined) {
+      throw new Error(
+        'Required parameter createProjectImageUploadUrlDto was null or undefined when calling projectsControllerCreateImageUploadUrl.'
+      );
+    }
+
+    let localVarHeaders = this.defaultHeaders;
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    // to determine the Content-Type header
+    const consumes: string[] = ['application/json'];
+    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+    if (httpContentTypeSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+    }
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/projects/upload-url`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<ProjectImageUploadUrlDto>('post', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      body: createProjectImageUploadUrlDto,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),
       headers: localVarHeaders,

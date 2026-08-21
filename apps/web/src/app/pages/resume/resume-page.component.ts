@@ -1,17 +1,21 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+import { ProfessionalJourneySection } from '../../home/components/professional-journey-section/professional-journey-section.component';
+import { PortfolioContentService } from '../../shared/portfolio-content.service';
 
 @Component({
   selector: 'web-resume-page',
-  template: `
-    <section
-      class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-4 p-6 lg:px-10"
-      aria-labelledby="resume-title"
-    >
-      <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase">Curriculum Vitae</p>
-      <h1 id="resume-title" class="font-display text-text text-4xl font-bold">Resume</h1>
-      <p class="text-text-muted max-w-2xl">A dedicated resume page is coming soon.</p>
-    </section>
-  `,
+  imports: [ProfessionalJourneySection],
+  templateUrl: './resume-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResumePage {}
+export class ResumePage {
+  protected readonly content = inject(PortfolioContentService);
+
+  constructor() {
+    const title = inject(Title);
+    const meta = inject(Meta);
+    title.setTitle('Resume');
+    meta.updateTag({ name: 'description', content: 'Professional experience and career history.' });
+  }
+}

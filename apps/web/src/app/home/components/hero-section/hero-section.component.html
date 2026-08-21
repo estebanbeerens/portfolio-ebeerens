@@ -3,6 +3,7 @@
     <h1
       id="hero-title"
       class="font-display text-text max-w-4xl text-5xl leading-[1.05] font-extrabold sm:text-6xl lg:text-6xl"
+      i18n="@@hero.title"
     >
       Crafting fluid <span class="text-accent">interactive</span> architectures
     </h1>
@@ -10,8 +11,8 @@
       <markdown class="hero-markdown text-text-muted max-w-3xl text-base leading-7 sm:leading-8" [data]="bio" />
     }
     <div class="flex flex-wrap gap-4">
-      <a uiButton routerLink="/projects">See My Projects</a>
-      <a uiButton variant="outlined" routerLink="/contact">Get In Touch</a>
+      <a uiButton routerLink="/projects" i18n="@@hero.seeProjects">See My Projects</a>
+      <a uiButton variant="outlined" routerLink="/contact" i18n="@@hero.getInTouch">Get In Touch</a>
     </div>
   </div>
 

@@ -24,7 +24,9 @@ import {
 } from '@nestjs/swagger';
 import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { CreateProjectImageUploadUrlDto } from './dto/create-project-image-upload-url.dto';
 import { ProjectDto } from './dto/project.dto';
+import { ProjectImageUploadUrlDto } from './dto/project-image-upload-url.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
 
@@ -32,6 +34,14 @@ import { ProjectsService } from './projects.service';
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
+
+  @Post('upload-url')
+  @UseGuards(SessionAuthGuard)
+  @ApiOkResponse({ description: 'A short-lived presigned PUT url for a project image', type: ProjectImageUploadUrlDto })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  createImageUploadUrl(@Body() dto: CreateProjectImageUploadUrlDto): Promise<ProjectImageUploadUrlDto> {
+    return this.projectsService.createImageUploadUrl(dto);
+  }
 
   @Get()
   @ApiOkResponse({ description: 'All projects', type: [ProjectDto] })

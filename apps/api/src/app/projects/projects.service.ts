@@ -1,16 +1,34 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { Prisma } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { R2Service } from '../storage/r2.service';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { CreateProjectImageUploadUrlDto } from './dto/create-project-image-upload-url.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectsService {
+  private readonly logger = new Logger(ProjectsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
-    private readonly activity: ActivityService
+    private readonly activity: ActivityService,
+    private readonly r2: R2Service
   ) {}
+
+  private get imagesBucket(): string {
+    return process.env.R2_IMAGES_BUCKET as string;
+  }
+
+  async createImageUploadUrl(dto: CreateProjectImageUploadUrlDto) {
+    const extension = dto.mimeType.split('/')[1];
+    const objectKey = `projects/${randomUUID()}.${extension}`;
+    const uploadUrl = await this.r2.presignPut(this.imagesBucket, objectKey, dto.mimeType, dto.fileSize);
+    const publicUrl = `${process.env.R2_PUBLIC_BASE_URL}/${objectKey}`;
+    return { uploadUrl, objectKey, publicUrl };
+  }
 
   findAll() {
     return this.prisma.project.findMany({
@@ -78,7 +96,7 @@ export class ProjectsService {
   }
 
   async update(id: string, dto: UpdateProjectDto, actor?: string) {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
     const { skills, startDate, endDate, ...rest } = dto;
     try {
       const project = await this.prisma.project.update({
@@ -87,6 +105,9 @@ export class ProjectsService {
           ...rest,
           // Cleared optional fields are omitted by the client, so null them explicitly rather than leaving them unchanged.
           imageUrl: rest.imageUrl || null,
+          // `imageObjectKey` isn't exposed on ProjectDto (it's an internal R2 detail), so the client can only ever
+          // send a *new* key from a fresh upload. When the image is unchanged, keep the object key we already have.
+          imageObjectKey: rest.imageUrl ? (rest.imageObjectKey ?? existing.imageObjectKey) : null,
           client: rest.client || null,
           jobRole: rest.jobRole || null,
           liveUrl: rest.liveUrl || null,
@@ -96,6 +117,9 @@ export class ProjectsService {
         },
         include: { skills: true },
       });
+      if (existing.imageObjectKey && existing.imageObjectKey !== project.imageObjectKey) {
+        await this.deleteImageObject(existing.imageObjectKey);
+      }
       await this.activity.record({
         entityType: 'PROJECT',
         action: 'UPDATED',
@@ -112,12 +136,27 @@ export class ProjectsService {
   async remove(id: string, actor?: string) {
     const project = await this.findOne(id);
     await this.prisma.project.delete({ where: { id } });
+    if (project.imageObjectKey) {
+      await this.deleteImageObject(project.imageObjectKey);
+    }
     await this.activity.record({
       entityType: 'PROJECT',
       action: 'DELETED',
       summary: `Deleted project "${project.title}"`,
       actor,
     });
+  }
+
+  // Best-effort: an R2 delete failure shouldn't fail an otherwise-successful project mutation.
+  private async deleteImageObject(objectKey: string): Promise<void> {
+    if (!this.r2.isConfigured) {
+      return;
+    }
+    try {
+      await this.r2.deleteObject(this.imagesBucket, objectKey);
+    } catch (error) {
+      this.logger.warn(`Failed to delete stale project image "${objectKey}" from R2: ${error}`);
+    }
   }
 
   // Reuses existing skills by name (case-insensitively normalized), creating new ones as needed.

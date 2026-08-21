@@ -57,4 +57,19 @@ export class ResumeService {
     await this.prisma.resumeDownload.create({ data: { resumeId: resume.id } });
     return this.r2.presignGet(this.bucket, resume.objectKey, resume.fileName);
   }
+
+  async deleteResume(actor?: string) {
+    const resume = await this.findResume();
+    await this.prisma.resume.delete({ where: { id: resume.id } });
+    if (this.r2.isConfigured) {
+      await this.r2.deleteObject(this.bucket, resume.objectKey);
+    }
+    await this.activity.record({
+      entityType: ActivityEntity.RESUME,
+      entityId: resume.id,
+      action: ActivityAction.DELETED,
+      summary: `Deleted the resume "${resume.fileName}"`,
+      actor,
+    });
+  }
 }

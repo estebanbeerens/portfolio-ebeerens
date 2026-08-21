@@ -20,6 +20,11 @@ export class ProfessionalJourneySection {
   protected readonly visibleGroups = computed(() =>
     this.expanded() ? this.groups() : this.groups().slice(0, COLLAPSED_COMPANY_COUNT)
   );
+  protected readonly toggleLabel = computed(() =>
+    this.expanded()
+      ? $localize`:@@journey.showLess:Show less experience`
+      : $localize`:@@journey.showAll:Show all experience`
+  );
 
   protected toggleExpanded(): void {
     this.expanded.update((value) => !value);
@@ -57,6 +62,15 @@ export class ProfessionalJourneySection {
       .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  }
+
+  // Fallback avatar when an organization has no logo — first letters of up to two words.
+  protected organizationInitials(name: string): string {
+    const words = name.trim().split(/\s+/).filter(Boolean);
+    return words
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
   }
 }
 

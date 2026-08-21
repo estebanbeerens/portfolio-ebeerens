@@ -5,10 +5,11 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ProfileService, UpdateProfileDto } from '@portfolio-ebeerens/api-client';
 import { PageHeader, ToastService } from '@portfolio-ebeerens/ui';
 import { ProfileForm, ProfileFormValue } from './profile-form/profile-form.component';
+import { ResumeUpload } from './resume-upload/resume-upload.component';
 
 @Component({
   selector: 'admin-profile',
-  imports: [PageHeader, ProfileForm],
+  imports: [PageHeader, ProfileForm, ResumeUpload],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-w-0 flex-1 flex-col gap-8' },

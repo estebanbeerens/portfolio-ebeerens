@@ -159,6 +159,7 @@ export class ProfessionalJourney {
   protected updateOrganization(update: OrganizationUpdate): void {
     const payload: UpdateOrganizationDto = {
       ...(update.logoUrl ? { logoUrl: update.logoUrl } : {}),
+      ...(update.logoObjectKey ? { logoObjectKey: update.logoObjectKey } : {}),
       ...(update.website ? { website: update.website } : {}),
     };
     this.organizationsApi.organizationsControllerUpdate(update.id, payload).subscribe({

@@ -12,6 +12,7 @@ import {
   RolesService,
 } from '@portfolio-ebeerens/api-client';
 import { of } from 'rxjs';
+import { axe } from 'vitest-axe';
 import { HomePage } from './home-page.component';
 
 const profile: ProfileDto = {
@@ -82,5 +83,35 @@ describe('HomePage', () => {
     expect(compiled.textContent).toContain('Crafting fluid');
     expect(compiled.textContent).toContain('Nebula Labs');
     expect(compiled.textContent).toContain('Aether Dashboard');
+  });
+
+  it('has no accessibility violations', async () => {
+    await TestBed.configureTestingModule({
+      imports: [HomePage],
+      providers: [
+        provideMarkdown(),
+        provideRouter([]),
+        { provide: ProfileService, useValue: { profileControllerGetProfile: () => of(profile) } },
+        { provide: RolesService, useValue: { rolesControllerFindAll: () => of(roles) } },
+        { provide: ProjectsService, useValue: { projectsControllerFindAll: () => of(projects) } },
+        {
+          provide: FeatureFlagsService,
+          useValue: {
+            featureFlagsControllerFindAll: () =>
+              of([
+                { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
+                { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
+              ]),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(HomePage);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const results = await axe(fixture.nativeElement);
+    (expect(results) as unknown as { toHaveNoViolations: () => void }).toHaveNoViolations();
   });
 });

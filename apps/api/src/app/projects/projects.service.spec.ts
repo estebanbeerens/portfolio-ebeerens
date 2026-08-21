@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { R2Service } from '../storage/r2.service';
 import { ProjectsService } from './projects.service';
 
 describe('ProjectsService', () => {
@@ -36,11 +37,13 @@ describe('ProjectsService', () => {
       },
     };
     const activity = { record: jest.fn() };
+    const r2 = { isConfigured: false, presignPut: jest.fn(), deleteObject: jest.fn() };
     const moduleRef = await Test.createTestingModule({
       providers: [
         ProjectsService,
         { provide: PrismaService, useValue: prisma },
         { provide: ActivityService, useValue: activity },
+        { provide: R2Service, useValue: r2 },
       ],
     }).compile();
 

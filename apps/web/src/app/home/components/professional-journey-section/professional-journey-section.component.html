@@ -1,11 +1,13 @@
 <section id="journey" class="scroll-mt-28" aria-labelledby="journey-title">
   <div class="mb-10 flex flex-col gap-2">
-    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase">Curriculum Vitae</p>
-    <h2 id="journey-title" class="font-display text-text text-4xl font-bold">Professional Journey</h2>
+    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase" i18n="@@journey.eyebrow">Curriculum Vitae</p>
+    <h2 id="journey-title" class="font-display text-text text-4xl font-bold" i18n="@@journey.title">
+      Professional Journey
+    </h2>
   </div>
 
   @if (groups().length > 0) {
-    <ol class="grid gap-0" aria-label="Professional organizations">
+    <ol class="grid gap-0" aria-label="Professional organizations" i18n-aria-label="@@journey.organizationsAriaLabel">
       @for (group of visibleGroups(); track group.organization.id; let last = $last) {
         <li class="grid gap-5 sm:grid-cols-[7.5rem_2rem_minmax(0,1fr)] sm:gap-8">
           <p class="dark:text-accent pt-6 font-mono text-sm font-semibold text-cyan-900 sm:text-right">
@@ -21,44 +23,85 @@
           </div>
           <div class="pb-8">
             <ui-card density="compact" class="shadow-elevation">
-              <div class="flex flex-col gap-1">
-                <h3 class="font-display text-text text-xl font-bold">{{ group.organization.name }}</h3>
-                @if (group.roles.length > 1) {
-                  <p class="text-text font-mono text-xs">{{ groupDuration(group) }} total</p>
-                }
-              </div>
-              <ol class="grid gap-4" aria-label="Roles at {{ group.organization.name }}">
-                @for (role of group.roles; track role.id) {
-                  <li class="border-border-subtle border-t pt-4 pl-4 first:border-t-0 first:pt-0">
-                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                      <div>
-                        <h4 class="font-display text-text text-lg font-semibold">{{ role.jobTitle }}</h4>
-                        <p class="text-text-subtle font-mono text-xs">
-                          {{ roleDateRange(role.startDate, role.endDate) }}
-                        </p>
-                      </div>
-                      <div class="flex flex-wrap items-center gap-2">
-                        @if (role.location) {
-                          <span class="text-text-muted font-mono text-xs">{{ role.location }}</span>
-                        }
-                        @if (role.employmentType) {
-                          <span class="text-text bg-glass rounded-full px-3 py-1 font-mono text-xs">{{
-                            employmentTypeLabel(role.employmentType)
-                          }}</span>
-                        }
-                      </div>
+              <div class="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-3">
+                <div class="col-start-1 row-start-1 flex justify-center self-center pb-3">
+                  @if (group.organization.logoUrl; as logoUrl) {
+                    <img
+                      class="border-border-subtle size-8 shrink-0 rounded-full border object-cover"
+                      [src]="logoUrl"
+                      [alt]="group.organization.name + ' logo'"
+                      width="32"
+                      height="32"
+                    />
+                  } @else {
+                    <div
+                      class="bg-glass-active text-text font-display flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                      aria-hidden="true"
+                    >
+                      {{ organizationInitials(group.organization.name) }}
                     </div>
-                    @if (role.description) {
-                      <web-role-description [description]="role.description" [roleTitle]="role.jobTitle" />
-                    }
-                    @if (role.skills.length > 0) {
-                      <p class="dark:text-accent mt-3 truncate font-mono text-xs text-cyan-900">
-                        {{ roleSkillSummary(role) }}
-                      </p>
-                    }
-                  </li>
-                }
-              </ol>
+                  }
+                </div>
+                <div class="col-start-2 row-start-1 flex flex-col justify-center gap-1 self-center pb-3">
+                  <h3 class="font-display text-text text-xl font-bold">{{ group.organization.name }}</h3>
+                  @if (group.roles.length > 1) {
+                    <p class="text-text font-mono text-xs" i18n="@@journey.totalDuration">
+                      {{ groupDuration(group) }} total
+                    </p>
+                  }
+                </div>
+
+                <ol
+                  class="contents"
+                  aria-label="Roles at {{ group.organization.name }}"
+                  i18n-aria-label="@@journey.rolesAtAriaLabel"
+                >
+                  @for (role of group.roles; track role.id; let i = $index; let lastRole = $last) {
+                    <li class="contents">
+                      <div
+                        class="col-start-1 flex flex-col items-center self-stretch"
+                        [style.grid-row]="i + 2"
+                        aria-hidden="true"
+                      >
+                        @if (group.roles.length > 1) {
+                          <span class="bg-accent mt-2 size-2 shrink-0 rounded-full"></span>
+                          @if (!lastRole) {
+                            <span class="bg-border-subtle mt-1 w-px flex-1"></span>
+                          }
+                        }
+                      </div>
+                      <div class="col-start-2 self-start pb-4 last:pb-0" [style.grid-row]="i + 2">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <h4 class="font-display text-text text-lg font-semibold">{{ role.jobTitle }}</h4>
+                            <p class="text-text-subtle font-mono text-xs">
+                              {{ roleDateRange(role.startDate, role.endDate) }}
+                            </p>
+                          </div>
+                          <div class="flex flex-wrap items-center gap-2">
+                            @if (role.location) {
+                              <span class="text-text-muted font-mono text-xs">{{ role.location }}</span>
+                            }
+                            @if (role.employmentType) {
+                              <span class="text-text bg-glass rounded-full px-3 py-1 font-mono text-xs">{{
+                                employmentTypeLabel(role.employmentType)
+                              }}</span>
+                            }
+                          </div>
+                        </div>
+                        @if (role.description) {
+                          <web-role-description [description]="role.description" [roleTitle]="role.jobTitle" />
+                        }
+                        @if (role.skills.length > 0) {
+                          <p class="dark:text-accent mt-3 truncate font-mono text-xs text-cyan-900">
+                            {{ roleSkillSummary(role) }}
+                          </p>
+                        }
+                      </div>
+                    </li>
+                  }
+                </ol>
+              </div>
             </ui-card>
           </div>
         </li>
@@ -67,13 +110,13 @@
     @if (hasMore()) {
       <div class="flex justify-center pt-2">
         <button uiButton variant="outlined" type="button" (click)="toggleExpanded()">
-          {{ expanded() ? 'Show less experience' : 'Show all experience' }}
+          {{ toggleLabel() }}
         </button>
       </div>
     }
   } @else {
     <ui-card density="compact">
-      <p class="text-text-muted">Professional journey details are coming soon.</p>
+      <p class="text-text-muted" i18n="@@journey.comingSoon">Professional journey details are coming soon.</p>
     </ui-card>
   }
 </section>

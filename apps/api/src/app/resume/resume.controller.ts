@@ -1,5 +1,11 @@
-import { Body, Controller, Get, Put, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Put, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { ConfirmResumeUploadDto } from './dto/confirm-resume-upload.dto';
@@ -41,5 +47,15 @@ export class ResumeController {
   async download(@Res() res: Response) {
     const url = await this.resumeService.registerDownload();
     return res.redirect(url);
+  }
+
+  @Delete()
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({ description: 'The resume was deleted' })
+  @ApiNotFoundResponse({ description: 'No resume uploaded yet' })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  remove(@Req() req: RequestWithGithubUser): Promise<void> {
+    return this.resumeService.deleteResume(req.displayName ?? req.githubUserId);
   }
 }

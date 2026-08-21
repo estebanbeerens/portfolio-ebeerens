@@ -332,11 +332,15 @@ storage instead of through your API.
    switch per row that calls `PUT /api/feature-flags/{key}`. This is admin-only config, not
    content the public site fetches at build time — every page load re-checks it (see Stage 6's
    note on the still-unbuilt frontend consumption piece).
-6. Create a Cloudflare R2 bucket (via the Cloudflare dashboard) for images. Add an endpoint
-   `POST /api/uploads/presign` that validates the requested content-type/size and returns a
-   short-lived presigned PUT URL using the S3-compatible R2 API.
-7. In the admin UI, upload the selected file directly to the presigned URL (not through your API),
-   then call a "confirm" endpoint that stores the resulting object key/URL against the project.
+6. Create the Cloudflare R2 buckets you'll need for this stage — one for project images, one for
+   the resume/CV document — following the **R2 setup walkthrough** below. Add a presign endpoint
+   per resource (`POST /api/projects/upload-url`, `POST /api/resume/upload-url`) that validates the
+   requested content-type/size against an explicit allowlist and returns a short-lived presigned PUT
+   URL using the S3-compatible R2 API.
+7. In the admin UI, upload the selected file directly to the presigned URL (not through your API).
+   For project images, include the returned object key alongside the resulting public URL in the
+   project's create/update payload. For the resume, call the `PUT /api/resume` confirm endpoint with
+   the object key/filename/size once the direct upload finishes.
 8. When rendering the project description anywhere (admin preview or later, the public site), parse
    the stored Markdown to HTML with `ngx-markdown`/`marked` and rely on its built-in sanitizer
    (Angular's `DomSanitizer`) — never bypass sanitization to render stored markdown as trusted HTML.
@@ -348,9 +352,70 @@ storage instead of through your API.
 > Your server hands that link to the browser, and the browser uploads straight to storage. Your
 > server never has to receive or forward the file's bytes, which keeps it fast and light.
 
+> 📦 **R2 setup walkthrough — creating the buckets and filling in `.env`**
+>
+> 1. **Create the buckets.** Cloudflare dashboard → **R2 Object Storage** → **Create bucket**.
+>    Create two buckets, named to match the env vars below exactly: `portfolio-images` and
+>    `portfolio-documents`. (A third, `portfolio-backups`, is created the same way in Stage 13.)
+>    If data residency matters to you (e.g. GDPR), under **Location** choose **Specify jurisdiction**
+>    and pick the same jurisdiction (e.g. `eu`) for every bucket — see the jurisdiction note in step 6;
+>    this choice **cannot be changed later** without deleting and recreating the bucket.
+> 2. **Get your account ID.** Still on the R2 overview page, copy the **Account ID** shown in the
+>    right-hand sidebar → this is `R2_ACCOUNT_ID`.
+> 3. **Create an API token.** R2 → **Manage API tokens** → **Create API token**. Scope permissions to
+>    **Object Read & Write**, restricted to the buckets you just created (don't grant account-wide
+>    access). Copy the **Access Key ID** and **Secret Access Key** immediately — the secret is only
+>    shown once → these become `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`.
+> 4. **Make the images bucket public; keep the documents bucket private.** Project images need to be
+>    loadable directly in a browser `<img>` tag, so open the `portfolio-images` bucket → **Settings**
+>    → **Public access** → enable the r2.dev subdomain (or connect a custom domain/subdomain once
+>    Stage 11 sets up Cloudflare DNS for this project). Whichever base URL you get becomes
+>    `R2_PUBLIC_BASE_URL`. Leave `portfolio-documents` **without** public access — the resume is only
+>    ever served through the API's short-lived signed download link (`GET /api/resume/download`),
+>    never a public URL.
+> 5. **Add a CORS policy so the browser can PUT directly to R2.** Presigned uploads happen straight
+>    from the admin UI's origin to R2, so both buckets need a CORS policy allowing that. On each
+>    bucket: **Settings** → **CORS Policy** → add:
+>    ```json
+>    [
+>      {
+>        "AllowedOrigins": ["http://localhost:4300", "https://admin.yourdomain.com"],
+>        "AllowedMethods": ["PUT"],
+>        "AllowedHeaders": ["*"],
+>        "MaxAgeSeconds": 3000
+>      }
+>    ]
+>    ```
+>    Add the images bucket's actual public base URL/origin too if you ever fetch images through
+>    something other than a plain `<img src>` (a plain image request doesn't need CORS).
+> 6. **Fill in `.env`** (copy from `.env.example`):
+>
+>    ```env
+>    R2_ACCOUNT_ID=<from step 2>
+>    R2_ACCESS_KEY_ID=<from step 3>
+>    R2_SECRET_ACCESS_KEY=<from step 3>
+>    R2_DOCUMENTS_BUCKET=portfolio-documents
+>    R2_IMAGES_BUCKET=portfolio-images
+>    R2_PUBLIC_BASE_URL=<the r2.dev or custom-domain base URL from step 4>
+>    R2_JURISDICTION=<only if you picked a jurisdiction in step 1, e.g. "eu" — otherwise leave unset>
+>    ```
+>
+>    The first five `R2_*` vars must be set together — the API's `R2Service` treats R2 as unconfigured
+>    (returning 503 on upload/download routes) until `R2_ACCOUNT_ID`/`R2_ACCESS_KEY_ID`/
+>    `R2_SECRET_ACCESS_KEY` are all present.
+>
+>    > 💡 **B1 explainer — why does jurisdiction need its own env var?** A bucket created under a
+>    > jurisdiction (e.g. `eu`) physically only exists at a jurisdiction-specific S3 endpoint —
+>    > `https://<account_id>.eu.r2.cloudflarestorage.com` instead of the default
+>    > `https://<account_id>.r2.cloudflarestorage.com`. Hitting the default endpoint for a
+>    > jurisdiction-restricted bucket fails outright (the bucket doesn't exist there), so
+>    > `R2Service` needs to know which endpoint to build. This also means all your R2 buckets must
+>    > share one jurisdiction (or none) — you can't mix them with a single client/env config.
+
 **Verify it worked:** creating a project with a rich-text description and an image in the admin UI
-results in a new row in `projects` with a `jsonb` description and a real R2 object URL; the image
-loads directly from the R2 URL in a browser.
+results in a new row in `projects` with a Markdown `description` and a real `R2_PUBLIC_BASE_URL`-backed
+image URL; the image loads directly from that URL in a browser. Uploading a resume in the admin UI's
+Basic Info page shows it as the active file and downloads correctly from the public site.
 
 **Reference:** architecture doc §10 (Image Storage, including the WYSIWYG/sanitization design).
 
@@ -358,36 +423,73 @@ loads directly from the R2 URL in a browser.
 
 ## Stage 6 — Public SSR site
 
-**Goal:** the public-facing site renders profile + project data, server-side rendered, with good
-SEO and accessibility basics.
+**Goal:** the public-facing site renders profile + project data, prerendered at build time (SSG)
+for good SEO, in both English and Dutch, with accessibility basics covered. `admin` intentionally
+stays client-rendered — see the explainer below for why the two apps make different choices here.
 
-**What you'll learn:** using Angular's SSR output for a content-driven, read-only public site.
+**What you'll learn:** using Angular's SSR/prerender output for a content-driven, read-only public
+site, and why "SSR" isn't a single one-size-fits-all choice across apps in the same monorepo.
 
 **Steps:**
 
-1. Fetch `GET /api/feature-flags` once at application init (e.g. an `APP_INITIALIZER`/
-   `provideAppInitializer`-style hook shared between `web` and `admin`) and expose the result via a
-   small service so pages/nav items can check `CONTACT`/`PROJECTS`/`ROLES`/`SKILLS` before
-   rendering. This wasn't designed in Stage 3/5 beyond the API contract itself — this is the first
-   point in the guide where there's an actual page to gate.
-2. Build the home/about/projects/project-detail pages in `web`, fetching data from the read-only
-   API endpoints (no auth needed for these). Show a project's skills, client, job role, live URL,
-   and start/end date (render "Present" when `endDate` is absent) where present.
-3. Build an experience/resume section from `GET /api/roles` (each role includes its nested
-   `organization` and `skills`). Group consecutive roles that share the same organization under a
-   single heading (LinkedIn-style), and render "Present" when a role's `endDate` is absent.
+1. Fetch `GET /api/feature-flags` once at application init via `provideAppInitializer`, guarded
+   with `isPlatformBrowser` (skipped server-side — see explainer), and expose the result via
+   `PortfolioContentService` so pages/nav items can check `CONTACT`/`PROJECTS`/`ROLES`/`SKILLS`
+   before rendering. `apps/web/src/app/layout/header/header.component.html` gates the
+   Projects/Resume/Contact nav links on their respective flags.
+2. Build the home/projects/project-detail pages in `web`, fetching data from the read-only API
+   endpoints (no auth needed for these). Show a project's skills, client, job role, live URL, and
+   start/end date where present.
+3. Build a real `/resume` page (`apps/web/src/app/pages/resume/resume-page.component.ts`) reusing
+   `ProfessionalJourneySection` fed from `PortfolioContentService.roleCompanyGroups()` — roles are
+   grouped by organization (LinkedIn-style) and render "Present" when a role's `endDate` is absent.
 4. Build a contact page with a Cloudflare Turnstile widget. Serve the public site key through
    `apps/web/public/runtime-config.json` as `turnstileSiteKey`, keep `TURNSTILE_SECRET_KEY`
    server-side only, submit the resulting `turnstileToken` to `POST /api/contact`, show a clear
    success/error state, and don't reveal server-side details on failure.
-5. Configure per-page `<title>`/meta description tags for SEO.
-6. Run an accessibility check (e.g. axe DevTools or Lighthouse) and fix obvious issues (alt text,
-   color contrast, landmark regions, focus order).
-7. Confirm SSR is actually rendering server-side: view page source (not devtools' rendered DOM) and
-   confirm the content is already present in the raw HTML.
+5. Configure per-page `<title>`/meta description tags via Angular's `Title`/`Meta` services
+   (`@angular/platform-browser`) — static per-page for home/resume/projects/contact, dynamic (via
+   an `effect()` watching the loaded project) for the project-detail page.
+6. Add `@angular/localize` for English/Dutch, with dedicated `/en/` and `/nl/` builds — see the
+   `angular-frontend` skill and `apps/web/src/locale/` for the extraction/translation workflow.
+7. Switch `apps/web/src/app/app.routes.server.ts` to `RenderMode.Prerender` (static routes) plus
+   `getPrerenderParams` for `projects/:slug` (fetches all project slugs from the API at build time
+   via a plain `fetch()` with an absolute `API_URL`, falling back to `PrerenderFallback.Server` for
+   any project added after the last build). Requires the API to be reachable at build time (locally
+   or in CI) — see the explainer below.
+8. Add accessibility tests with `vitest-axe` (`apps/web/src/test-setup.ts` registers the matcher)
+   alongside functional specs — see `header.component.spec.ts`, `home-page.component.spec.ts`, and
+   `footer.component.spec.ts` for the pattern.
+9. Confirm SSG is actually producing real content: view page source (not devtools' rendered DOM)
+   on a built/served page and confirm project/profile content and the correct `<title>` are already
+   present in the raw HTML — not just an empty `<app-root>` shell.
 
-**Verify it worked:** `curl` the `web` app's URL and see project/profile content in the raw HTML
-response, not just an empty `<app-root>` shell.
+> 💡 **B1 explainer — why does `admin` stay client-rendered while `web` uses SSG?**
+> SSR/SSG exist to make server-rendered HTML available to search engines and first-paint
+> performance. `admin` is a single-administrator, auth-gated tool — nothing on it needs to rank in
+> search results, and its session cookie is HttpOnly, so Angular can only learn the real auth state
+> via a browser-side round-trip to `/api/auth/me`. Making `admin` render server-side would mean
+> forwarding that cookie into every SSR request and validating the session on the server too — a
+> real, security-sensitive refactor for a page that gets no SEO benefit from it. `web` has neither
+> problem (public, read-only, no auth), so it can safely commit to full build-time prerendering.
+
+> 💡 **B1 explainer — why did Prerender need an absolute API URL?**
+> A relative API URL (`basePath: ''`) works fine once your app is running for real: in the browser
+> it resolves against the page's own origin, and during a genuine per-request SSR render Angular
+> can resolve it against the incoming request. But build-time prerendering has no request at
+> all — there's nothing to resolve a relative URL against, so those HTTP calls just hang forever
+> until the build times out. The fix is to give the **server** bundle (used for both prerendering
+> and any later per-request SSR) an absolute URL instead — `apps/web/src/app/app.config.server.ts`
+> re-provides `provideApi(...)` with `process.env['API_URL'] ?? 'http://localhost:3000'`, which
+> only takes effect server-side; the browser bundle keeps using the relative URL.
+
+**Verify it worked:**
+
+- With the API running locally, `API_URL=http://localhost:3000 nx build web --configuration=production`
+  completes and logs "Prerendered N static routes."
+- `grep -o '<title>[^<]*</title>' dist/apps/web/browser/en/projects/<a-real-slug>/index.html` shows
+  the real project title, not a placeholder — confirms per-page dynamic titles are baked in.
+- `nx test web` passes, including the `vitest-axe` "has no accessibility violations" specs.
 
 **Reference:** architecture doc §5 (Frontend).
 
@@ -554,8 +656,12 @@ origin-to-Cloudflare TLS needs its own certificate.
 2. Under SSL/TLS, set the mode to **Full (strict)**, then generate a Cloudflare **Origin CA**
    certificate and install it in Nginx (this is different from a normal publicly-trusted cert —
    see the explainer below).
-3. Confirm the R2 buckets from Stages 5 and (later) 13 exist and note their access keys in your
-   VPS's `.env`.
+3. Confirm the R2 buckets from Stage 5 (`portfolio-images`, `portfolio-documents`) and Stage 13
+   (`portfolio-backups`) exist, and that all six `R2_*` vars (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+   `R2_SECRET_ACCESS_KEY`, `R2_DOCUMENTS_BUCKET`, `R2_IMAGES_BUCKET`, `R2_PUBLIC_BASE_URL`) are set
+   in the VPS's `.env`. If you connect a custom domain/subdomain (e.g. `cdn.yourdomain.com`) to the
+   images bucket for public access instead of the default `r2.dev` subdomain, add that DNS record
+   here and update `R2_PUBLIC_BASE_URL` to match.
 4. Add a couple of free-tier rate limiting rules (e.g. throttle repeated POSTs to `/api/auth/*`).
 5. Optionally enable basic WAF managed rules available on the free plan.
 
@@ -672,8 +778,10 @@ gates).
 **Steps:**
 
 1. Write a small script that runs `pg_dump` against the production database, compresses the output,
-   and uploads it to a **separate** R2 bucket (not the images bucket) using the R2 S3-compatible API
-   (e.g. via the `aws` CLI configured against R2, or `rclone`).
+   and uploads it to a **separate** `portfolio-backups` R2 bucket (not the images/documents buckets —
+   create it the same way as in the Stage 5 R2 setup walkthrough, with its own scoped API token) using
+   the R2 S3-compatible API (e.g. via the `aws` CLI configured against R2, or `rclone`). This bucket
+   stays private; there's no need for public access or CORS on it.
 2. Schedule it with a cron job on the VPS (e.g. daily at a quiet hour).
 3. Add a retention policy in the script or via R2 lifecycle rules (e.g. keep the last 7 daily + 4
    weekly dumps) so storage stays inside the free tier.

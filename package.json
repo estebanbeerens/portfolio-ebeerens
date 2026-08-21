@@ -23,6 +23,7 @@
     "@angular/cli": "~22.0.4",
     "@angular/compiler-cli": "~22.0.4",
     "@angular/language-service": "~22.0.4",
+    "@angular/localize": "~22.0.4",
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^11.0.0",

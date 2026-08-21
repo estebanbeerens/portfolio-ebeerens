@@ -117,3 +117,8 @@
   /* Figma uses #64748b here; lightened to clear 4.5:1 against --color-bg. */
   --color-text-subtle-value: #7c8aa0;
 }
+
+/* Thin scollbar */
+* {
+  scrollbar-width: thin;
+}

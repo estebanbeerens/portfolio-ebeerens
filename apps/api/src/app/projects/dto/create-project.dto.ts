@@ -42,6 +42,14 @@ export class CreateProjectDto {
   @IsUrl()
   imageUrl?: string;
 
+  @ApiPropertyOptional({
+    description: 'R2 object key returned by the image presign endpoint, paired with `imageUrl`',
+    example: 'projects/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png',
+  })
+  @IsOptional()
+  @IsString()
+  imageObjectKey?: string;
+
   @ApiPropertyOptional({ example: 'Acme Corp' })
   @IsOptional()
   @IsString()

@@ -11,5 +11,9 @@
 export interface UpdateOrganizationDto {
   name?: string;
   logoUrl?: string;
+  /**
+   * R2 object key returned by the logo presign endpoint, paired with `logoUrl`
+   */
+  logoObjectKey?: string;
   website?: string;
 }

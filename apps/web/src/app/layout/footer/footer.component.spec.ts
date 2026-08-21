@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { axe } from 'vitest-axe';
 import { Footer } from './footer.component';
 
 describe('Footer', () => {
@@ -34,5 +35,16 @@ describe('Footer', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).not.toContain('Instagram');
     expect(text).not.toContain('YouTube');
+  });
+
+  it('has no accessibility violations', async () => {
+    await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
+
+    const fixture = TestBed.createComponent(Footer);
+    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'Erwin Beerens', updatedAt: '2026-01-01' });
+    await fixture.whenStable();
+
+    const results = await axe(fixture.nativeElement);
+    (expect(results) as unknown as { toHaveNoViolations: () => void }).toHaveNoViolations();
   });
 });

@@ -113,10 +113,38 @@
       <ui-input controlId="project-role" label="Job role" formControlName="jobRole" />
     </div>
 
-    <div class="flex flex-col gap-4">
-      <ui-input controlId="project-image-url" label="Image URL" type="url" formControlName="imageUrl" />
-      <ui-input controlId="project-live-url" label="Live URL" type="url" formControlName="liveUrl" />
+    <div class="flex flex-col gap-2">
+      <p class="text-sm font-medium">Image</p>
+      @if (form.controls.imageUrl.value; as imageUrl) {
+        <div class="border-border-subtle bg-glass-active flex items-center gap-3 rounded-md border p-3">
+          <img [src]="imageUrl" alt="" class="size-12 shrink-0 rounded object-cover" />
+          <p class="text-text-muted min-w-0 flex-1 truncate text-xs">{{ imageUrl }}</p>
+          <button
+            uiButton
+            variant="outlined"
+            tone="danger"
+            type="button"
+            [disabled]="imageUploading()"
+            (click)="removeImage()"
+          >
+            Remove
+          </button>
+        </div>
+      } @else {
+        <ui-file-dropzone
+          label="Drag & drop a project image"
+          hint="PNG, JPEG, or WebP up to 5MB"
+          accept="image/png,image/jpeg,image/webp"
+          [disabled]="imageUploading()"
+          (fileSelected)="uploadImage($event)"
+        />
+      }
+      @if (imageUploading()) {
+        <p class="text-text-muted text-xs" role="status">Uploading image...</p>
+      }
     </div>
+
+    <ui-input controlId="project-live-url" label="Live URL" type="url" formControlName="liveUrl" />
 
     @if (formError(); as error) {
       <p class="text-error text-xs" role="alert">{{ error }}</p>

@@ -22,13 +22,13 @@
   <dl class="border-border-subtle grid gap-4 border-t pt-6 text-sm">
     @if (profile()?.headline; as headline) {
       <div class="flex items-center justify-between gap-6">
-        <dt class="text-text">Role</dt>
+        <dt class="text-text" i18n="@@basicInfo.role">Role</dt>
         <dd class="text-text text-right font-mono">{{ headline }}</dd>
       </div>
     }
     @if (profile()?.location; as location) {
       <div class="flex items-center justify-between gap-6">
-        <dt class="text-text">Residence</dt>
+        <dt class="text-text" i18n="@@basicInfo.residence">Residence</dt>
         <dd class="text-text text-right font-mono">{{ location }}</dd>
       </div>
     }

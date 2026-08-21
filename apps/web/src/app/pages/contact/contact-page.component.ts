@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, Card, TextInput, Textarea } from '@portfolio-ebeerens/ui';
@@ -29,6 +30,13 @@ export class ContactPage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   protected readonly content = inject(PortfolioContentService);
 
+  constructor() {
+    const title = inject(Title);
+    const meta = inject(Meta);
+    title.setTitle('Contact');
+    meta.updateTag({ name: 'description', content: 'Get in touch about a project or collaboration.' });
+  }
+
   private readonly turnstile = viewChild<{ reset: () => void }>('turnstile');
   protected readonly turnstileToken = signal<string | undefined>(undefined);
   protected readonly submissionState = signal<SubmissionState>('idle');
@@ -48,31 +56,44 @@ export class ContactPage {
   });
 
   protected readonly turnstileSiteKey = computed(() => this.runtimeConfig.value()?.turnstileSiteKey || undefined);
+  protected readonly submitLabel = computed(() =>
+    this.submissionState() === 'submitting'
+      ? $localize`:@@contact.form.submitting:Sending...`
+      : $localize`:@@contact.form.submit:Send message`
+  );
   protected readonly statusMessage = computed(() => {
     if (!this.turnstileSiteKey()) {
-      return 'Verification is unavailable right now.';
+      return $localize`:@@contact.status.verificationUnavailable:Verification is unavailable right now.`;
     }
     if (this.submissionState() === 'submitting') {
-      return 'Sending your message...';
+      return $localize`:@@contact.status.sending:Sending your message...`;
     }
     if (this.submissionState() === 'success') {
-      return 'Your message was sent.';
+      return $localize`:@@contact.status.success:Your message was sent.`;
     }
     if (this.submissionState() === 'error') {
-      return 'Something went wrong. Please try again.';
+      return $localize`:@@contact.status.error:Something went wrong. Please try again.`;
     }
     if (this.submittedInvalid() && this.form.invalid) {
-      return 'Complete the required fields before sending.';
+      return $localize`:@@contact.status.invalid:Complete the required fields before sending.`;
     }
     if (!this.turnstileToken()) {
-      return 'Complete the verification before sending.';
+      return $localize`:@@contact.status.needsVerification:Complete the verification before sending.`;
     }
-    return 'Verification complete.';
+    return $localize`:@@contact.status.verified:Verification complete.`;
   });
 
-  protected fieldError(controlName: keyof typeof this.form.controls, message: string): string | undefined {
+  private readonly fieldErrorMessages = {
+    fullName: $localize`:@@contact.field.fullName.error:Enter your name`,
+    email: $localize`:@@contact.field.email.error:Enter a valid email address`,
+    organization: $localize`:@@contact.field.organization.error:Keep organization under 200 characters`,
+    subject: $localize`:@@contact.field.subject.error:Enter a subject under 200 characters`,
+    message: $localize`:@@contact.field.message.error:Enter a message under 5000 characters`,
+  } as const;
+
+  protected fieldError(controlName: keyof typeof this.form.controls): string | undefined {
     const control = this.form.controls[controlName];
-    return control.invalid && (control.dirty || control.touched) ? message : undefined;
+    return control.invalid && (control.dirty || control.touched) ? this.fieldErrorMessages[controlName] : undefined;
   }
 
   protected onTurnstileResolved(token: string | null): void {

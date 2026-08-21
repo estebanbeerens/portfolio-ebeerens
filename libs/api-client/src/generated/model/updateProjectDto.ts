@@ -23,6 +23,10 @@ export interface UpdateProjectDto {
    */
   description?: string;
   imageUrl?: string;
+  /**
+   * R2 object key returned by the image presign endpoint, paired with `imageUrl`
+   */
+  imageObjectKey?: string;
   client?: string;
   jobRole?: string;
   liveUrl?: string;

@@ -17,7 +17,11 @@ import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 // @ts-ignore
 import { CreateOrganizationDto } from '../model/createOrganizationDto';
 // @ts-ignore
+import { CreateOrganizationLogoUploadUrlDto } from '../model/createOrganizationLogoUploadUrlDto';
+// @ts-ignore
 import { OrganizationDto } from '../model/organizationDto';
+// @ts-ignore
+import { OrganizationLogoUploadUrlDto } from '../model/organizationLogoUploadUrlDto';
 // @ts-ignore
 import { UpdateOrganizationDto } from '../model/updateOrganizationDto';
 
@@ -110,6 +114,87 @@ export class OrganizationsService extends BaseService {
     return this.httpClient.request<OrganizationDto>('post', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
       body: createOrganizationDto,
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * @endpoint post /api/organizations/upload-url
+   * @param createOrganizationLogoUploadUrlDto
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public organizationsControllerCreateLogoUploadUrl(
+    createOrganizationLogoUploadUrlDto: CreateOrganizationLogoUploadUrlDto,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<OrganizationLogoUploadUrlDto>;
+  public organizationsControllerCreateLogoUploadUrl(
+    createOrganizationLogoUploadUrlDto: CreateOrganizationLogoUploadUrlDto,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpResponse<OrganizationLogoUploadUrlDto>>;
+  public organizationsControllerCreateLogoUploadUrl(
+    createOrganizationLogoUploadUrlDto: CreateOrganizationLogoUploadUrlDto,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpEvent<OrganizationLogoUploadUrlDto>>;
+  public organizationsControllerCreateLogoUploadUrl(
+    createOrganizationLogoUploadUrlDto: CreateOrganizationLogoUploadUrlDto,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<any> {
+    if (createOrganizationLogoUploadUrlDto === null || createOrganizationLogoUploadUrlDto === undefined) {
+      throw new Error(
+        'Required parameter createOrganizationLogoUploadUrlDto was null or undefined when calling organizationsControllerCreateLogoUploadUrl.'
+      );
+    }
+
+    let localVarHeaders = this.defaultHeaders;
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    // to determine the Content-Type header
+    const consumes: string[] = ['application/json'];
+    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+    if (httpContentTypeSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+    }
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/organizations/upload-url`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<OrganizationLogoUploadUrlDto>('post', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      body: createOrganizationLogoUploadUrlDto,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),
       headers: localVarHeaders,

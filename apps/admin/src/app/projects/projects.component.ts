@@ -86,6 +86,7 @@ export class Projects {
       description: value.description,
       startDate: value.startDate,
       ...(value.imageUrl ? { imageUrl: value.imageUrl } : {}),
+      ...(value.imageObjectKey ? { imageObjectKey: value.imageObjectKey } : {}),
       ...(value.client ? { client: value.client } : {}),
       ...(value.jobRole ? { jobRole: value.jobRole } : {}),
       ...(value.liveUrl ? { liveUrl: value.liveUrl } : {}),

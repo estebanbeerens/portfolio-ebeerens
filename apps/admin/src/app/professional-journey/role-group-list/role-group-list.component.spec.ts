@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { OrganizationDto, RoleDto } from '@portfolio-ebeerens/api-client';
+import { OrganizationDto, OrganizationsService, RoleDto } from '@portfolio-ebeerens/api-client';
+import { ToastService } from '@portfolio-ebeerens/ui';
 import { OrganizationUpdate, RoleGroup, RoleGroupList } from './role-group-list.component';
 
 const organization: OrganizationDto = {
@@ -63,7 +64,13 @@ class HostComponent {
 
 describe('RoleGroupList', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [HostComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [HostComponent],
+      providers: [
+        { provide: OrganizationsService, useValue: { organizationsControllerCreateLogoUploadUrl: vi.fn() } },
+        { provide: ToastService, useValue: { success: vi.fn(), error: vi.fn() } },
+      ],
+    }).compileComponents();
   });
 
   it('renders every role under its organization group', async () => {

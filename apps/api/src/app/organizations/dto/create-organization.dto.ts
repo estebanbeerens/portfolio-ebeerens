@@ -12,6 +12,14 @@ export class CreateOrganizationDto {
   @IsUrl()
   logoUrl?: string;
 
+  @ApiPropertyOptional({
+    description: 'R2 object key returned by the logo presign endpoint, paired with `logoUrl`',
+    example: 'organizations/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png',
+  })
+  @IsOptional()
+  @IsString()
+  logoObjectKey?: string;
+
   @ApiPropertyOptional({ example: 'https://acme.example.com' })
   @IsOptional()
   @IsUrl()

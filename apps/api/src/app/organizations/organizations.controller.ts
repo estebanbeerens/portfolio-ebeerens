@@ -10,7 +10,9 @@ import {
 } from '@nestjs/swagger';
 import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { CreateOrganizationLogoUploadUrlDto } from './dto/create-organization-logo-upload-url.dto';
 import { OrganizationDto } from './dto/organization.dto';
+import { OrganizationLogoUploadUrlDto } from './dto/organization-logo-upload-url.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { OrganizationsService } from './organizations.service';
 
@@ -18,6 +20,17 @@ import { OrganizationsService } from './organizations.service';
 @Controller('organizations')
 export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
+
+  @Post('upload-url')
+  @UseGuards(SessionAuthGuard)
+  @ApiOkResponse({
+    description: 'A short-lived presigned PUT url for an organization logo',
+    type: OrganizationLogoUploadUrlDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  createLogoUploadUrl(@Body() dto: CreateOrganizationLogoUploadUrlDto): Promise<OrganizationLogoUploadUrlDto> {
+    return this.organizationsService.createLogoUploadUrl(dto);
+  }
 
   @Get()
   @ApiOkResponse({ description: 'All organizations', type: [OrganizationDto] })

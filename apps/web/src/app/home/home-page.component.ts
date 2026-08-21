@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { Button } from '@portfolio-ebeerens/ui';
 import { EngineeredArtifactsSection } from './components/engineered-artifacts-section/engineered-artifacts-section.component';
@@ -16,4 +17,11 @@ import { PortfolioContentService } from '../shared/portfolio-content.service';
 export class HomePage {
   protected readonly content = inject(PortfolioContentService);
   protected readonly selectedProjects = computed(() => this.content.selectedProjects());
+
+  constructor() {
+    const title = inject(Title);
+    const meta = inject(Meta);
+    title.setTitle('Home');
+    meta.updateTag({ name: 'description', content: 'Portfolio, projects, and professional journey.' });
+  }
 }

@@ -71,6 +71,8 @@ export class PortfolioContentService {
   readonly projectsLoaded = computed(() => this.projects.hasValue());
   readonly rolesEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Roles));
   readonly projectsEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Projects));
+  readonly contactEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Contact));
+  readonly skillsEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Skills));
 
   readonly loadError = computed(() =>
     this.profile.error() || this.roles.error() || this.projects.error() || this.featureFlags.error()

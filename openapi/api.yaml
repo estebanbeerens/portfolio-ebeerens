@@ -59,6 +59,27 @@ paths:
         '401':
           description: No valid session
       tags: *ref_1
+  /api/projects/upload-url:
+    post:
+      operationId: ProjectsController_createImageUploadUrl
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectImageUploadUrlDto'
+      responses:
+        '200':
+          description: A short-lived presigned PUT url for a project image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectImageUploadUrlDto'
+        '401':
+          description: No valid session
+      tags: &ref_2
+        - projects
   /api/projects:
     get:
       operationId: ProjectsController_findAll
@@ -72,8 +93,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectDto'
-      tags: &ref_2
-        - projects
+      tags: *ref_2
     post:
       operationId: ProjectsController_create
       parameters: []
@@ -200,6 +220,27 @@ paths:
                   $ref: '#/components/schemas/SkillDto'
       tags:
         - skills
+  /api/organizations/upload-url:
+    post:
+      operationId: OrganizationsController_createLogoUploadUrl
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationLogoUploadUrlDto'
+      responses:
+        '200':
+          description: A short-lived presigned PUT url for an organization logo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationLogoUploadUrlDto'
+        '401':
+          description: No valid session
+      tags: &ref_3
+        - organizations
   /api/organizations:
     get:
       operationId: OrganizationsController_findAll
@@ -213,8 +254,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OrganizationDto'
-      tags: &ref_3
-        - organizations
+      tags: *ref_3
     post:
       operationId: OrganizationsController_create
       parameters: []
@@ -548,6 +588,17 @@ paths:
         '404':
           description: No resume uploaded yet
       tags: *ref_7
+    delete:
+      operationId: ResumeController_remove
+      parameters: []
+      responses:
+        '204':
+          description: The resume was deleted
+        '401':
+          description: No valid session
+        '404':
+          description: No resume uploaded yet
+      tags: *ref_7
   /api/resume/download:
     get:
       operationId: ResumeController_download
@@ -691,6 +742,40 @@ components:
           example: https://www.youtube.com/@jane-doe
       required:
         - name
+    CreateProjectImageUploadUrlDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+          enum:
+            - image/png
+            - image/jpeg
+            - image/webp
+        fileSize:
+          type: number
+          maximum: 5242880
+      required:
+        - fileName
+        - mimeType
+        - fileSize
+    ProjectImageUploadUrlDto:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        objectKey:
+          type: string
+        publicUrl:
+          type: string
+          description: >-
+            Public URL to store as the project imageUrl once the upload
+            completes
+      required:
+        - uploadUrl
+        - objectKey
+        - publicUrl
     SkillDto:
       type: object
       properties:
@@ -804,6 +889,12 @@ components:
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
+        imageObjectKey:
+          type: string
+          description: >-
+            R2 object key returned by the image presign endpoint, paired with
+            `imageUrl`
+          example: projects/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png
         client:
           type: string
           example: Acme Corp
@@ -865,6 +956,12 @@ components:
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
+        imageObjectKey:
+          type: string
+          description: >-
+            R2 object key returned by the image presign endpoint, paired with
+            `imageUrl`
+          example: projects/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png
         client:
           type: string
           example: Acme Corp
@@ -890,6 +987,40 @@ components:
           type: array
           items:
             type: string
+    CreateOrganizationLogoUploadUrlDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+          enum:
+            - image/png
+            - image/jpeg
+            - image/webp
+        fileSize:
+          type: number
+          maximum: 5242880
+      required:
+        - fileName
+        - mimeType
+        - fileSize
+    OrganizationLogoUploadUrlDto:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        objectKey:
+          type: string
+        publicUrl:
+          type: string
+          description: >-
+            Public URL to store as the organization logoUrl once the upload
+            completes
+      required:
+        - uploadUrl
+        - objectKey
+        - publicUrl
     OrganizationDto:
       type: object
       properties:
@@ -928,6 +1059,12 @@ components:
         logoUrl:
           type: string
           example: https://cdn.example.com/logos/acme.png
+        logoObjectKey:
+          type: string
+          description: >-
+            R2 object key returned by the logo presign endpoint, paired with
+            `logoUrl`
+          example: organizations/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png
         website:
           type: string
           example: https://acme.example.com
@@ -942,6 +1079,12 @@ components:
         logoUrl:
           type: string
           example: https://cdn.example.com/logos/acme.png
+        logoObjectKey:
+          type: string
+          description: >-
+            R2 object key returned by the logo presign endpoint, paired with
+            `logoUrl`
+          example: organizations/9c3f9b2e-2b8e-4a9b-8f1a-9c3f9b2e2b8e.png
         website:
           type: string
           example: https://acme.example.com

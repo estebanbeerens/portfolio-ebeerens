@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
+import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
+import { ToastService } from '@portfolio-ebeerens/ui';
 import { provideMarkdown } from 'ngx-markdown';
+import { of } from 'rxjs';
 import { ProjectForm, ProjectFormValue } from './project-form.component';
 
 const project: ProjectDto = {
@@ -47,10 +49,17 @@ function findButton(root: HTMLElement, text: string): HTMLButtonElement {
 }
 
 describe('ProjectForm', () => {
+  const projectsApi = { projectsControllerCreateImageUploadUrl: vi.fn() };
+  const toast = { success: vi.fn(), error: vi.fn() };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HostComponent],
-      providers: [provideMarkdown()],
+      providers: [
+        provideMarkdown(),
+        { provide: ProjectsService, useValue: projectsApi },
+        { provide: ToastService, useValue: toast },
+      ],
     }).compileComponents();
   });
 
@@ -137,5 +146,52 @@ describe('ProjectForm', () => {
     await fixture.whenStable();
 
     expect((fixture.nativeElement.querySelector('#project-title') as HTMLInputElement).value).toBe('');
+  });
+
+  it('uploads a dropped image and includes its object key when saving', async () => {
+    projectsApi.projectsControllerCreateImageUploadUrl.mockReturnValue(
+      of({
+        uploadUrl: 'https://r2.example.com/upload',
+        objectKey: 'projects/abc.png',
+        publicUrl: 'https://cdn.example.com/projects/abc.png',
+      })
+    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 200 })));
+
+    const fixture = TestBed.createComponent(HostComponent);
+    await fixture.whenStable();
+
+    const setValue = (id: string, value: string) => {
+      const input = fixture.nativeElement.querySelector(`#${id}`) as HTMLInputElement | HTMLTextAreaElement;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+    };
+    setValue('project-title', 'New project');
+    setValue('project-slug', 'new-project');
+    setValue('project-short-description', 'A short description.');
+    setValue('project-description', 'Full description.');
+    setValue('project-start-date', '2024-05-01');
+
+    const fileInput = fixture.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'cover.png', { type: 'image/png' });
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fileInput.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+
+    expect(projectsApi.projectsControllerCreateImageUploadUrl).toHaveBeenCalledWith({
+      fileName: 'cover.png',
+      mimeType: 'image/png',
+      fileSize: file.size,
+    });
+
+    findButton(fixture.nativeElement, 'Save project').click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.savedValue).toMatchObject({
+      imageUrl: 'https://cdn.example.com/projects/abc.png',
+      imageObjectKey: 'projects/abc.png',
+    });
+
+    vi.unstubAllGlobals();
   });
 });

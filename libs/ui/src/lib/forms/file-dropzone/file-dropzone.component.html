@@ -1,0 +1,19 @@
+<label
+  class="border-accent bg-glass-active has-[:focus-visible]:outline-accent flex w-full flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-6 text-center transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+  [class.bg-glass-hover]="dragActive()"
+  [class.opacity-60]="disabled()"
+  [class.cursor-not-allowed]="disabled()"
+  [class.cursor-pointer]="!disabled()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave()"
+  (drop)="onDrop($event)"
+>
+  <svg class="text-accent size-8" [lucideIcon]="uploadIcon" aria-hidden="true"></svg>
+  <div class="flex flex-col items-center gap-1">
+    <p class="text-text text-sm font-semibold">{{ label() }}</p>
+    @if (hint(); as hint) {
+      <p class="text-text-muted text-xs">{{ hint }}</p>
+    }
+  </div>
+  <input type="file" class="sr-only" [accept]="accept()" [disabled]="disabled()" (change)="onFileInputChange($event)" />
+</label>

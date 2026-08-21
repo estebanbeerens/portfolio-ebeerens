@@ -1,7 +1,9 @@
 <section id="projects" class="scroll-mt-28" aria-labelledby="projects-title">
   <div class="mb-10 flex flex-col gap-2">
-    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase">Selected Work</p>
-    <h2 id="projects-title" class="font-display text-text text-4xl font-bold">Engineered Artifacts</h2>
+    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase" i18n="@@artifacts.eyebrow">Selected Work</p>
+    <h2 id="projects-title" class="font-display text-text text-4xl font-bold" i18n="@@artifacts.title">
+      Engineered Artifacts
+    </h2>
   </div>
 
   @if (projects().length > 0) {
@@ -14,7 +16,7 @@
     </div>
   } @else {
     <ui-card density="compact">
-      <p class="text-text-muted">Engineered artifacts are being prepared.</p>
+      <p class="text-text-muted" i18n="@@artifacts.comingSoon">Engineered artifacts are being prepared.</p>
     </ui-card>
   }
 </section>

@@ -5,6 +5,12 @@
   "prefix": "web",
   "sourceRoot": "apps/web/src",
   "tags": [],
+  "i18n": {
+    "sourceLocale": "en",
+    "locales": {
+      "nl": "apps/web/src/locale/messages.nl.xlf"
+    }
+  },
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -41,13 +47,21 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "localize": true
         },
         "development": {
           "optimization": false,
           "extractLicenses": false,
           "sourceMap": true
         }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular/build:extract-i18n",
+      "options": {
+        "buildTarget": "web:build",
+        "outputPath": "apps/web/src/locale"
       }
     },
     "serve": {
@@ -70,7 +84,8 @@
     "test": {
       "executor": "@angular/build:unit-test",
       "options": {
-        "watch": false
+        "watch": false,
+        "setupFiles": ["apps/web/src/test-setup.ts"]
       }
     },
     "serve-static": {

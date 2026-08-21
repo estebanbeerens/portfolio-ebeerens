@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import { Prisma } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { R2Service } from '../storage/r2.service';
 import { OrganizationsService } from './organizations.service';
 
 describe('OrganizationsService', () => {
@@ -10,6 +11,7 @@ describe('OrganizationsService', () => {
     id: 'org-1',
     name: 'Acme Corp',
     logoUrl: null,
+    logoObjectKey: null,
     website: null,
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     updatedAt: new Date('2026-01-01T00:00:00.000Z'),
@@ -33,11 +35,13 @@ describe('OrganizationsService', () => {
       },
     };
     const activity = { record: jest.fn() };
+    const r2 = { isConfigured: false, presignPut: jest.fn(), deleteObject: jest.fn() };
     const moduleRef = await Test.createTestingModule({
       providers: [
         OrganizationsService,
         { provide: PrismaService, useValue: prisma },
         { provide: ActivityService, useValue: activity },
+        { provide: R2Service, useValue: r2 },
       ],
     }).compile();
 

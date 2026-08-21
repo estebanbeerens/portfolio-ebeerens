@@ -1,8 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
-import { Button, Card, TagCombobox, TextInput, Textarea } from '@portfolio-ebeerens/ui';
+import { CreateProjectImageUploadUrlDto, ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
+import { Button, Card, FileDropzone, TagCombobox, TextInput, Textarea, ToastService } from '@portfolio-ebeerens/ui';
 import { MarkdownComponent } from 'ngx-markdown';
+import { firstValueFrom } from 'rxjs';
+
+const PROJECT_IMAGE_MIME_TYPES: readonly string[] = Object.values(CreateProjectImageUploadUrlDto.MimeTypeEnum);
+const PROJECT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 export interface ProjectFormValue {
   title: string;
@@ -10,6 +14,7 @@ export interface ProjectFormValue {
   shortDescription: string;
   description: string;
   imageUrl: string;
+  imageObjectKey: string;
   client: string;
   jobRole: string;
   liveUrl: string;
@@ -23,12 +28,14 @@ export interface ProjectFormValue {
  */
 @Component({
   selector: 'admin-project-form',
-  imports: [Button, Card, MarkdownComponent, ReactiveFormsModule, TagCombobox, TextInput, Textarea],
+  imports: [Button, Card, FileDropzone, MarkdownComponent, ReactiveFormsModule, TagCombobox, TextInput, Textarea],
   templateUrl: './project-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectForm {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly api = inject(ProjectsService);
+  private readonly toast = inject(ToastService);
 
   readonly project = input<ProjectDto>();
   readonly skillOptions = input<string[]>([]);
@@ -43,6 +50,10 @@ export class ProjectForm {
 
   protected readonly isEditing = computed(() => this.project() !== undefined);
   protected readonly descriptionView = signal<'markdown' | 'preview'>('markdown');
+  // Not a form control: the client only ever learns a *new* object key from a fresh upload
+  // (ProjectDto doesn't expose the existing one), so this stays empty until an upload succeeds.
+  protected readonly imageObjectKey = signal('');
+  protected readonly imageUploading = signal(false);
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
@@ -65,12 +76,50 @@ export class ProjectForm {
     });
   }
 
+  protected async uploadImage(file: File): Promise<void> {
+    if (this.imageUploading()) {
+      return;
+    }
+    if (!PROJECT_IMAGE_MIME_TYPES.includes(file.type)) {
+      this.toast.error('Only PNG, JPEG, or WebP images are supported.');
+      return;
+    }
+    if (file.size > PROJECT_IMAGE_MAX_BYTES) {
+      this.toast.error('The image must be 5MB or smaller.');
+      return;
+    }
+
+    this.imageUploading.set(true);
+    try {
+      const { uploadUrl, objectKey, publicUrl } = await firstValueFrom(
+        this.api.projectsControllerCreateImageUploadUrl({
+          fileName: file.name,
+          mimeType: file.type as CreateProjectImageUploadUrlDto.MimeTypeEnum,
+          fileSize: file.size,
+        })
+      );
+      await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+      this.form.controls.imageUrl.setValue(publicUrl);
+      this.imageObjectKey.set(objectKey);
+      this.toast.success('Image uploaded.');
+    } catch {
+      this.toast.error('The image could not be uploaded. Try again.');
+    } finally {
+      this.imageUploading.set(false);
+    }
+  }
+
+  protected removeImage(): void {
+    this.form.controls.imageUrl.setValue('');
+    this.imageObjectKey.set('');
+  }
+
   protected submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.saved.emit(this.form.getRawValue());
+    this.saved.emit({ ...this.form.getRawValue(), imageObjectKey: this.imageObjectKey() });
   }
 
   protected fieldInvalid(name: string): boolean {
@@ -80,6 +129,7 @@ export class ProjectForm {
 
   private resetForm(): void {
     this.descriptionView.set('markdown');
+    this.imageObjectKey.set('');
     const project = this.project();
     this.form.reset(
       project

@@ -1,0 +1,70 @@
+services:
+  postgres:
+    restart: unless-stopped
+    ports: []
+
+  api:
+    image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/api:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: portfolio-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_DOCUMENTS_BUCKET: ${R2_DOCUMENTS_BUCKET}
+      R2_IMAGES_BUCKET: ${R2_IMAGES_BUCKET}
+      R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
+      R2_JURISDICTION: ${R2_JURISDICTION}
+    depends_on:
+      - postgres
+
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/web:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: portfolio-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+    depends_on:
+      - api
+
+  admin:
+    image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/admin:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: portfolio-admin
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+    depends_on:
+      - api
+
+  # only nginx is published to the host; api/web/admin stay on the internal compose network
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: portfolio-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - api
+      - web
+      - admin

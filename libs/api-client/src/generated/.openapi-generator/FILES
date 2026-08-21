@@ -24,7 +24,9 @@ model/confirmResumeUploadDto.ts
 model/contactMessageDto.ts
 model/createContactMessageDto.ts
 model/createOrganizationDto.ts
+model/createOrganizationLogoUploadUrlDto.ts
 model/createProjectDto.ts
+model/createProjectImageUploadUrlDto.ts
 model/createResumeUploadUrlDto.ts
 model/createRoleDto.ts
 model/dashboardSummaryDto.ts
@@ -32,8 +34,10 @@ model/featureFlagDto.ts
 model/meResponseDto.ts
 model/models.ts
 model/organizationDto.ts
+model/organizationLogoUploadUrlDto.ts
 model/profileDto.ts
 model/projectDto.ts
+model/projectImageUploadUrlDto.ts
 model/resumeDto.ts
 model/resumeUploadUrlDto.ts
 model/roleDto.ts

@@ -1,0 +1,38 @@
+<ui-card heading="Resume / CV PDF">
+  @if (requestError(); as error) {
+    <p class="text-error text-sm" role="alert">{{ error }}</p>
+  }
+
+  <ui-file-dropzone
+    label="Drag & drop new resume file"
+    hint="PDF up to 5MB"
+    [disabled]="busy()"
+    (fileSelected)="uploadResume($event)"
+  />
+
+  @if (isLoading()) {
+    <p class="text-text-muted text-sm" role="status">Loading resume...</p>
+  } @else if (resume(); as resume) {
+    <div class="flex flex-col gap-2">
+      <p class="text-text-subtle text-xs font-semibold tracking-wide uppercase">Active file</p>
+      <div class="border-border-subtle bg-glass-active flex items-center gap-3 rounded-md border p-3">
+        <svg class="text-accent size-5 shrink-0" [lucideIcon]="fileIcon" aria-hidden="true"></svg>
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <p class="text-text truncate text-xs font-semibold">{{ resume.fileName }}</p>
+          <p class="text-text-subtle text-[10px]">
+            {{ fileSizeLabel(resume.fileSize) }} · Uploaded {{ resume.uploadedAt | date: 'MMM d, y' }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="text-text-subtle hover:text-error focus-visible:outline-accent shrink-0 rounded p-1 focus-visible:outline-2 focus-visible:outline-offset-2"
+          [disabled]="busy()"
+          aria-label="Delete resume"
+          (click)="removeResume()"
+        >
+          <svg class="size-3.5" [lucideIcon]="trashIcon" aria-hidden="true"></svg>
+        </button>
+      </div>
+    </div>
+  }
+</ui-card>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="nl" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="app.skipToContent" datatype="html">
+        <source>Skip to content</source>
+        <target>Naar de inhoud</target>
+      </trans-unit>
+      <trans-unit id="basicInfo.role" datatype="html">
+        <source>Role</source>
+        <target>Functie</target>
+      </trans-unit>
+      <trans-unit id="basicInfo.residence" datatype="html">
+        <source>Residence</source>
+        <target>Woonplaats</target>
+      </trans-unit>
+      <trans-unit id="artifacts.eyebrow" datatype="html">
+        <source>Selected Work</source>
+        <target>Uitgelicht werk</target>
+      </trans-unit>
+      <trans-unit id="artifacts.title" datatype="html">
+        <source> Engineered Artifacts </source>
+        <target> Ontwikkelde Projecten </target>
+      </trans-unit>
+      <trans-unit id="artifacts.comingSoon" datatype="html">
+        <source>Engineered artifacts are being prepared.</source>
+        <target>Ontwikkelde projecten worden voorbereid.</target>
+      </trans-unit>
+      <trans-unit id="hero.title" datatype="html">
+        <source> Crafting fluid <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>interactive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> architectures </source>
+        <target> Vloeiende <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>interactieve<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> architecturen bouwen </target>
+      </trans-unit>
+      <trans-unit id="hero.seeProjects" datatype="html">
+        <source>See My Projects</source>
+        <target>Bekijk mijn projecten</target>
+      </trans-unit>
+      <trans-unit id="hero.getInTouch" datatype="html">
+        <source>Get In Touch</source>
+        <target>Neem contact op</target>
+      </trans-unit>
+      <trans-unit id="journey.eyebrow" datatype="html">
+        <source>Curriculum Vitae</source>
+        <target>Curriculum Vitae</target>
+      </trans-unit>
+      <trans-unit id="journey.title" datatype="html">
+        <source> Professional Journey </source>
+        <target> Professionele Reis </target>
+      </trans-unit>
+      <trans-unit id="journey.organizationsAriaLabel" datatype="html">
+        <source>Professional organizations</source>
+        <target>Professionele organisaties</target>
+      </trans-unit>
+      <trans-unit id="journey.totalDuration" datatype="html">
+        <source> <x id="INTERPOLATION" equiv-text="{{ groupDuration(group) }}"/> total </source>
+        <target> <x id="INTERPOLATION" equiv-text="{{ groupDuration(group) }}"/> totaal </target>
+      </trans-unit>
+      <trans-unit id="journey.rolesAtAriaLabel" datatype="html">
+        <source>Roles at <x id="INTERPOLATION" equiv-text="{{ group.organization.name }}"/></source>
+        <target>Functies bij <x id="INTERPOLATION" equiv-text="{{ group.organization.name }}"/></target>
+      </trans-unit>
+      <trans-unit id="journey.comingSoon" datatype="html">
+        <source>Professional journey details are coming soon.</source>
+        <target>Details over de professionele reis volgen binnenkort.</target>
+      </trans-unit>
+      <trans-unit id="journey.showLess" datatype="html">
+        <source>Show less experience</source>
+        <target>Toon minder ervaring</target>
+      </trans-unit>
+      <trans-unit id="journey.showAll" datatype="html">
+        <source>Show all experience</source>
+        <target>Toon alle ervaring</target>
+      </trans-unit>
+      <trans-unit id="roleDescription.readMore" datatype="html">
+        <source> Read more </source>
+        <target> Lees meer </target>
+      </trans-unit>
+      <trans-unit id="home.viewAllProjects" datatype="html">
+        <source>View All Projects</source>
+        <target>Bekijk alle projecten</target>
+      </trans-unit>
+      <trans-unit id="footer.resumeLink" datatype="html">
+        <source>Resume</source>
+        <target>Cv</target>
+      </trans-unit>
+      <trans-unit id="footer.copyright" datatype="html">
+        <source> © <x id="INTERPOLATION" equiv-text="{{ currentYear }}"/> <x id="START_BLOCK_IF" equiv-text="@if (profile()?.name; as name) {"/> <x id="INTERPOLATION_1" equiv-text="{{ &apos; &apos; + name }}"/> <x id="CLOSE_BLOCK_IF" equiv-text="}"/> . Designed with Apple Liquid Glass aesthetic. </source>
+        <target> © <x id="INTERPOLATION" equiv-text="{{ currentYear }}"/> <x id="START_BLOCK_IF" equiv-text="@if (profile()?.name; as name) {"/> <x id="INTERPOLATION_1" equiv-text="{{ &apos; &apos; + name }}"/> <x id="CLOSE_BLOCK_IF" equiv-text="}"/> . Ontworpen met de Apple Liquid Glass-esthetiek. </target>
+      </trans-unit>
+      <trans-unit id="header.nav.ariaLabel" datatype="html">
+        <source>Primary navigation</source>
+        <target>Hoofdnavigatie</target>
+      </trans-unit>
+      <trans-unit id="header.logo.ariaLabel" datatype="html">
+        <source>Home</source>
+        <target>Home</target>
+      </trans-unit>
+      <trans-unit id="header.nav.home" datatype="html">
+        <source>Home</source>
+        <target>Home</target>
+      </trans-unit>
+      <trans-unit id="header.nav.projects" datatype="html">
+        <source>Projects</source>
+        <target>Projecten</target>
+      </trans-unit>
+      <trans-unit id="header.nav.resume" datatype="html">
+        <source>Resume</source>
+        <target>Cv</target>
+      </trans-unit>
+      <trans-unit id="header.nav.contact" datatype="html">
+        <source>Contact</source>
+        <target>Contact</target>
+      </trans-unit>
+      <trans-unit id="contact.eyebrow" datatype="html">
+        <source>Contact</source>
+        <target>Contact</target>
+      </trans-unit>
+      <trans-unit id="contact.title" datatype="html">
+        <source> Get In Touch </source>
+        <target> Neem contact op </target>
+      </trans-unit>
+      <trans-unit id="contact.subtitle" datatype="html">
+        <source> Send a project inquiry, collaboration idea, or a note about the portfolio. </source>
+        <target> Stuur een projectvraag, samenwerkingsidee of opmerking over de portfolio. </target>
+      </trans-unit>
+      <trans-unit id="contact.form.heading" datatype="html">
+        <source>Send a message</source>
+        <target>Stuur een bericht</target>
+      </trans-unit>
+      <trans-unit id="contact.field.fullName.label" datatype="html">
+        <source>Full name</source>
+        <target>Volledige naam</target>
+      </trans-unit>
+      <trans-unit id="contact.field.email.label" datatype="html">
+        <source>Email</source>
+        <target>E-mail</target>
+      </trans-unit>
+      <trans-unit id="contact.field.organization.label" datatype="html">
+        <source>Organization</source>
+        <target>Organisatie</target>
+      </trans-unit>
+      <trans-unit id="contact.field.subject.label" datatype="html">
+        <source>Subject</source>
+        <target>Onderwerp</target>
+      </trans-unit>
+      <trans-unit id="contact.field.message.label" datatype="html">
+        <source>Message</source>
+        <target>Bericht</target>
+      </trans-unit>
+      <trans-unit id="contact.verificationUnavailable" datatype="html">
+        <source> Contact verification is not configured. </source>
+        <target> Contactverificatie is niet geconfigureerd. </target>
+      </trans-unit>
+      <trans-unit id="contact.form.submitting" datatype="html">
+        <source>Sending...</source>
+        <target>Verzenden...</target>
+      </trans-unit>
+      <trans-unit id="contact.form.submit" datatype="html">
+        <source>Send message</source>
+        <target>Bericht verzenden</target>
+      </trans-unit>
+      <trans-unit id="contact.status.verificationUnavailable" datatype="html">
+        <source>Verification is unavailable right now.</source>
+        <target>Verificatie is momenteel niet beschikbaar.</target>
+      </trans-unit>
+      <trans-unit id="contact.status.sending" datatype="html">
+        <source>Sending your message...</source>
+        <target>Je bericht wordt verzonden...</target>
+      </trans-unit>
+      <trans-unit id="contact.status.success" datatype="html">
+        <source>Your message was sent.</source>
+        <target>Je bericht is verzonden.</target>
+      </trans-unit>
+      <trans-unit id="contact.status.error" datatype="html">
+        <source>Something went wrong. Please try again.</source>
+        <target>Er is iets misgegaan. Probeer het opnieuw.</target>
+      </trans-unit>
+      <trans-unit id="contact.status.invalid" datatype="html">
+        <source>Complete the required fields before sending.</source>
+        <target>Vul de verplichte velden in voordat je verzendt.</target>
+      </trans-unit>
+      <trans-unit id="contact.status.needsVerification" datatype="html">
+        <source>Complete the verification before sending.</source>
+        <target>Voltooi de verificatie voordat je verzendt.</target>
+      </trans-unit>
+      <trans-unit id="contact.status.verified" datatype="html">
+        <source>Verification complete.</source>
+        <target>Verificatie voltooid.</target>
+      </trans-unit>
+      <trans-unit id="contact.field.fullName.error" datatype="html">
+        <source>Enter your name</source>
+        <target>Vul je naam in</target>
+      </trans-unit>
+      <trans-unit id="contact.field.email.error" datatype="html">
+        <source>Enter a valid email address</source>
+        <target>Vul een geldig e-mailadres in</target>
+      </trans-unit>
+      <trans-unit id="contact.field.organization.error" datatype="html">
+        <source>Keep organization under 200 characters</source>
+        <target>Houd organisatie onder 200 tekens</target>
+      </trans-unit>
+      <trans-unit id="contact.field.subject.error" datatype="html">
+        <source>Enter a subject under 200 characters</source>
+        <target>Vul een onderwerp van minder dan 200 tekens in</target>
+      </trans-unit>
+      <trans-unit id="contact.field.message.error" datatype="html">
+        <source>Enter a message under 5000 characters</source>
+        <target>Vul een bericht van minder dan 5000 tekens in</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.backToDirectory" datatype="html">
+        <source><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg [lucideIcon]=&quot;backIcon&quot; class=&quot;size-4&quot; aria-hidden=&quot;true&quot;&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Go back to project directory </source>
+        <target><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg [lucideIcon]=&quot;backIcon&quot; class=&quot;size-4&quot; aria-hidden=&quot;true&quot;&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Terug naar projectoverzicht </target>
+      </trans-unit>
+      <trans-unit id="projectDetail.overviewLabel" datatype="html">
+        <source> PROJECT OVERVIEW // <x id="INTERPOLATION" equiv-text="{{ projectYear(project) }}"/> </source>
+        <target> PROJECTOVERZICHT // <x id="INTERPOLATION" equiv-text="{{ projectYear(project) }}"/> </target>
+      </trans-unit>
+      <trans-unit id="projectDetail.client" datatype="html">
+        <source>Client</source>
+        <target>Klant</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.role" datatype="html">
+        <source>Role</source>
+        <target>Functie</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.duration" datatype="html">
+        <source>Duration</source>
+        <target>Duur</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.engineeredStack" datatype="html">
+        <source>Engineered Stack</source>
+        <target>Technische Stack</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.skillsAriaLabel" datatype="html">
+        <source>Project skills</source>
+        <target>Projectvaardigheden</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.visitLive" datatype="html">
+        <source><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg [lucideIcon]=&quot;externalLinkIcon&quot; class=&quot;size-4&quot; aria-hidden=&quot;true&quot;&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Visit Live Project </source>
+        <target><x id="START_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;svg [lucideIcon]=&quot;externalLinkIcon&quot; class=&quot;size-4&quot; aria-hidden=&quot;true&quot;&gt;"/><x id="CLOSE_TAG__SVG_SVG" ctype="x-_svg_svg" equiv-text="&lt;/svg&gt;"/> Bezoek live project </target>
+      </trans-unit>
+      <trans-unit id="projectDetail.moreProjects" datatype="html">
+        <source>More Projects</source>
+        <target>Meer Projecten</target>
+      </trans-unit>
+      <trans-unit id="projectDetail.notFound" datatype="html">
+        <source> Project not found </source>
+        <target> Project niet gevonden </target>
+      </trans-unit>
+      <trans-unit id="projectDetail.notFoundBody" datatype="html">
+        <source>That project could not be found.</source>
+        <target>Dat project kon niet worden gevonden.</target>
+      </trans-unit>
+      <trans-unit id="resume.eyebrow" datatype="html">
+        <source>Curriculum Vitae</source>
+        <target>Curriculum Vitae</target>
+      </trans-unit>
+      <trans-unit id="resume.title" datatype="html">
+        <source>Resume</source>
+        <target>Cv</target>
+      </trans-unit>
+      <trans-unit id="resume.comingSoon" datatype="html">
+        <source>A dedicated resume page is coming soon.</source>
+        <target>Een aparte cv-pagina volgt binnenkort.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

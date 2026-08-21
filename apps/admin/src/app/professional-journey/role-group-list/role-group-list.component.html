@@ -29,13 +29,34 @@
             </div>
             @if (editingOrganizationId() === group.organization.id) {
               <div class="flex min-w-64 flex-col gap-2">
-                <label class="text-xs font-medium" [attr.for]="'org-logo-' + group.organization.id">Logo URL</label>
-                <input
-                  [id]="'org-logo-' + group.organization.id"
-                  class="border-border rounded border px-2 py-1 text-sm"
-                  [value]="logoUrlDraft()"
-                  (input)="logoUrlDraft.set($any($event.target).value)"
-                />
+                <p class="text-xs font-medium">Logo</p>
+                @if (logoUrlDraft(); as logoUrl) {
+                  <div class="border-border-subtle bg-glass-active flex items-center gap-3 rounded-md border p-2">
+                    <img [src]="logoUrl" alt="" class="size-10 shrink-0 rounded object-cover" />
+                    <p class="text-text-muted min-w-0 flex-1 truncate text-xs">{{ logoUrl }}</p>
+                    <button
+                      uiButton
+                      variant="outlined"
+                      tone="danger"
+                      type="button"
+                      [disabled]="logoUploading()"
+                      (click)="removeLogo()"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                } @else {
+                  <ui-file-dropzone
+                    label="Drag & drop a logo"
+                    hint="PNG, JPEG, or WebP up to 5MB"
+                    accept="image/png,image/jpeg,image/webp"
+                    [disabled]="logoUploading()"
+                    (fileSelected)="uploadLogo($event)"
+                  />
+                }
+                @if (logoUploading()) {
+                  <p class="text-text-muted text-xs" role="status">Uploading logo...</p>
+                }
                 <label class="text-xs font-medium" [attr.for]="'org-website-' + group.organization.id">Website</label>
                 <input
                   [id]="'org-website-' + group.organization.id"

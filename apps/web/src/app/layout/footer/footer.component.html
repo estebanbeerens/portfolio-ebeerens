@@ -19,9 +19,9 @@
       @if (profile()?.xUrl; as xUrl) {
         <a class="footer-link" [href]="xUrl" target="_blank" rel="noreferrer">Twitter</a>
       }
-      <a class="footer-link" routerLink="/resume">Resume</a>
+      <a class="footer-link" routerLink="/resume" i18n="@@footer.resumeLink">Resume</a>
     </div>
-    <p class="text-text-subtle text-xs">
+    <p class="text-text-subtle text-xs" i18n="@@footer.copyright">
       © {{ currentYear }}
       @if (profile()?.name; as name) {
         {{ ' ' + name }}
