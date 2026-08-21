@@ -89,6 +89,13 @@
         "passWithNoTests": true
       }
     },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --build --noEmit",
+        "cwd": "apps/api"
+      }
+    },
     "export-openapi": {
       "executor": "nx:run-commands",
       "dependsOn": ["build"],

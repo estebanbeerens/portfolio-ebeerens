@@ -1,6 +1,7 @@
 # Stage 1: build
 FROM node:22-alpine AS build
 WORKDIR /app
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 COPY . .
 RUN npm ci
 RUN npx nx build admin --configuration=production
@@ -10,7 +11,7 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 COPY --from=build /app/dist/apps/admin ./dist/apps/admin
 USER app
 ENV NODE_ENV=production

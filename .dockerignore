@@ -6,3 +6,4 @@ tmp
 .angular
 coverage
 *.log
+.env*

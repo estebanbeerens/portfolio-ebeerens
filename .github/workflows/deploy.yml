@@ -1,0 +1,88 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ['Checks']
+    types: [completed]
+    branches: [main]
+
+jobs:
+  build-and-push:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: api
+            dockerfile: apps/api/Dockerfile
+            target: runtime
+            tag-suffix: ''
+          - app: api
+            dockerfile: apps/api/Dockerfile
+            target: migrate
+            tag-suffix: '-migrate'
+          - app: web
+            dockerfile: apps/web/Dockerfile
+            target: runtime
+            tag-suffix: ''
+          - app: admin
+            dockerfile: apps/admin/Dockerfile
+            target: runtime
+            tag-suffix: ''
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push ${{ matrix.app }}${{ matrix.tag-suffix }}
+        uses: docker/build-push-action@v6
+        id: build
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          platforms: linux/arm64
+          push: true
+          cache-from: type=gha,scope=${{ matrix.app }}${{ matrix.tag-suffix }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}${{ matrix.tag-suffix }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}${{ matrix.tag-suffix }}
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest${{ matrix.tag-suffix }}
+
+      - name: Scan image for known CVEs
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}${{ matrix.tag-suffix }}
+          severity: CRITICAL,HIGH
+          exit-code: '0' # report only for now; flip to '1' once the baseline is clean
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-main
+      cancel-in-progress: false
+    steps:
+      # The `deploy` user's SSH key is locked to a forced command on the VPS
+      # (/opt/deploy/pull-and-restart.sh) — whatever script/command is passed here is ignored
+      # server-side; only that one script ever runs.
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: exit 0
