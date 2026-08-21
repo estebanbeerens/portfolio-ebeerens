@@ -18,6 +18,16 @@
           {
             "glob": "**/*",
             "input": "apps/admin/public"
+          },
+          {
+            "glob": "logo-light.svg",
+            "input": ".",
+            "output": "."
+          },
+          {
+            "glob": "logo-dark.svg",
+            "input": ".",
+            "output": "."
           }
         ],
         "styles": ["apps/admin/src/styles.css"],

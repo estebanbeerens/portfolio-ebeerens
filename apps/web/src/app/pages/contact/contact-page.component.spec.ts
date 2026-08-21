@@ -47,7 +47,7 @@ describe('ContactPage', () => {
           useValue: {
             profileValue: () => ({
               id: 'profile-1',
-              name: 'Erwin Beerens',
+              name: 'John Beerens',
               headline: 'Frontend Engineer',
               location: 'Amsterdam, Netherlands',
               updatedAt: '2026-01-01',
@@ -92,7 +92,7 @@ describe('ContactPage', () => {
 
     expect(compiled.textContent).toContain('Get In Touch');
     expect(compiled.textContent).toContain('Send a message');
-    expect(compiled.textContent).toContain('Erwin Beerens');
+    expect(compiled.textContent).toContain('John Beerens');
     expect(compiled.textContent).toContain('Frontend Engineer');
     expect(compiled.querySelector('label[for="contact-full-name"]')?.textContent).toContain('Full name');
     expect((compiled.querySelector('button[type="submit"]') as HTMLButtonElement).disabled).toBe(false);

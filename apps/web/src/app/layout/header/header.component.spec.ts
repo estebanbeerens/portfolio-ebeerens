@@ -36,11 +36,11 @@ describe('Header', () => {
     await configure();
 
     const fixture = TestBed.createComponent(Header);
-    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'Erwin Beerens', updatedAt: '2026-01-01' });
+    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Erwin Beerens');
+    expect(compiled.textContent).toContain('John Beerens');
     expect(compiled.querySelector('a[href="/resume"]')?.textContent).toContain('Resume');
     expect(compiled.querySelector('a[href="/projects"]')?.textContent).toContain('Projects');
     expect(compiled.querySelector('a[href="/contact"]')?.textContent).toContain('Contact');
@@ -71,7 +71,7 @@ describe('Header', () => {
     await configure();
 
     const fixture = TestBed.createComponent(Header);
-    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'Erwin Beerens', updatedAt: '2026-01-01' });
+    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });
     await fixture.whenStable();
 
     const results = await axe(fixture.nativeElement);

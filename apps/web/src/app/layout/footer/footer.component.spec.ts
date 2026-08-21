@@ -10,26 +10,26 @@ describe('Footer', () => {
     const fixture = TestBed.createComponent(Footer);
     fixture.componentRef.setInput('profile', {
       id: 'profile-1',
-      name: 'Erwin Beerens',
-      githubUrl: 'https://github.com/erwin',
-      linkedinUrl: 'https://linkedin.com/in/erwin',
-      instagramUrl: 'https://instagram.com/erwin',
-      youtubeUrl: 'https://youtube.com/@erwin',
-      xUrl: 'https://x.com/erwin',
+      name: 'John Beerens',
+      githubUrl: 'https://github.com/john',
+      linkedinUrl: 'https://linkedin.com/in/john',
+      instagramUrl: 'https://instagram.com/john',
+      youtubeUrl: 'https://youtube.com/@john',
+      xUrl: 'https://x.com/john',
       updatedAt: '2026-01-01',
     });
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('a[href="https://instagram.com/erwin"]')?.textContent).toContain('Instagram');
-    expect(compiled.querySelector('a[href="https://youtube.com/@erwin"]')?.textContent).toContain('YouTube');
+    expect(compiled.querySelector('a[href="https://instagram.com/john"]')?.textContent).toContain('Instagram');
+    expect(compiled.querySelector('a[href="https://youtube.com/@john"]')?.textContent).toContain('YouTube');
   });
 
   it('omits social links that are not provided', async () => {
     await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
 
     const fixture = TestBed.createComponent(Footer);
-    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'Erwin Beerens', updatedAt: '2026-01-01' });
+    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });
     await fixture.whenStable();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
@@ -41,7 +41,7 @@ describe('Footer', () => {
     await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
 
     const fixture = TestBed.createComponent(Footer);
-    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'Erwin Beerens', updatedAt: '2026-01-01' });
+    fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });
     await fixture.whenStable();
 
     const results = await axe(fixture.nativeElement);

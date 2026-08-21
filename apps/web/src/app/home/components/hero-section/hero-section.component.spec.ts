@@ -13,7 +13,7 @@ describe('HeroSection', () => {
     const fixture = TestBed.createComponent(HeroSection);
     fixture.componentRef.setInput('profile', {
       id: 'profile-1',
-      name: 'Erwin Beerens',
+      name: 'John Beerens',
       headline: 'Frontend Engineer',
       bio: '**Builds** useful interfaces.',
       location: 'Amsterdam, Netherlands',

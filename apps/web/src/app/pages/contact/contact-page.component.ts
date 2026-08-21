@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
+import { Meta } from '@angular/platform-browser';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, Card, TextInput, Textarea } from '@portfolio-ebeerens/ui';
@@ -31,9 +31,7 @@ export class ContactPage {
   protected readonly content = inject(PortfolioContentService);
 
   constructor() {
-    const title = inject(Title);
     const meta = inject(Meta);
-    title.setTitle('Contact');
     meta.updateTag({ name: 'description', content: 'Get in touch about a project or collaboration.' });
   }
 

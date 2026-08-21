@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
+import { Meta } from '@angular/platform-browser';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
@@ -10,6 +10,7 @@ import { map } from 'rxjs';
 import { ProjectCard } from '../../shared/project-card/project-card.component';
 import { projectDuration, projectYear } from '../../shared/project-summary.util';
 import { PortfolioContentService } from '../../shared/portfolio-content.service';
+import { PortfolioTitleStrategy } from '../../portfolio-title.strategy';
 
 const RELATED_PROJECTS_LIMIT = 3;
 
@@ -23,7 +24,7 @@ export class ProjectDetailPage {
   protected readonly content = inject(PortfolioContentService);
   private readonly projectsApi = inject(ProjectsService);
   private readonly route = inject(ActivatedRoute);
-  private readonly title = inject(Title);
+  private readonly titleStrategy = inject(PortfolioTitleStrategy);
   private readonly meta = inject(Meta);
   private readonly slug = toSignal(this.route.paramMap.pipe(map((params) => params.get('slug') ?? '')), {
     initialValue: '',
@@ -49,10 +50,10 @@ export class ProjectDetailPage {
     effect(() => {
       const project = this.project();
       if (project) {
-        this.title.setTitle(project.title);
+        this.titleStrategy.setPageTitle(project.title);
         this.meta.updateTag({ name: 'description', content: project.shortDescription });
       } else if (this.content.projectsLoaded()) {
-        this.title.setTitle('Project not found');
+        this.titleStrategy.setPageTitle('Project not found');
       }
     });
   }

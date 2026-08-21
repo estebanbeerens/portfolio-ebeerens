@@ -24,6 +24,16 @@
           {
             "glob": "**/*",
             "input": "apps/web/public"
+          },
+          {
+            "glob": "logo-light.svg",
+            "input": ".",
+            "output": "."
+          },
+          {
+            "glob": "logo-dark.svg",
+            "input": ".",
+            "output": "."
           }
         ],
         "styles": ["apps/web/src/styles.css"],

@@ -3,23 +3,28 @@ import { Route } from '@angular/router';
 export const appRoutes: Route[] = [
   {
     path: '',
+    title: 'Home',
     loadComponent: () => import('./home/home-page.component').then((component) => component.HomePage),
   },
   {
     path: 'resume',
+    title: 'Resume',
     loadComponent: () => import('./pages/resume/resume-page.component').then((component) => component.ResumePage),
   },
   {
     path: 'projects',
+    title: 'Projects',
     loadComponent: () => import('./pages/projects/projects-page.component').then((component) => component.ProjectsPage),
   },
   {
     path: 'projects/:slug',
+    title: 'Project',
     loadComponent: () =>
       import('./pages/project-detail/project-detail-page.component').then((component) => component.ProjectDetailPage),
   },
   {
     path: 'contact',
+    title: 'Contact',
     loadComponent: () => import('./pages/contact/contact-page.component').then((component) => component.ContactPage),
   },
 ];

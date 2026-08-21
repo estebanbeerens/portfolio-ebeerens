@@ -17,6 +17,8 @@ export class ThemeService {
       const theme = this.theme();
       if (!this.isBrowser) return;
       document.documentElement.classList.toggle('dark', theme === 'dark');
+      const favicon = document.getElementById('app-favicon');
+      if (favicon) favicon.setAttribute('href', theme === 'dark' ? 'logo-dark.svg' : 'logo-light.svg');
       localStorage.setItem(STORAGE_KEY, theme);
     });
   }

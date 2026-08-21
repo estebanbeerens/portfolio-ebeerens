@@ -9,15 +9,15 @@ describe('socialLinksFor', () => {
   it('includes only the platforms with a URL, in a stable display order', () => {
     const profile: ProfileDto = {
       id: 'profile-1',
-      name: 'Erwin Beerens',
-      githubUrl: 'https://github.com/erwin',
-      instagramUrl: 'https://instagram.com/erwin',
+      name: 'John Beerens',
+      githubUrl: 'https://github.com/john',
+      instagramUrl: 'https://instagram.com/john',
       updatedAt: '2026-01-01',
     };
 
     expect(socialLinksFor(profile)).toEqual([
-      { platform: 'github', label: 'GitHub', url: 'https://github.com/erwin' },
-      { platform: 'instagram', label: 'Instagram', url: 'https://instagram.com/erwin' },
+      { platform: 'github', label: 'GitHub', url: 'https://github.com/john' },
+      { platform: 'instagram', label: 'Instagram', url: 'https://instagram.com/john' },
     ]);
   });
 });
