@@ -15,8 +15,8 @@ export class FeatureFlagsService implements OnModuleInit {
           where: { key },
           create: { key, enabled: false },
           update: {},
-        }),
-      ),
+        })
+      )
     );
   }
 

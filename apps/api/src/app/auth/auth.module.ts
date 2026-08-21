@@ -9,18 +9,9 @@ import { SessionAuthGuard } from './session-auth.guard';
 import { SessionCleanupService } from './session-cleanup.service';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule.register({ defaultStrategy: 'github' }),
-  ],
+  imports: [PrismaModule, PassportModule.register({ defaultStrategy: 'github' })],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    GithubStrategy,
-    GithubAuthGuard,
-    SessionAuthGuard,
-    SessionCleanupService,
-  ],
+  providers: [AuthService, GithubStrategy, GithubAuthGuard, SessionAuthGuard, SessionCleanupService],
   exports: [AuthService, SessionAuthGuard],
 })
 export class AuthModule {}

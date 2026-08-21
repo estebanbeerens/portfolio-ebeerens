@@ -498,7 +498,8 @@ site, and why "SSR" isn't a single one-size-fits-all choice across apps in the s
 ## Stage 7 — Containerize for production
 
 **Goal:** production-ready, multi-stage Dockerfiles for `web`, `admin`, and `api`, built for arm64,
-plus a production `docker-compose.yml`.
+plus a production Compose overlay (`docker-compose.prod.yml`) layered on the local base
+`docker-compose.yml`.
 
 **What you'll learn:** multi-stage builds, minimal production images, and why the Oracle VPS's CPU
 architecture matters for how you build images.
@@ -510,10 +511,13 @@ architecture matters for how you build images.
    user).
 2. Add `HEALTHCHECK` instructions and read config via environment variables (no secrets baked into
    images).
-3. Write the production `docker-compose.yml` with services for `nginx`, `web`, `admin`, `api`, and
-   `postgres`, using a named volume for Postgres data, and without publishing Postgres's port to the
-   host.
-4. Build once locally for arm64 to confirm the Dockerfiles work, using Docker's built-in `buildx`:
+3. Write the production Compose overlay with `web`, `admin`, `api`, and `postgres`, using the named
+   Postgres volume from the base file and without publishing Postgres's port to the host. Add the
+   `nginx` service and its config/certificate mounts in Stage 10, when its routing configuration is
+   introduced. Validate the merged files with `docker compose -f docker-compose.yml
+-f docker-compose.prod.yml config`.
+4. Build each app locally for arm64 to confirm the Dockerfiles work, using Docker's built-in
+   `buildx`:
    ```
    docker buildx build --platform linux/arm64 -t portfolio-api:test -f apps/api/Dockerfile .
    ```
@@ -529,7 +533,8 @@ architecture matters for how you build images.
 > version, even from a non-arm64 machine.
 
 **Verify it worked:** `docker buildx build --platform linux/arm64 ...` completes without errors for
-each app; `docker compose config` validates the compose file with no syntax errors.
+each app; `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` validates the
+merged Compose configuration with no syntax errors and shows no published Postgres port.
 
 **Reference:** architecture doc §13 (Docker, including the arm64/multi-arch section).
 
@@ -549,13 +554,17 @@ non-root, least-privilege deploy user.
 2. Configure Oracle's cloud-level firewall ("security list"/"network security group") to allow only
    ports 22 (SSH), 80, and 443 inbound.
 3. SSH in, then harden the OS-level firewall too (e.g. `ufw allow 22,80,443` + `ufw enable`) —
-   defense in depth in case the cloud-level rule is ever misconfigured.
+   defense in depth in case the cloud-level rule is ever misconfigured. Do not allow application or
+   database ports such as 3000, 4000, 5432, or 5434; production exposes only Nginx on 80/443, and
+   the `postgres-e2e` service is development-only and profile-gated.
 4. Disable SSH password authentication and root login in `/etc/ssh/sshd_config`
    (`PasswordAuthentication no`, `PermitRootLogin no`), then restart `sshd`.
-5. Create a dedicated `deploy` user (no sudo, no interactive shell needed beyond running Docker
-   Compose) for Stage 12's CI/CD to use later — you can finish locking its SSH key down with a
-   forced command once you reach that stage.
-6. Install Docker Engine + the Docker Compose plugin on the VM.
+5. Create a dedicated `deploy` user for Stage 12's CI/CD to use later. Choose one Docker access
+   model explicitly: rootless Docker for the least privilege, or membership in the `docker` group
+   for simpler setup (the latter grants root-equivalent access and must not be described as a
+   fully unprivileged user). Lock its CI key down with a forced command once you reach Stage 12.
+6. Install the arm64-compatible Docker Engine and Docker Compose plugin on the VM, then verify the
+   deploy user can run the chosen Docker setup without interactive sudo.
 
 > 💡 **B1 explainer — SSH keys vs. passwords.**
 > An SSH key pair is two matched files: a private key (stays only on your computer, never shared)
@@ -573,7 +582,8 @@ non-root, least-privilege deploy user.
 
 **Verify it worked:** you can SSH in using only your key (`ssh deploy@<vps-ip>` fails cleanly if you
 try a password); `sudo ufw status` shows only 22/80/443 allowed; `docker run hello-world` succeeds
-on the VM.
+on the VM; and after the production Compose stack is installed, `docker compose ps` shows no
+`postgres-e2e` service and no published ports other than Nginx's 80/443.
 
 **Reference:** architecture doc §3 (Instance shape), §15 (Server Security).
 

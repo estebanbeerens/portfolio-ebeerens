@@ -1,6 +1,7 @@
 # Session Token Mechanics
 
 ## Generating & Storing the Token
+
 ```ts
 import { randomBytes, createHash } from 'node:crypto';
 
@@ -10,11 +11,13 @@ function generateSessionToken() {
   return { token, tokenHash };
 }
 ```
+
 - The raw `token` is returned to the browser in the cookie and **never persisted**.
 - Only `tokenHash` is written to the `Session` row (`tokenHash`, `githubUserId`, `expiresAt`, `createdAt` — matches the existing Prisma model).
 - Hashing means a database read (backup, leak, etc.) doesn't hand out valid session tokens.
 
 ## Creating a Session
+
 ```ts
 async createSession(githubUserId: string) {
   const { token, tokenHash } = generateSessionToken();
@@ -27,6 +30,7 @@ async createSession(githubUserId: string) {
 ```
 
 ## Validating a Session (Auth Guard)
+
 ```ts
 @Injectable()
 export class SessionAuthGuard implements CanActivate {
@@ -46,19 +50,24 @@ export class SessionAuthGuard implements CanActivate {
   }
 }
 ```
+
 Apply `@UseGuards(SessionAuthGuard)` to every admin-only controller/route — never rely on the frontend hiding a button as the actual access control.
 
 ## Logout
+
 ```ts
 async destroySession(token: string) {
   const tokenHash = createHash('sha256').update(token).digest('hex');
   await this.prisma.session.deleteMany({ where: { tokenHash } });
 }
 ```
+
 Deleting the row is the entire revocation mechanism — no blocklist needed.
 
 ## Expired Session Cleanup
+
 Use `@nestjs/schedule` for a periodic cleanup job rather than a separate worker process:
+
 ```ts
 @Injectable()
 export class SessionCleanupService {
@@ -70,4 +79,5 @@ export class SessionCleanupService {
   }
 }
 ```
+
 Register `ScheduleModule.forRoot()` once at the app module level for this to work.

@@ -19,10 +19,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  const swaggerDocument = SwaggerModule.createDocument(
-    app,
-    createSwaggerConfig(),
-  );
+  const swaggerDocument = SwaggerModule.createDocument(app, createSwaggerConfig());
   SwaggerModule.setup(`${globalPrefix}/docs`, app, swaggerDocument);
 
   // EXPORT_OPENAPI=true dumps openapi/api.yaml and exits instead of serving —
@@ -38,12 +35,8 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
-  );
-  Logger.log(
-    `📚 Swagger docs available at: http://localhost:${port}/${globalPrefix}/docs`,
-  );
+  Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+  Logger.log(`📚 Swagger docs available at: http://localhost:${port}/${globalPrefix}/docs`);
 }
 
 bootstrap();

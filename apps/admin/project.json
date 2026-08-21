@@ -51,7 +51,8 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/admin/"
         },
         "development": {
           "optimization": false,
@@ -82,6 +83,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --build --noEmit",
+        "cwd": "apps/admin"
+      }
     },
     "test": {
       "executor": "@angular/build:unit-test",

@@ -1,7 +1,27 @@
 services:
   postgres:
     restart: unless-stopped
-    ports: []
+    ports: !reset []
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-off: `docker compose run --rm migrate` before (re)starting api. Not part of `up`.
+  migrate:
+    image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/api:${IMAGE_TAG:-latest}-migrate
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: migrate
+    container_name: portfolio-migrate
+    profiles: ['migrate']
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   api:
     image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/api:${IMAGE_TAG:-latest}
@@ -12,11 +32,13 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-      SESSION_SECRET: ${SESSION_SECRET}
-      R2_ENDPOINT: ${R2_ENDPOINT}
+      GITHUB_CALLBACK_URL: ${GITHUB_CALLBACK_URL}
+      ADMIN_GITHUB_ID: ${ADMIN_GITHUB_ID}
+      ADMIN_APP_URL: ${ADMIN_APP_URL}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
@@ -25,7 +47,8 @@ services:
       R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
       R2_JURISDICTION: ${R2_JURISDICTION}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   web:
     image: ghcr.io/${GITHUB_REPOSITORY:-portfolio-ebeerens}/web:${IMAGE_TAG:-latest}
@@ -37,6 +60,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4000
+      # SSR requests resolve this at runtime via Docker's internal DNS (compose service name).
+      API_URL: http://api:3000
     depends_on:
       - api
 
@@ -52,18 +77,19 @@ services:
       PORT: 4000
     depends_on:
       - api
+    # admin stays client-rendered (see build guide Stage 6) — no API_URL needed server-side.
 
-  # only nginx is published to the host; api/web/admin stay on the internal compose network
+  # only nginx is published to the host; api/web/admin stay on the internal compose network.
+  # HTTP-only for now (Stage 10) — Stage 11 adds `443:443` + a `./nginx/certs` mount once the
+  # Cloudflare Origin CA cert exists.
   nginx:
     image: nginx:1.27-alpine
     container_name: portfolio-nginx
     restart: unless-stopped
     ports:
       - '80:80'
-      - '443:443'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - api
       - web

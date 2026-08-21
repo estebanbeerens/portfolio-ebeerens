@@ -1,6 +1,7 @@
 # Nginx & Cloudflare
 
 ## Nginx Routing (architecture plan §11)
+
 ```nginx
 server {
   listen 443 ssl;
@@ -25,10 +26,12 @@ server {
   limit_req zone=api_limit burst=20 nodelay;
 }
 ```
+
 - Only Nginx is reachable from outside the Docker network — `web`, `admin`, `api` should not publish ports directly to the host once Nginx is in place.
 - Compression, connection handling, and static asset serving for `/assets` also live here per §11 — add as needed, don't duplicate what Cloudflare's CDN already caches.
 
 ## Cloudflare Setup (architecture plan §12)
+
 1. **DNS**: point the domain (and `www`) at the VPS's public IP with the proxy ("orange cloud") **on**.
 2. **TLS**: set SSL/TLS mode to **Full (strict)**. Generate a Cloudflare **Origin CA** certificate (Cloudflare dashboard) and install it in Nginx — this is a different certificate from a normal publicly-trusted one; it's only for the Cloudflare-to-origin leg.
 3. **Rate limiting split** — not duplicated effort between the two layers:
@@ -37,4 +40,5 @@ server {
 4. **WAF**: enable the free-plan managed rules where useful.
 
 ## Domain Strategy
+
 Serve the API under `example.com/api/*` rather than a separate `api.example.com` subdomain — keeps the architecture simple and avoids unnecessary cross-origin concerns (per §12).

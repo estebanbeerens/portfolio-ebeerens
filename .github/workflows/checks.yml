@@ -1,0 +1,99 @@
+name: Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # prisma generate (run via postinstall) requires this to be set, even though
+  # generate itself never connects to a database.
+  DATABASE_URL: postgresql://user:password@localhost:5432/db
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      # Resolves NX_BASE/NX_HEAD correctly for both push and pull_request events - a bare `main`
+      # isn't resolvable via git rev-parse from a checkout alone (git only checks refs/heads/<name>
+      # and refs/remotes/<name>, not refs/remotes/origin/<name>).
+      - uses: nrwl/nx-set-shas@v4
+
+      # Cache node_modules
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npx prisma migrate deploy
+
+      - name: Check formatting
+        run: npx prettier --check .
+
+      - name: Audit dependencies
+        # Report-only for now (mirrors the Trivy image scan below) until the current
+        # dependency baseline is clean - flip to a hard failure in a follow-up.
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      # Prepend any command with "nx record --" to record its logs to Nx Cloud
+      - run: npx nx affected -t lint typecheck build
+
+      - name: Test with coverage
+        run: npx nx affected -t test --coverage --coverageReporters=text-summary --coverageReporters=json-summary
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "## Coverage summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Project | Statements | Branches | Functions | Lines |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- | --- | --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          for f in $(find coverage -name coverage-summary.json 2>/dev/null); do
+            project=$(dirname "$f" | sed 's#^coverage/##')
+            jq -r --arg project "$project" \
+              '.total | "| \($project) | \(.statements.pct)% | \(.branches.pct)% | \(.functions.pct)% | \(.lines.pct)% |"' \
+              "$f" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
+      - run: npx nx fix-ci
+        if: always()

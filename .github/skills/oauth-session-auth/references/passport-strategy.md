@@ -1,12 +1,14 @@
 # Passport GitHub Strategy Setup
 
 ## Packages
+
 ```
 npm install passport passport-github2 @nestjs/passport
 npm install -D @types/passport-github2
 ```
 
 ## Strategy
+
 ```ts
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
@@ -33,10 +35,12 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   }
 }
 ```
+
 - Returning `null`/throwing from `validate()` is the rejection point — don't let a non-admin identity reach the controller and rely on a later check.
 - `scope: ['read:user']` is enough to get the GitHub user ID; don't request broader scopes than needed.
 
 ## Controller
+
 ```ts
 @Controller('auth')
 export class AuthController {
@@ -75,4 +79,5 @@ export class AuthController {
 ```
 
 ## Module Wiring
+
 Register the strategy as a provider in the owning module (e.g. an `AuthModule`) alongside `PassportModule.register({ defaultStrategy: 'github' })`. Keep `AuthService` responsible for all Prisma/session logic — the controller only orchestrates, matching the `nestjs-backend` skill's controller/service split.

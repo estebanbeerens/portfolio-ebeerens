@@ -15,6 +15,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --build --noEmit",
+        "cwd": "libs/ui"
+      }
     }
   }
 }
