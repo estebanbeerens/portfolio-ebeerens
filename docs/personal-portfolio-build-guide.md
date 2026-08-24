@@ -621,7 +621,7 @@ all services healthy.
 ## Stage 10 — Nginx reverse proxy
 
 **Goal:** a single entry point on the VPS (port 80/443) that routes to the right container based on
-path, instead of exposing each app's port directly.
+hostname + path, instead of exposing each app's port directly.
 
 **What you'll learn:** what a reverse proxy is for, and why you still need one even with Cloudflare
 in front of everything.
@@ -630,8 +630,9 @@ in front of everything.
 
 1. Add an `nginx` service to the compose file (or install Nginx directly on the VPS — a container is
    more consistent with the rest of the stack).
-2. Write the Nginx config routing `/` → `web`, `/admin` → `admin`, `/api` → `api`, per architecture
-   doc §11.
+2. Write the Nginx config routing host `ebeerens.com`/`www.ebeerens.com` (`/` → `web`, `/api` → `api`)
+   and host `admin.ebeerens.com` (`/` → `admin`, `/api` → `api`), per architecture doc §11. Keep an
+   optional 301 redirect from `ebeerens.com/admin` to `admin.ebeerens.com` for backwards compatibility.
 3. Add basic security headers and a `limit_req` zone as a defense-in-depth rate limit (Cloudflare's
    edge rules are the primary defense — see Stage 11).
 4. Stop publishing the app containers' ports directly to the host; only Nginx should be reachable
@@ -640,12 +641,14 @@ in front of everything.
 > 💡 **B1 explainer — why do I need Nginx if Cloudflare is already "in front"?**
 > Cloudflare sits between the whole internet and _your server as a whole_ — it doesn't know that
 > your one server is actually running three separate apps inside Docker. Nginx's job is _inside_
-> your server: when a request arrives, Nginx looks at the path (`/`, `/admin`, `/api`) and forwards
-> it to the correct container. Think of Cloudflare as the building's front security desk, and Nginx
-> as the receptionist on your specific floor who knows which office door to send you to.
+> your server: when a request arrives, Nginx looks at both the hostname (`ebeerens.com` vs
+> `admin.ebeerens.com`) and the path (`/`, `/api`) and forwards it to the correct container. Think
+> of Cloudflare as the building's front security desk, and Nginx as the receptionist on your specific
+> floor who knows which office door to send you to.
 
-**Verify it worked:** hitting the VPS's IP on port 80 for `/`, `/admin`, and `/api` each reach the
-correct app; hitting the old direct app ports (e.g. the API's raw port) no longer works from outside.
+**Verify it worked:** with DNS pointed at the VPS, `http://ebeerens.com/` reaches `web`,
+`http://admin.ebeerens.com/` reaches `admin`, and `http://admin.ebeerens.com/api/profile` reaches
+the API; hitting the old direct app ports (e.g. the API's raw port) no longer works from outside.
 
 **Reference:** architecture doc §11 (Nginx).
 
@@ -661,8 +664,9 @@ origin-to-Cloudflare TLS needs its own certificate.
 
 **Steps:**
 
-1. In Cloudflare DNS, point your domain (and `www`) at the VPS's public IP (proxied "orange cloud"
-   on, so traffic routes through Cloudflare).
+1. In Cloudflare DNS, point your domain and `www` at the VPS's public IP, and add
+   `admin.yourdomain.com` to the same origin (proxied "orange cloud" on for all of them, so
+   traffic routes through Cloudflare).
 2. Under SSL/TLS, set the mode to **Full (strict)**, then generate a Cloudflare **Origin CA**
    certificate and install it in Nginx (this is different from a normal publicly-trusted cert —
    see the explainer below).

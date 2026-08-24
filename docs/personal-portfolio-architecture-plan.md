@@ -603,10 +603,13 @@ HTTPS :443
    │
    ▼
  Nginx
-   ├── /       → frontend SSR
-   ├── /admin  → admin application
-   ├── /api    → backend
-   └── /assets → static assets where appropriate
+  ├── Host: ebeerens.com / www.ebeerens.com
+  │   ├── /       → frontend SSR
+  │   └── /api    → backend
+  ├── Host: admin.ebeerens.com
+  │   ├── /       → admin application
+  │   └── /api    → backend
+  └── /assets → static assets where appropriate
 ```
 
 Nginx responsibilities may include:
@@ -649,7 +652,7 @@ Potential domains:
 ```text
 example.com
 www.example.com
-api.example.com
+admin.example.com
 ```
 
 Alternatively, serve the API under:
