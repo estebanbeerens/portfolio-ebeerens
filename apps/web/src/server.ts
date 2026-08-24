@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
+const defaultLocaleBrowserDistFolder = resolve(browserDistFolder, 'en');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -29,6 +30,12 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Serve static files from /browser
  */
+for (const asset of ['robots.txt', 'sitemap.xml', 'manifest.webmanifest', 'logo-light.svg', 'logo-dark.svg']) {
+  app.get(`/${asset}`, (_req, res) => {
+    res.sendFile(resolve(defaultLocaleBrowserDistFolder, asset));
+  });
+}
+
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',

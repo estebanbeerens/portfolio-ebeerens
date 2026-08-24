@@ -13,6 +13,50 @@ starting only after the first goes green.
 
 Replace `<public-ip>` and `deploy@<public-ip>` below with your real VPS address throughout.
 
+## Network map
+
+Cloudflare DNS records decide where the domain points. Oracle Cloud network rules decide whether
+traffic that reaches the VPS is allowed through to Nginx.
+
+```mermaid
+flowchart TD
+	Browser[Browser] --> Cloudflare[Cloudflare DNS / proxy]
+	Cloudflare --> PublicIp[Oracle public IP]
+
+	subgraph OCI[Oracle Cloud]
+		subgraph VCN[VCN]
+			IGW[Internet Gateway]
+
+			subgraph Subnet[Public Subnet]
+				SL[Subnet Security List]
+
+				subgraph Instance[Compute Instance / VPS]
+					VNIC[Primary VNIC]
+					NSG[Network Security Group]
+					Host[Ubuntu firewall + Docker]
+					Nginx[Nginx container :80]
+				end
+			end
+		end
+	end
+
+	PublicIp --> IGW
+	IGW --> SL
+	SL --> VNIC
+	NSG -. attached to .-> VNIC
+	VNIC --> Host
+	Host --> Nginx
+	Nginx --> Web[web:4000]
+	Nginx --> Admin[admin:4000]
+	Nginx --> API[api:3000]
+	API --> Postgres[postgres:5432 internal only]
+```
+
+Add DNS records in Cloudflare (`@`, `www`, `admin`). Add ingress firewall rules in the Oracle
+Network Security Group attached to the instance's primary VNIC, or in the subnet security list if
+the instance does not use an NSG. Public ingress should be limited to TCP `80`, TCP `443` once TLS
+is enabled, and TCP `22` from your own IP only.
+
 ---
 
 ## 1. Put the repo + deploy files on the VPS

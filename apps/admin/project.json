@@ -39,6 +39,9 @@
       },
       "configurations": {
         "production": {
+          "security": {
+            "allowedHosts": ["admin.ebeerens.com", "localhost", "127.0.0.1"]
+          },
           "budgets": [
             {
               "type": "initial",

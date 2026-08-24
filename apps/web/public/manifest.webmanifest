@@ -1,0 +1,25 @@
+{
+  "id": "https://ebeerens.com/",
+  "name": "Esteban Beerens Portfolio",
+  "short_name": "E. Beerens",
+  "description": "Portfolio of Esteban Beerens: software projects, professional experience, resume, and contact information.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f3ec",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "/logo-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ]
+}

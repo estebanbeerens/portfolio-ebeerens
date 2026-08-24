@@ -1,0 +1,25 @@
+{
+  "id": "https://admin.ebeerens.com/",
+  "name": "Portfolio Admin",
+  "short_name": "Admin",
+  "description": "Private administration interface for the portfolio.",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f3ec",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "/logo-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ]
+}
