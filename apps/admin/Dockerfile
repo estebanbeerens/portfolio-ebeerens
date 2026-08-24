@@ -2,8 +2,12 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
+# Dependencies first so the (slow) install layer is only invalidated by lockfile changes.
+# The prisma files are needed because `postinstall` runs `prisma generate`.
+COPY package.json package-lock.json prisma.config.ts ./
+COPY apps/api/prisma ./apps/api/prisma
+RUN npm ci --no-audit --no-fund
 COPY . .
-RUN npm ci
 RUN npx nx build admin --configuration=production
 
 # Stage 2: runtime
@@ -11,7 +15,7 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 COPY --from=build /app/dist/apps/admin ./dist/apps/admin
 USER app
 ENV NODE_ENV=production

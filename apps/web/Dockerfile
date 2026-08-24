@@ -6,8 +6,12 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 # Pass --build-arg API_URL=http://<host-or-service>:3000 with --network so this can actually resolve.
 ARG API_URL=http://localhost:3000
 ENV API_URL=$API_URL
+# Dependencies first so the (slow) install layer is only invalidated by lockfile changes.
+# The prisma files are needed because `postinstall` runs `prisma generate`.
+COPY package.json package-lock.json prisma.config.ts ./
+COPY apps/api/prisma ./apps/api/prisma
+RUN npm ci --no-audit --no-fund
 COPY . .
-RUN npm ci
 RUN npx nx build web --configuration=production
 
 # Stage 2: runtime
@@ -15,7 +19,7 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 COPY --from=build /app/dist/apps/web ./dist/apps/web
 USER app
 ENV NODE_ENV=production

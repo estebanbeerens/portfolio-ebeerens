@@ -10,36 +10,33 @@ on:
 jobs:
   build-and-push:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    # Native arm64 runner: building linux/arm64 on an x86 runner goes through QEMU, which makes
+    # `npm ci` take hours instead of minutes.
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
+    env:
+      # `workflow_run.head_sha` is empty on a manual dispatch, which would render an untagged ref.
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - app: api
             dockerfile: apps/api/Dockerfile
-            target: runtime
-            tag-suffix: ''
-          - app: api
-            dockerfile: apps/api/Dockerfile
-            target: migrate
-            tag-suffix: '-migrate'
+            migrate: true
           - app: web
             dockerfile: apps/web/Dockerfile
-            target: runtime
-            tag-suffix: ''
+            migrate: false
           - app: admin
             dockerfile: apps/admin/Dockerfile
-            target: runtime
-            tag-suffix: ''
+            migrate: false
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ env.SHA }}
 
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
@@ -48,25 +45,42 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push ${{ matrix.app }}${{ matrix.tag-suffix }}
+      - name: Build & push ${{ matrix.app }}
         uses: docker/build-push-action@v6
-        id: build
         with:
           context: .
           file: ${{ matrix.dockerfile }}
-          target: ${{ matrix.target }}
+          target: runtime
           platforms: linux/arm64
           push: true
-          cache-from: type=gha,scope=${{ matrix.app }}${{ matrix.tag-suffix }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.app }}${{ matrix.tag-suffix }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}${{ matrix.tag-suffix }}
-            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest${{ matrix.tag-suffix }}
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ env.SHA }}
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest
+
+      # Same job, so the shared `build` stage is already in the local buildx cache.
+      - name: Build & push ${{ matrix.app }}-migrate
+        if: matrix.migrate
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: migrate
+          platforms: linux/arm64
+          push: true
+          cache-from: type=gha,scope=${{ matrix.app }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ env.SHA }}-migrate
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest-migrate
 
       - name: Scan image for known CVEs
         uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          # The pushed index only has an arm64 child; Trivy would otherwise default to linux/amd64.
+          TRIVY_PLATFORM: linux/arm64
         with:
-          image-ref: ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ github.event.workflow_run.head_sha }}${{ matrix.tag-suffix }}
+          image-ref: ghcr.io/${{ github.repository }}/${{ matrix.app }}:${{ env.SHA }}
           severity: CRITICAL,HIGH
           exit-code: '0' # report only for now; flip to '1' once the baseline is clean
 
