@@ -1,98 +1,156 @@
-# PortfolioEbeerens
+# Personal Portfolio
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+This repository contains my personal portfolio website and the systems behind it. It is both a public portfolio and a hands-on full-stack project for exploring modern web development, API design, authentication, content management, and production-style deployment.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+**Live site:** <https://ebeerens.com>
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## What it includes
 
-## Run tasks
+- A server-side rendered portfolio site for projects, experience, skills, and profile information.
+- English and Dutch content on the public site.
+- A private admin application for managing portfolio content.
+- GitHub OAuth with an opaque, server-side session for the single administrator.
+- A contact form protected by Cloudflare Turnstile.
+- Cloudflare R2 storage for project images and documents, using presigned URLs.
+- Server-side feature flags for optional portfolio sections.
+- Activity logging for administrative changes.
+- A typed Angular API client generated from the committed OpenAPI contract.
 
-To run tasks with Nx use:
+## Technology
 
-```sh
-npx nx <target> <project-name>
+| Area                  | Technologies                                 |
+| --------------------- | -------------------------------------------- |
+| Workspace             | Nx monorepo, TypeScript                      |
+| Public site and admin | Angular 22, Angular SSR, Tailwind CSS 4      |
+| API                   | NestJS 11, Prisma 7, OpenAPI                 |
+| Database              | PostgreSQL 16                                |
+| Storage and edge      | Cloudflare R2, Cloudflare, Nginx             |
+| Testing               | Vitest, Jest, Playwright, axe-core           |
+| Deployment            | Docker Compose, Oracle Cloud, GitHub Actions |
+
+## Repository structure
+
+```text
+apps/
+  web/                  Public portfolio website with SSR and localization
+  admin/                Authenticated content management interface
+  api/                  NestJS REST API and Prisma schema
+  web-e2e/              Playwright tests for the public site
+  admin-e2e/            Playwright tests for the admin application
+  api-e2e/              HTTP tests for the API
+
+libs/
+  ui/                   Shared Angular UI components
+  api-client/           Generated Angular client for the API
+
+openapi/
+  api.yaml              Source-of-truth API contract
+
+docs/                   Architecture, build, and deployment documentation
+deploy/                 Deployment scripts
+docker-compose*.yml     Local and production service definitions
+nginx/                  Reverse-proxy configuration
 ```
 
-For example:
+## Local development
 
-```sh
-npx nx build myproject
+### Prerequisites
+
+- Node.js 22.x, as specified in `.nvmrc`
+- npm
+- Docker Desktop with Docker Compose
+- GitHub OAuth application credentials for administrator login
+- Cloudflare Turnstile credentials for the contact form
+- Cloudflare R2 credentials for image and document storage
+
+The database is the only external service required to start the core application locally. OAuth, Turnstile, and R2-backed features need their corresponding credentials before they can be used. Never commit real credentials to the repository.
+
+### Setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a local environment file and fill in the values you need:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Start the local PostgreSQL instance:
+
+   ```bash
+   docker compose up -d postgres
+   ```
+
+   PostgreSQL is available on `localhost:5433` by default.
+
+4. Apply the Prisma migrations:
+
+   ```bash
+   npx prisma migrate deploy
+   npx prisma generate
+   ```
+
+5. Start the applications:
+
+   ```bash
+   npm run serve
+   ```
+
+   The local applications are available at:
+
+   - Public site: <http://localhost:4200>
+   - Admin application: <http://localhost:4300>
+
+   To run a smaller slice of the workspace, use `npm run serve:web` for the public site and API, or `npm run serve:admin` for the admin application and API.
+
+## Development commands
+
+Run Nx targets for an individual project with `npx nx run <project>:<target>`. Common examples:
+
+```bash
+# Run checks for a project
+npx nx lint web
+npx nx typecheck web
+npx nx test web
+
+# Run all configured tests
+npx nx run-many --target=test --all
+
+# Explore the local database
+npm run studio
+
+# Export the API contract and regenerate the Angular client
+npm run build:openapispec
+npm run build:api-client
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+The generated client lives in `libs/api-client/src/generated`. Update the backend contract through `openapi/api.yaml` and use the repository scripts when regenerating it.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+End-to-end tests are opt-in because they start application and database services:
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-
-```sh
-npx nx add @nx/react
+```bash
+npx nx e2e web-e2e
+npx nx e2e admin-e2e
+npx nx e2e api-e2e
 ```
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+## Deployment
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
+The production setup uses Docker Compose on an Oracle Cloud Arm64 VPS, with Nginx behind Cloudflare and PostgreSQL alongside the application services. GitHub Actions builds and deploys the containers.
 
-# Generate a library
-npx nx g @nx/react:lib some-lib
-```
+The existing documentation explains the decisions and operational steps in more detail:
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+- [Architecture and infrastructure plan](docs/personal-portfolio-architecture-plan.md)
+- [Build guide](docs/personal-portfolio-build-guide.md)
+- [Deployment manual steps](docs/deploy-manual-steps.md)
+- [Deployment script](deploy/pull-and-restart.sh)
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Production credentials belong in the deployment environment or secret store, not in tracked files. Review `.env.example` for the required variable names and keep `.env` local.
 
-## Set up CI
+## License
 
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+This project is licensed under the [MIT License](LICENSE).
