@@ -19,15 +19,12 @@ CMD ["npx", "prisma", "migrate", "deploy"]
 FROM node:22-alpine AS runtime
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
-# The generated output includes the API's production package metadata.
+# The generated output includes the API's production package metadata. '@prisma/client' is
+# declared in apps/api/package.json (not auto-detected: the generated client that imports
+# '@prisma/client/runtime/*' is gitignored, so Nx's generatePackageJson can't see it), so the
+# install below resolves it and its runtime subtree normally.
 COPY --from=build /app/dist/apps/api ./
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
-# Nx's generatePackageJson only detects direct static imports, missing the requires inside the
-# generated Prisma client (apps/api/src/generated/prisma) for '@prisma/client/runtime/*' — so
-# @prisma/client never lands in dist's package.json / gets installed above. Copy it (and its own
-# runtime dependency) straight from the build stage instead of relying on that.
-COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=build /app/node_modules/@prisma/client-runtime-utils ./node_modules/@prisma/client-runtime-utils
 USER app
 ENV NODE_ENV=production
 EXPOSE 3000

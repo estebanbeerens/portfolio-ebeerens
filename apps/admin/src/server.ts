@@ -37,6 +37,20 @@ app.use(
   })
 );
 
+// A request for a hashed build asset that reaches this point does not exist on disk
+// (e.g. a stale index.html referencing a removed file, or a mid-deploy race). It must
+// return 404, never fall through to the SSR HTML below: otherwise a 200 text/html body
+// gets cached by the CDN under a .js/.css URL and then fails strict MIME checks (nosniff).
+const STATIC_ASSET_EXT =
+  /\.(?:js|mjs|css|map|json|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|eot|webmanifest|txt|xml)$/i;
+app.use((req, res, next) => {
+  if (req.method === 'GET' && STATIC_ASSET_EXT.test(req.path)) {
+    res.status(404).end();
+    return;
+  }
+  next();
+});
+
 /**
  * Handle all other requests by rendering the Angular application.
  */
