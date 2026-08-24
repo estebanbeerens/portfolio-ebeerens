@@ -6,11 +6,6 @@ set -euo pipefail
 
 cd /opt/portfolio
 
-# Compose files, nginx.conf and this script's inputs are versioned, so refresh them before pulling
-# images. --ff-only rather than a hard reset: local drift should abort the deploy, not be wiped.
-git fetch --prune origin
-git merge --ff-only origin/main
-
 docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
 
 # Run pending Prisma migrations before swapping the api container over.
