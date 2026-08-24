@@ -10,7 +10,7 @@ services:
 
   # One-off: `docker compose run --rm migrate` before (re)starting api. Not part of `up`.
   migrate:
-    image: ghcr.io/estebanbeerens/portfolio-ebeerens/api:${IMAGE_TAG:-latest}-migrate
+    image: ghcr.io/estebanbeerens/portfolio-ebeerens/api:${IMAGE_TAG:?set IMAGE_TAG to the target git SHA}-migrate
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -24,7 +24,7 @@ services:
         condition: service_healthy
 
   api:
-    image: ghcr.io/estebanbeerens/portfolio-ebeerens/api:${IMAGE_TAG:-latest}
+    image: ghcr.io/estebanbeerens/portfolio-ebeerens/api:${IMAGE_TAG:?set IMAGE_TAG to the target git SHA}
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -51,7 +51,7 @@ services:
         condition: service_healthy
 
   web:
-    image: ghcr.io/estebanbeerens/portfolio-ebeerens/web:${IMAGE_TAG:-latest}
+    image: ghcr.io/estebanbeerens/portfolio-ebeerens/web:${IMAGE_TAG:?set IMAGE_TAG to the target git SHA}
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -66,7 +66,7 @@ services:
       - api
 
   admin:
-    image: ghcr.io/estebanbeerens/portfolio-ebeerens/admin:${IMAGE_TAG:-latest}
+    image: ghcr.io/estebanbeerens/portfolio-ebeerens/admin:${IMAGE_TAG:?set IMAGE_TAG to the target git SHA}
     build:
       context: .
       dockerfile: apps/admin/Dockerfile

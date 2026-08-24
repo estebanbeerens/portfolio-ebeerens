@@ -103,6 +103,13 @@ For this routing setup, use values like:
 
 ## 3. Install the forced-command deploy script on the VPS
 
+Only `deploy/pull-and-restart.sh` is installed to `/opt/deploy/` and pinned as the deploy key's
+forced command. It is a thin bootstrap: it takes the deploy lock, fast-forwards `/opt/portfolio` to
+`origin/main`, then hands off to `deploy/run-deploy.sh` **from the freshly-pulled checkout**. The
+actual deploy steps live in `deploy/run-deploy.sh`, so changes to them ship with a normal push — you
+do **not** re-copy anything to the VPS when the deploy steps change, only when this bootstrap itself
+changes (which should be almost never).
+
 ```bash
 scp deploy/pull-and-restart.sh deploy@<public-ip>:~/pull-and-restart.sh
 ssh deploy@<public-ip>
@@ -115,6 +122,19 @@ exit
 
 (If `/opt/deploy` doesn't exist yet or isn't owned by `deploy`, adjust the `mkdir`/`chown` above —
 run those two lines as a sudo-capable user first if `deploy` itself doesn't have sudo.)
+
+> If the installed bootstrap is out of date (e.g. it still ran the deploy steps inline and the
+> `docker compose config` step now fails with `required variable IMAGE_TAG is missing a value`),
+> re-install it once from the checkout already on the VPS:
+>
+> ```bash
+> ssh <admin>@<public-ip>            # use your personal admin key, not the forced-command deploy key
+> cd /opt/portfolio && git fetch origin main && git reset --hard origin/main
+> sudo install -m 755 -o deploy -g deploy deploy/pull-and-restart.sh /opt/deploy/pull-and-restart.sh
+> ```
+>
+> Then re-run the failed **Deploy** job. After this one-time update, future deploy-step changes
+> apply automatically via `deploy/run-deploy.sh`.
 
 ## 4. Generate a dedicated SSH key pair for CI to use
 

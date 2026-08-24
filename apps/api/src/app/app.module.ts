@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
+import { HealthModule } from './health/health.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma.module';
 import { ProfileModule } from './profile/profile.module';
@@ -19,6 +20,7 @@ import { StorageModule } from './storage/storage.module';
     ScheduleModule.forRoot(),
     PrismaModule,
     StorageModule,
+    HealthModule,
     ActivityModule,
     AuthModule,
     ProfileModule,

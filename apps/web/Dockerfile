@@ -25,5 +25,7 @@ USER app
 ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
-HEALTHCHECK --interval=30s --timeout=5s CMD node -e "require('http').get('http://localhost:4000/', r => process.exit(r.statusCode === 200 ? 0 : 1))"
+# Liveness probe: '/' 302-redirects to the default locale '/en', so accept any 2xx/3xx as "server up
+# and routing" rather than pinning to 200 (which the old probe did, marking the container unhealthy).
+HEALTHCHECK --interval=30s --timeout=5s CMD node -e "require('http').get('http://localhost:4000/', r => process.exit(r.statusCode < 400 ? 0 : 1))"
 CMD ["node", "dist/apps/web/server/server.mjs"]
