@@ -29,6 +29,9 @@ git reset --hard "origin/${DEPLOY_BRANCH}"
 echo "Validating Docker Compose configuration..."
 "${compose[@]}" config >/dev/null
 
+echo "Refreshing Cloudflare real-IP trust list..."
+"${APP_DIR}/deploy/update-cloudflare-ips.sh"
+
 echo "Pulling Docker images..."
 "${compose_with_migrate_profile[@]}" pull
 
