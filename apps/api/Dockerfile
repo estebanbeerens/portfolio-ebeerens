@@ -22,6 +22,11 @@ RUN addgroup -S app && adduser -S app -G app
 # The generated output includes the API's production package metadata.
 COPY --from=build /app/dist/apps/api ./
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
+# Nx's generatePackageJson only detects direct static imports, missing the requires inside the
+# generated Prisma client (apps/api/src/generated/prisma) for '@prisma/client/runtime/*' — so
+# @prisma/client never lands in dist's package.json / gets installed above. Copy it straight from
+# the build stage (same version the client was generated against) instead of relying on that.
+COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
 USER app
 ENV NODE_ENV=production
 EXPOSE 3000
