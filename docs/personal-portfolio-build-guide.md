@@ -605,8 +605,9 @@ command over SSH.
 2. Build and push the three arm64 images somewhere reachable from the VPS for now — either build
    directly on the Arm VPS itself (simplest for this one manual run) or push to GHCR from your own
    machine using `buildx`.
-3. On the VPS: `docker compose pull && docker compose up -d` (or just `docker compose up -d --build`
-   if you built locally on the box).
+3. On the VPS: pull the latest images and restart with
+   `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans`
+   after validating the Compose config.
 4. Run the Prisma migration against the production database from the VPS (or via a one-off
    container) so the schema exists.
 
@@ -738,7 +739,9 @@ SSH without giving CI full access to your server.
    command="/opt/deploy/pull-and-restart.sh",no-port-forwarding,no-agent-forwarding,no-pty ssh-ed25519 AAAA...
    ```
    so that key can only ever run that one script.
-8. Write `/opt/deploy/pull-and-restart.sh` on the VPS to `docker compose pull && docker compose up -d`.
+8. Install `/opt/deploy/pull-and-restart.sh` on the VPS. It should update `/opt/portfolio` from
+   `origin/main`, validate Compose, pull the normal and migration images, run migrations, restart
+   services, prune old images, and print `docker compose ps`.
 9. Add a deploy job (e.g. using `appleboy/ssh-action` or a plain `ssh` step) that connects as
    `deploy` using a private key stored in GitHub Actions encrypted secrets, running only the forced
    command. Gate this job so it only runs on `main`, and only after the lint/test/security/build

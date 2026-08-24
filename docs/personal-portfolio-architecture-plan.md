@@ -750,7 +750,7 @@ execute arbitrary workflow code with the runner's privileges). Instead:
 
 - Create a dedicated, least-privilege `deploy` user on the VPS with no interactive shell.
 - Restrict its SSH key with a forced `command="..."` in `authorized_keys` that only allows running
-  the fixed `docker compose pull && docker compose up -d` script — nothing else.
+  the fixed Git-backed pull-and-restart script — nothing else.
 - Store the private key in GitHub Actions encrypted secrets; never commit it.
 - Rotate the deploy key periodically.
 

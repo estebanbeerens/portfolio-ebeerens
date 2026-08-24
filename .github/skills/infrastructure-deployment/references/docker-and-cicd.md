@@ -71,17 +71,26 @@ A self-hosted GitHub Actions runner on an internet-facing VPS is an RCE-adjacent
    #!/usr/bin/env bash
    set -euo pipefail
    cd /opt/portfolio
-   docker compose pull
-   docker compose up -d
    ```
+
+git fetch --prune origin main
+git reset --hard origin/main
+docker compose -f docker-compose.yml -f docker-compose.prod.yml config >/dev/null
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile migrate pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm migrate
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+
+```
 4. In the deploy job, use the private key from a GitHub Actions encrypted secret (never commit it) to run only that forced command — e.g. via `appleboy/ssh-action` or a plain `ssh deploy@<host>` step (no explicit command needed; the server ignores whatever is sent and runs the forced one).
 5. Only trigger the deploy job on `main`, after lint/test/build/image-push have all succeeded.
 
 ## Pipeline Shape
 
 ```
+
 lint/typecheck/format → unit tests + coverage → security audit → e2e (incl. a11y) → build → buildx (arm64) → image scan (Trivy) → push GHCR → ssh deploy (main only)
-```
+
+````
 
 Use `nx affected` for every quality-gate step (`nx affected -t lint,typecheck,test,e2e`) so CI only re-checks what actually changed, not the whole workspace on every push.
 
@@ -106,7 +115,7 @@ All of the following are free — either bundled with tools already in the works
   with:
     name: coverage-report
     path: coverage/
-```
+````
 
 Vitest (`admin`, `web`) and Jest (`api`, `api-e2e`) both support `--coverage` natively — no extra dependency needed. `actions/upload-artifact` + `$GITHUB_STEP_SUMMARY` are both free, built into GitHub Actions.
 

@@ -4,13 +4,43 @@
 # the *only* command that key is allowed to run.
 set -euo pipefail
 
-cd /opt/portfolio
+APP_DIR="${APP_DIR:-/opt/portfolio}"
+DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
+LOCK_FILE="${LOCK_FILE:-/tmp/portfolio-deploy.lock}"
 
-docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+exec 9>"${LOCK_FILE}"
+flock -n 9 || {
+	echo "Another portfolio deploy is already running; exiting."
+	exit 1
+}
+
+cd "${APP_DIR}"
+
+compose=(docker compose -f docker-compose.yml -f docker-compose.prod.yml)
+compose_with_migrate_profile=(docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile migrate)
+
+echo "Checking Git repository..."
+git rev-parse --is-inside-work-tree >/dev/null
+
+echo "Updating ${APP_DIR} from origin/${DEPLOY_BRANCH}..."
+git fetch --prune origin "${DEPLOY_BRANCH}"
+git reset --hard "origin/${DEPLOY_BRANCH}"
+
+echo "Validating Docker Compose configuration..."
+"${compose[@]}" config >/dev/null
+
+echo "Pulling Docker images..."
+"${compose_with_migrate_profile[@]}" pull
 
 # Run pending Prisma migrations before swapping the api container over.
-docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm migrate
+echo "Running database migrations..."
+"${compose[@]}" run --rm migrate
 
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+echo "Restarting services..."
+"${compose[@]}" up -d --remove-orphans
 
+echo "Pruning unused Docker images..."
 docker image prune -f
+
+echo "Deployment complete. Current service status:"
+"${compose[@]}" ps
