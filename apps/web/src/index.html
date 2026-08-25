@@ -12,6 +12,19 @@
     <meta name="theme-color" content="#111827" />
     <link id="app-favicon" rel="icon" type="image/svg+xml" href="logo-light.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <style>
+      /* Matches --color-bg-value from libs/ui/src/theme/tokens.css. Paints the correct theme
+         background before the stylesheet loads, so there's no flash of the browser's default
+         white background while navigating in (especially noticeable in dark mode). */
+      html,
+      body {
+        background-color: #ffffff;
+      }
+      html.dark,
+      html.dark body {
+        background-color: #08071a;
+      }
+    </style>
     <script>
       // Set the theme class before first paint/hydration to avoid a flash of the wrong theme.
       (function () {

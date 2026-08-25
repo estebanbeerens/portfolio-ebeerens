@@ -423,12 +423,14 @@ Basic Info page shows it as the active file and downloads correctly from the pub
 
 ## Stage 6 — Public SSR site
 
-**Goal:** the public-facing site renders profile + project data, prerendered at build time (SSG)
-for good SEO, in both English and Dutch, with accessibility basics covered. `admin` intentionally
-stays client-rendered — see the explainer below for why the two apps make different choices here.
+**Goal:** the public-facing site renders profile + project data via on-demand server-side rendering
+(every request re-fetches from the live API) for good SEO, in both English and Dutch, with
+accessibility basics covered. `admin` intentionally stays client-rendered — see the explainer below
+for why the two apps make different choices here.
 
-**What you'll learn:** using Angular's SSR/prerender output for a content-driven, read-only public
-site, and why "SSR" isn't a single one-size-fits-all choice across apps in the same monorepo.
+**What you'll learn:** using Angular's SSR for a content-driven, read-only public site, and why
+"SSR" isn't a single one-size-fits-all choice across apps in the same monorepo — and why build-time
+prerendering (SSG) is the wrong choice when the content is admin-editable after deploy.
 
 **Steps:**
 
@@ -452,43 +454,52 @@ site, and why "SSR" isn't a single one-size-fits-all choice across apps in the s
    an `effect()` watching the loaded project) for the project-detail page.
 6. Add `@angular/localize` for English/Dutch, with dedicated `/en/` and `/nl/` builds — see the
    `angular-frontend` skill and `apps/web/src/locale/` for the extraction/translation workflow.
-7. Switch `apps/web/src/app/app.routes.server.ts` to `RenderMode.Prerender` (static routes) plus
-   `getPrerenderParams` for `projects/:slug` (fetches all project slugs from the API at build time
-   via a plain `fetch()` with an absolute `API_URL`, falling back to `PrerenderFallback.Server` for
-   any project added after the last build). Requires the API to be reachable at build time (locally
-   or in CI) — see the explainer below.
+7. Set `apps/web/src/app/app.routes.server.ts`'s catch-all route to `RenderMode.Server` — every
+   request is rendered on the fly against the live API (`API_URL`, resolved at container runtime,
+   not build time — see the explainer below). Do **not** use `RenderMode.Prerender` here: profile/
+   role/project content is edited via `admin` after deploy, so a build-time snapshot would go stale
+   (or, worse, freeze in an error state if the API wasn't reachable during the image build).
 8. Add accessibility tests with `vitest-axe` (`apps/web/src/test-setup.ts` registers the matcher)
    alongside functional specs — see `header.component.spec.ts`, `home-page.component.spec.ts`, and
    `footer.component.spec.ts` for the pattern.
-9. Confirm SSG is actually producing real content: view page source (not devtools' rendered DOM)
-   on a built/served page and confirm project/profile content and the correct `<title>` are already
-   present in the raw HTML — not just an empty `<app-root>` shell.
+9. Confirm SSR is actually producing real content: view page source (not devtools' rendered DOM)
+   on a page served by the running SSR server and confirm project/profile content and the correct
+   `<title>` are already present in the raw HTML — not just an empty `<app-root>` shell.
 
-> 💡 **B1 explainer — why does `admin` stay client-rendered while `web` uses SSG?**
-> SSR/SSG exist to make server-rendered HTML available to search engines and first-paint
+> 💡 **B1 explainer — why does `admin` stay client-rendered while `web` uses SSR?**
+> SSR exists to make server-rendered HTML available to search engines and first-paint
 > performance. `admin` is a single-administrator, auth-gated tool — nothing on it needs to rank in
 > search results, and its session cookie is HttpOnly, so Angular can only learn the real auth state
 > via a browser-side round-trip to `/api/auth/me`. Making `admin` render server-side would mean
 > forwarding that cookie into every SSR request and validating the session on the server too — a
 > real, security-sensitive refactor for a page that gets no SEO benefit from it. `web` has neither
-> problem (public, read-only, no auth), so it can safely commit to full build-time prerendering.
+> problem (public, read-only, no auth), so it renders every request server-side instead.
 
-> 💡 **B1 explainer — why did Prerender need an absolute API URL?**
-> A relative API URL (`basePath: ''`) works fine once your app is running for real: in the browser
-> it resolves against the page's own origin, and during a genuine per-request SSR render Angular
-> can resolve it against the incoming request. But build-time prerendering has no request at
-> all — there's nothing to resolve a relative URL against, so those HTTP calls just hang forever
-> until the build times out. The fix is to give the **server** bundle (used for both prerendering
-> and any later per-request SSR) an absolute URL instead — `apps/web/src/app/app.config.server.ts`
-> re-provides `provideApi(...)` with `process.env['API_URL'] ?? 'http://localhost:3000'`, which
-> only takes effect server-side; the browser bundle keeps using the relative URL.
+> 💡 **B1 explainer — why does the server bundle need an absolute API URL?**
+> A relative API URL (`basePath: ''`) works fine in the browser — it resolves against the page's
+> own origin. But a Node SSR process has no browser origin to resolve a relative URL against, so
+> those HTTP calls would need the incoming request's Host header threaded through, which is more
+> fragile than just giving the **server** bundle an absolute URL directly —
+> `apps/web/src/app/app.config.server.ts` re-provides `provideApi(...)` with
+> `process.env['API_URL'] ?? 'http://localhost:3000'`. This is a **runtime** env var (set on the
+> `web` container, e.g. `API_URL=http://api:3000` via Docker DNS in `docker-compose.prod.yml`), read
+> fresh on every request — not a build-time value baked into the image — which only takes effect
+> server-side; the browser bundle keeps using the relative URL.
+>
+> An earlier version of this stage used `RenderMode.Prerender` with `getPrerenderParams` fetching
+> from the API at **build** time instead. That's a real footgun for admin-editable content: CI builds
+> the image without a live API to fetch from, so every prerendered page baked in whatever the fetch
+> failure produced (a permanent "Portfolio content could not be loaded" error, shown to every visitor
+> until client-side hydration re-fetched from the real live API and replaced it) — worse on slow
+> connections, where that broken baked-in state is visible for longer before hydration catches up.
 
 **Verify it worked:**
 
 - With the API running locally, `API_URL=http://localhost:3000 nx build web --configuration=production`
-  completes and logs "Prerendered N static routes."
-- `grep -o '<title>[^<]*</title>' dist/apps/web/browser/en/projects/<a-real-slug>/index.html` shows
-  the real project title, not a placeholder — confirms per-page dynamic titles are baked in.
+  builds successfully, then `nx serve-ssr web` (or running `dist/apps/web/server/server.mjs` with
+  `API_URL` set) and requesting a project detail page shows a `curl`'d response with
+  `grep -o '<title>[^<]*</title>'` containing the real project title, not a placeholder — confirms
+  per-request dynamic titles are rendered server-side.
 - `nx test web` passes, including the `vitest-axe` "has no accessibility violations" specs.
 
 **Reference:** architecture doc §5 (Frontend).
@@ -668,9 +679,25 @@ origin-to-Cloudflare TLS needs its own certificate.
 1. In Cloudflare DNS, point your domain and `www` at the VPS's public IP, and add
    `admin.yourdomain.com` to the same origin (proxied "orange cloud" on for all of them, so
    traffic routes through Cloudflare).
-2. Under SSL/TLS, set the mode to **Full (strict)**, then generate a Cloudflare **Origin CA**
-   certificate and install it in Nginx (this is different from a normal publicly-trusted cert —
-   see the explainer below).
+2. Under SSL/TLS, generate a Cloudflare **Origin CA** certificate and install it in the Dockerized
+   Nginx origin (this is different from a normal publicly-trusted cert — see the explainer below).
+   On the VPS, run these commands from the deployment directory (`/opt/portfolio`):
+
+   ```bash
+   mkdir -p nginx/certs
+   chmod 700 nginx/certs
+   nano nginx/certs/ebeerens.com.pem   # paste the Origin CA certificate, including both BEGIN/END lines
+   nano nginx/certs/ebeerens.com.key   # paste the private key, including both BEGIN/END lines
+   chmod 644 nginx/certs/ebeerens.com.pem
+   chmod 600 nginx/certs/ebeerens.com.key
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml config
+   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d nginx
+   ```
+
+   The certificate files belong under `nginx/certs` on the host because this project runs Nginx in
+   Docker; `/etc/nginx/certs` is their read-only path inside the Nginx container. After the files
+   exist and Nginx is healthy, set Cloudflare SSL/TLS mode to **Full (strict)**.
+
 3. Confirm the R2 buckets from Stage 5 (`portfolio-images`, `portfolio-documents`) and Stage 13
    (`portfolio-backups`) exist, and that all six `R2_*` vars (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
    `R2_SECRET_ACCESS_KEY`, `R2_DOCUMENTS_BUCKET`, `R2_IMAGES_BUCKET`, `R2_PUBLIC_BASE_URL`) are set

@@ -2,10 +2,6 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
-# Absolute API origin reachable at build time, used only for prerendering (see app.routes.server.ts).
-# Pass --build-arg API_URL=http://<host-or-service>:3000 with --network so this can actually resolve.
-ARG API_URL=http://localhost:3000
-ENV API_URL=$API_URL
 # Dependencies first so the (slow) install layer is only invalidated by lockfile changes.
 # The prisma files are needed because `postinstall` runs `prisma generate`.
 COPY package.json package-lock.json prisma.config.ts ./
