@@ -1,12 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import {
-  FeatureFlagDto,
-  FeatureFlagsService,
-  ProfileService,
-  ProjectsService,
-  RolesService,
-} from '@portfolio-ebeerens/api-client';
+import { FeatureFlagDto, ProfileService } from '@portfolio-ebeerens/api-client';
 import { axe } from 'vitest-axe';
 import { of } from 'rxjs';
 import { Header } from './header.component';
@@ -23,10 +17,13 @@ function configure(flags: Partial<FeatureFlagDto>[] = allFlagsEnabled) {
     imports: [Header],
     providers: [
       provideRouter([]),
-      { provide: ProfileService, useValue: { profileControllerGetProfile: () => of(undefined) } },
-      { provide: RolesService, useValue: { rolesControllerFindAll: () => of([]) } },
-      { provide: ProjectsService, useValue: { projectsControllerFindAll: () => of([]) } },
-      { provide: FeatureFlagsService, useValue: { featureFlagsControllerFindAll: () => of(flags) } },
+      {
+        provide: ProfileService,
+        useValue: {
+          profileControllerGetPublicPortfolio: () =>
+            of({ profile: undefined, roles: [], projects: [], featureFlags: flags }),
+        },
+      },
     ],
   }).compileComponents();
 }

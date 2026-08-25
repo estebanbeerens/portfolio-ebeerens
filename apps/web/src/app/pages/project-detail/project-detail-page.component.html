@@ -13,6 +13,8 @@
           class="absolute inset-0 h-full w-full object-cover"
           [src]="project.imageUrl"
           [alt]="project.title + ' project preview'"
+          fetchpriority="high"
+          decoding="async"
         />
       } @else {
         <div class="absolute inset-0 bg-linear-to-br from-cyan-500 to-violet-500 opacity-90" aria-hidden="true"></div>
@@ -58,7 +60,7 @@
           </div>
           <div class="border-border border-t"></div>
         }
-        <markdown class="project-markdown text-text-muted" [data]="project.description" />
+        <p class="project-markdown text-text-muted whitespace-pre-line">{{ project.description }}</p>
       </div>
       <aside
         class="border-border bg-glass backdrop-blur-glass shadow-elevation flex h-fit flex-col gap-6 rounded-xl border p-8"

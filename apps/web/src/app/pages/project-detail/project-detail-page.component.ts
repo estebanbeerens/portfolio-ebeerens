@@ -5,7 +5,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
 import { Button } from '@portfolio-ebeerens/ui';
 import { LucideArrowLeft, LucideDynamicIcon, LucideExternalLink } from '@lucide/angular';
-import { MarkdownComponent } from 'ngx-markdown';
 import { map } from 'rxjs';
 import { ProjectCard } from '../../shared/project-card/project-card.component';
 import { projectDuration, projectYear } from '../../shared/project-summary.util';
@@ -16,7 +15,7 @@ const RELATED_PROJECTS_LIMIT = 3;
 
 @Component({
   selector: 'web-project-detail-page',
-  imports: [MarkdownComponent, RouterLink, Button, LucideDynamicIcon, ProjectCard],
+  imports: [RouterLink, Button, LucideDynamicIcon, ProjectCard],
   templateUrl: './project-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

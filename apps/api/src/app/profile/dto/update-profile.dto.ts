@@ -26,7 +26,7 @@ export class UpdateProfileDto {
   @MaxLength(200)
   headline?: string;
 
-  @ApiPropertyOptional({ description: 'Markdown source for the public biography' })
+  @ApiPropertyOptional({ description: 'Plain-text biography shown on the public portfolio' })
   @IsOptional()
   @IsString()
   @MaxLength(20000)

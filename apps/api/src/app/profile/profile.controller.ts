@@ -4,6 +4,7 @@ import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/sessio
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
+import { PublicPortfolioDto } from './dto/public-portfolio.dto';
 
 @ApiTags('profile')
 @Controller('profile')
@@ -15,6 +16,12 @@ export class ProfileController {
   @ApiNotFoundResponse({ description: 'No profile has been created yet' })
   getProfile() {
     return this.profileService.findProfile();
+  }
+
+  @Get('public-portfolio')
+  @ApiOkResponse({ description: 'All public portfolio content for the initial view', type: PublicPortfolioDto })
+  getPublicPortfolio() {
+    return this.profileService.findPublicPortfolio();
   }
 
   @Put()

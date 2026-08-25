@@ -1,8 +1,4 @@
-<a
-  class="project-card-link"
-  [routerLink]="['/projects', project().slug]"
-  [attr.aria-label]="'View project ' + project().title"
->
+<a class="project-card-link" [routerLink]="['/projects', project().slug]">
   <ui-card
     density="compact"
     class="shadow-elevation hover:bg-glass-hover active:bg-glass-active h-full transition-colors"
@@ -12,6 +8,8 @@
         class="h-44 w-full rounded-md object-cover"
         [src]="project().imageUrl"
         [alt]="project().title + ' project preview'"
+        loading="lazy"
+        decoding="async"
       />
     } @else {
       <div

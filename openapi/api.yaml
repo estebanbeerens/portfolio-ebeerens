@@ -59,6 +59,18 @@ paths:
         '401':
           description: No valid session
       tags: *ref_1
+  /api/profile/public-portfolio:
+    get:
+      operationId: ProfileController_getPublicPortfolio
+      parameters: []
+      responses:
+        '200':
+          description: All public portfolio content for the initial view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPortfolioDto'
+      tags: *ref_1
   /api/projects/upload-url:
     post:
       operationId: ProjectsController_createImageUploadUrl
@@ -698,6 +710,232 @@ components:
         - id
         - name
         - updatedAt
+    OrganizationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the organization
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          example: Acme Corp
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/acme.png
+        website:
+          type: string
+          example: https://acme.example.com
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+    SkillDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the skill
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          example: Angular
+      required:
+        - id
+        - name
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the role
+          example: cly1x8f9z0000abcd1234efgh
+        jobTitle:
+          type: string
+          example: Senior Frontend Engineer
+        organization:
+          description: The organization this role was held at
+          allOf:
+            - $ref: '#/components/schemas/OrganizationDto'
+        description:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role
+          example: >-
+            Built **accessible** Angular interfaces and mentored frontend
+            engineers.
+        location:
+          type: string
+          example: Amsterdam, Netherlands
+        employmentType:
+          type: string
+          enum:
+            - FULL_TIME
+            - PART_TIME
+            - SELF_EMPLOYED
+            - FREELANCE
+            - INTERNSHIP
+            - TRAINEE
+            - APPRENTICESHIP
+            - SEASONAL
+          example: FULL_TIME
+        startDate:
+          format: date-time
+          type: string
+          description: When this role started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When this role ended — absent means still current
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used in this role
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - jobTitle
+        - organization
+        - startDate
+        - skills
+        - createdAt
+        - updatedAt
+    ProjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the project
+          example: cly1x8f9z0000abcd1234efgh
+        title:
+          type: string
+          example: Personal Portfolio
+        slug:
+          type: string
+          description: URL-safe unique identifier
+          example: personal-portfolio
+        shortDescription:
+          type: string
+          description: Short summary shown alongside the project
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
+        description:
+          type: string
+          description: >-
+            Markdown source for the project description, rendered client-side
+            with ngx-markdown
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/projects/portfolio.png
+        client:
+          type: string
+          example: Acme Corp
+        jobRole:
+          type: string
+          example: Lead Frontend Engineer
+        liveUrl:
+          type: string
+          example: https://portfolio.example.com
+        startDate:
+          format: date-time
+          type: string
+          description: When work on the project started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When work on the project ended — absent means still ongoing
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used on this project
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+      required:
+        - id
+        - title
+        - slug
+        - shortDescription
+        - description
+        - startDate
+        - skills
+        - createdAt
+        - updatedAt
+    FeatureFlagDto:
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+            - CONTACT
+            - PROJECTS
+            - ROLES
+            - SKILLS
+          example: PROJECTS
+        enabled:
+          type: boolean
+          example: false
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - key
+        - enabled
+        - updatedAt
+    PublicPortfolioDto:
+      type: object
+      properties:
+        profile:
+          $ref: '#/components/schemas/ProfileDto'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleDto'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectDto'
+        featureFlags:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureFlagDto'
+      required:
+        - roles
+        - projects
+        - featureFlags
     UpdateProfileDto:
       type: object
       properties:
@@ -776,92 +1014,6 @@ components:
         - uploadUrl
         - objectKey
         - publicUrl
-    SkillDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the skill
-          example: cly1x8f9z0000abcd1234efgh
-        name:
-          type: string
-          example: Angular
-      required:
-        - id
-        - name
-    ProjectDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the project
-          example: cly1x8f9z0000abcd1234efgh
-        title:
-          type: string
-          example: Personal Portfolio
-        slug:
-          type: string
-          description: URL-safe unique identifier
-          example: personal-portfolio
-        shortDescription:
-          type: string
-          description: Short summary shown alongside the project
-          example: A fast, accessible portfolio built with Angular and NestJS.
-          maxLength: 255
-        description:
-          type: string
-          description: >-
-            Markdown source for the project description, rendered client-side
-            with ngx-markdown
-          example: |-
-            ## Overview
-
-            Built with **Angular** and *NestJS*.
-        imageUrl:
-          type: string
-          example: https://cdn.example.com/projects/portfolio.png
-        client:
-          type: string
-          example: Acme Corp
-        jobRole:
-          type: string
-          example: Lead Frontend Engineer
-        liveUrl:
-          type: string
-          example: https://portfolio.example.com
-        startDate:
-          format: date-time
-          type: string
-          description: When work on the project started
-          example: '2024-01-15T00:00:00.000Z'
-        endDate:
-          format: date-time
-          type: string
-          description: When work on the project ended — absent means still ongoing
-          example: '2024-06-30T00:00:00.000Z'
-        skills:
-          description: Skills used on this project
-          type: array
-          items:
-            $ref: '#/components/schemas/SkillDto'
-        createdAt:
-          format: date-time
-          type: string
-          example: '2026-08-14T12:00:00.000Z'
-        updatedAt:
-          format: date-time
-          type: string
-          example: '2026-08-14T12:00:00.000Z'
-      required:
-        - id
-        - title
-        - slug
-        - shortDescription
-        - description
-        - startDate
-        - skills
-        - createdAt
-        - updatedAt
     CreateProjectDto:
       type: object
       properties:
@@ -1021,35 +1173,6 @@ components:
         - uploadUrl
         - objectKey
         - publicUrl
-    OrganizationDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the organization
-          example: cly1x8f9z0000abcd1234efgh
-        name:
-          type: string
-          example: Acme Corp
-        logoUrl:
-          type: string
-          example: https://cdn.example.com/logos/acme.png
-        website:
-          type: string
-          example: https://acme.example.com
-        createdAt:
-          format: date-time
-          type: string
-          example: '2026-08-17T12:00:00.000Z'
-        updatedAt:
-          format: date-time
-          type: string
-          example: '2026-08-17T12:00:00.000Z'
-      required:
-        - id
-        - name
-        - createdAt
-        - updatedAt
     CreateOrganizationDto:
       type: object
       properties:
@@ -1088,74 +1211,6 @@ components:
         website:
           type: string
           example: https://acme.example.com
-    RoleDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the role
-          example: cly1x8f9z0000abcd1234efgh
-        jobTitle:
-          type: string
-          example: Senior Frontend Engineer
-        organization:
-          description: The organization this role was held at
-          allOf:
-            - $ref: '#/components/schemas/OrganizationDto'
-        description:
-          type: string
-          description: >-
-            Markdown source describing responsibilities and achievements in this
-            role
-          example: >-
-            Built **accessible** Angular interfaces and mentored frontend
-            engineers.
-        location:
-          type: string
-          example: Amsterdam, Netherlands
-        employmentType:
-          type: string
-          enum:
-            - FULL_TIME
-            - PART_TIME
-            - SELF_EMPLOYED
-            - FREELANCE
-            - INTERNSHIP
-            - TRAINEE
-            - APPRENTICESHIP
-            - SEASONAL
-          example: FULL_TIME
-        startDate:
-          format: date-time
-          type: string
-          description: When this role started
-          example: '2024-01-15T00:00:00.000Z'
-        endDate:
-          format: date-time
-          type: string
-          description: When this role ended — absent means still current
-          example: '2024-06-30T00:00:00.000Z'
-        skills:
-          description: Skills used in this role
-          type: array
-          items:
-            $ref: '#/components/schemas/SkillDto'
-        createdAt:
-          format: date-time
-          type: string
-          example: '2026-08-17T12:00:00.000Z'
-        updatedAt:
-          format: date-time
-          type: string
-          example: '2026-08-17T12:00:00.000Z'
-      required:
-        - id
-        - jobTitle
-        - organization
-        - startDate
-        - skills
-        - createdAt
-        - updatedAt
     CreateRoleDto:
       type: object
       properties:
@@ -1253,28 +1308,6 @@ components:
           type: array
           items:
             type: string
-    FeatureFlagDto:
-      type: object
-      properties:
-        key:
-          type: string
-          enum:
-            - CONTACT
-            - PROJECTS
-            - ROLES
-            - SKILLS
-          example: PROJECTS
-        enabled:
-          type: boolean
-          example: false
-        updatedAt:
-          format: date-time
-          type: string
-          example: '2026-08-17T12:00:00.000Z'
-      required:
-        - key
-        - enabled
-        - updatedAt
     UpdateFeatureFlagDto:
       type: object
       properties:

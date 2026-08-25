@@ -19,6 +19,7 @@
       "options": {
         "outputPath": "dist/apps/web",
         "browser": "apps/web/src/main.ts",
+        "polyfills": ["@angular/localize/init"],
         "tsConfig": "apps/web/tsconfig.app.json",
         "assets": [
           {

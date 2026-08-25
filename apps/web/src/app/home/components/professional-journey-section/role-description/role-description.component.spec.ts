@@ -1,15 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { provideMarkdown } from 'ngx-markdown';
 import { RoleDescription } from './role-description.component';
 
 describe('RoleDescription', () => {
   it('renders a short description without an expansion control', async () => {
     await TestBed.configureTestingModule({
       imports: [RoleDescription],
-      providers: [provideMarkdown()],
     }).compileComponents();
     const fixture = TestBed.createComponent(RoleDescription);
-    fixture.componentRef.setInput('description', 'Built **accessible** interfaces.');
+    fixture.componentRef.setInput('description', 'Built accessible interfaces.');
     fixture.componentRef.setInput('roleTitle', 'Frontend Engineer');
     await fixture.whenStable();
 
@@ -27,7 +25,6 @@ describe('RoleDescription', () => {
     try {
       await TestBed.configureTestingModule({
         imports: [RoleDescription],
-        providers: [provideMarkdown()],
       }).compileComponents();
       const fixture = TestBed.createComponent(RoleDescription);
       fixture.componentRef.setInput('description', 'A longer role description.');

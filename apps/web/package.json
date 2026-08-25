@@ -6,11 +6,9 @@
     "@angular/ssr": "~22.0.4",
     "rxjs": "~7.8.0",
     "@angular/platform-browser": "~22.0.4",
-    "ngx-markdown": "^22.0.0",
     "@angular/forms": "~22.0.4",
     "ngx-turnstile": "^1.0.0",
     "@lucide/angular": "^1.31.0",
-    "@angular/localize": "~22.0.4",
     "express": "^4.21.2",
     "@angular/common": "~22.0.4",
     "@angular/router": "~22.0.4"

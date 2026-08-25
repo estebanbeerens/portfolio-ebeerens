@@ -1,16 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideMarkdown } from 'ngx-markdown';
-import {
-  FeatureFlagDto,
-  FeatureFlagsService,
-  ProfileDto,
-  ProfileService,
-  ProjectDto,
-  ProjectsService,
-  RoleDto,
-  RolesService,
-} from '@portfolio-ebeerens/api-client';
+import { FeatureFlagDto, ProfileDto, ProfileService, ProjectDto, RoleDto } from '@portfolio-ebeerens/api-client';
 import { of } from 'rxjs';
 import { axe } from 'vitest-axe';
 import { HomePage } from './home-page.component';
@@ -56,20 +46,22 @@ describe('HomePage', () => {
   it('renders API-backed homepage sections when feature flags are enabled', async () => {
     await TestBed.configureTestingModule({
       imports: [HomePage],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
       providers: [
-        provideMarkdown(),
         provideRouter([]),
-        { provide: ProfileService, useValue: { profileControllerGetProfile: () => of(profile) } },
-        { provide: RolesService, useValue: { rolesControllerFindAll: () => of(roles) } },
-        { provide: ProjectsService, useValue: { projectsControllerFindAll: () => of(projects) } },
         {
-          provide: FeatureFlagsService,
+          provide: ProfileService,
           useValue: {
-            featureFlagsControllerFindAll: () =>
-              of([
-                { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
-                { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
-              ]),
+            profileControllerGetPublicPortfolio: () =>
+              of({
+                profile,
+                roles,
+                projects,
+                featureFlags: [
+                  { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
+                ],
+              }),
           },
         },
       ],
@@ -77,6 +69,8 @@ describe('HomePage', () => {
 
     const fixture = TestBed.createComponent(HomePage);
     await fixture.whenStable();
+    const deferBlocks = await fixture.getDeferBlocks();
+    await Promise.all(deferBlocks.map((deferBlock) => deferBlock.render(DeferBlockState.Complete)));
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
@@ -89,19 +83,20 @@ describe('HomePage', () => {
     await TestBed.configureTestingModule({
       imports: [HomePage],
       providers: [
-        provideMarkdown(),
         provideRouter([]),
-        { provide: ProfileService, useValue: { profileControllerGetProfile: () => of(profile) } },
-        { provide: RolesService, useValue: { rolesControllerFindAll: () => of(roles) } },
-        { provide: ProjectsService, useValue: { projectsControllerFindAll: () => of(projects) } },
         {
-          provide: FeatureFlagsService,
+          provide: ProfileService,
           useValue: {
-            featureFlagsControllerFindAll: () =>
-              of([
-                { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
-                { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
-              ]),
+            profileControllerGetPublicPortfolio: () =>
+              of({
+                profile,
+                roles,
+                projects,
+                featureFlags: [
+                  { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
+                ],
+              }),
           },
         },
       ],
