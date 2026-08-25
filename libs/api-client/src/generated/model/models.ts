@@ -18,6 +18,7 @@ export * from './organizationLogoUploadUrlDto';
 export * from './profileDto';
 export * from './projectDto';
 export * from './projectImageUploadUrlDto';
+export * from './publicPortfolioDto';
 export * from './resumeDto';
 export * from './resumeUploadUrlDto';
 export * from './roleDto';

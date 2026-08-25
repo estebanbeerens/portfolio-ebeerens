@@ -4,6 +4,7 @@ import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { PublicPortfolioDto } from './dto/public-portfolio.dto';
 
 @Injectable()
 export class ProfileService {
@@ -18,6 +19,31 @@ export class ProfileService {
       throw new NotFoundException('Profile has not been created yet');
     }
     return this.toDto(profile);
+  }
+
+  async findPublicPortfolio(): Promise<PublicPortfolioDto> {
+    const [profile, roles, projects, featureFlags] = await Promise.all([
+      this.prisma.profile.findFirst(),
+      this.prisma.role.findMany({
+        orderBy: { startDate: 'desc' },
+        include: { organization: true, skills: true },
+      }),
+      this.prisma.project.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: { skills: true },
+      }),
+      this.prisma.featureFlag.findMany({ orderBy: { key: 'asc' } }),
+    ]);
+
+    return {
+      profile: profile ? this.toDto(profile) : undefined,
+      roles: roles.map((role) => {
+        const { description, ...rest } = role;
+        return description === null ? rest : { ...rest, description };
+      }),
+      projects,
+      featureFlags,
+    };
   }
 
   // There is only ever one administrator/profile row, so PUT upserts it.

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { FeatureFlagsService, ProfileService, ProjectsService, RolesService } from '@portfolio-ebeerens/api-client';
+import { FeatureFlagDto, ProfileService } from '@portfolio-ebeerens/api-client';
 import { of } from 'rxjs';
 import { App } from './app';
 
@@ -13,12 +13,20 @@ describe('App', () => {
         {
           provide: ProfileService,
           useValue: {
-            profileControllerGetProfile: () => of({ id: 'profile-1', name: 'Alex Mercer', updatedAt: '2026-01-01' }),
+            profileControllerGetPublicPortfolio: () =>
+              of({
+                profile: { id: 'profile-1', name: 'Alex Mercer', updatedAt: '2026-01-01' },
+                roles: [],
+                projects: [],
+                featureFlags: [
+                  { key: FeatureFlagDto.KeyEnum.Contact, enabled: false, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Projects, enabled: false, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Roles, enabled: false, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Skills, enabled: false, updatedAt: '2026-01-01' },
+                ],
+              }),
           },
         },
-        { provide: RolesService, useValue: { rolesControllerFindAll: () => of([]) } },
-        { provide: ProjectsService, useValue: { projectsControllerFindAll: () => of([]) } },
-        { provide: FeatureFlagsService, useValue: { featureFlagsControllerFindAll: () => of([]) } },
       ],
     }).compileComponents();
   });

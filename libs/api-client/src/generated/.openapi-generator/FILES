@@ -38,6 +38,7 @@ model/organizationLogoUploadUrlDto.ts
 model/profileDto.ts
 model/projectDto.ts
 model/projectImageUploadUrlDto.ts
+model/publicPortfolioDto.ts
 model/resumeDto.ts
 model/resumeUploadUrlDto.ts
 model/roleDto.ts

@@ -19,7 +19,7 @@ export class ProfileDto {
   })
   headline?: string;
 
-  @ApiPropertyOptional({ description: 'Longer biography text' })
+  @ApiPropertyOptional({ description: 'Plain-text biography shown on the public portfolio' })
   bio?: string;
 
   @ApiPropertyOptional({

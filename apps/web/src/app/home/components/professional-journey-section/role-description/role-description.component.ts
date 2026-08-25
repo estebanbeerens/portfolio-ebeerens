@@ -10,11 +10,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Markdown } from '@portfolio-ebeerens/ui';
 
 @Component({
   selector: 'web-role-description',
-  imports: [Markdown],
   templateUrl: './role-description.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

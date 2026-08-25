@@ -2,7 +2,6 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
-import { provideMarkdown } from 'ngx-markdown';
 import { Observable, of } from 'rxjs';
 import { PortfolioContentService } from '../../shared/portfolio-content.service';
 import { ProjectDetailPage } from './project-detail-page.component';
@@ -41,7 +40,6 @@ describe('ProjectDetailPage', () => {
     return TestBed.configureTestingModule({
       imports: [ProjectDetailPage],
       providers: [
-        provideMarkdown(),
         provideRouter([]),
         { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ slug: options.slug })) } },
         {
