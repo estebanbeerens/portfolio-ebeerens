@@ -24,9 +24,13 @@ export interface ProjectDto {
    */
   shortDescription: string;
   /**
-   * Markdown source for the project description, rendered client-side with ngx-markdown
+   * Markdown source for the project description, as authored in admin
    */
   description: string;
+  /**
+   * Sanitized HTML rendered from `description`; only populated on the public portfolio response
+   */
+  descriptionHtml?: string;
   imageUrl?: string;
   client?: string;
   jobRole?: string;

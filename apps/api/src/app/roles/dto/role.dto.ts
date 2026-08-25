@@ -25,6 +25,11 @@ export class RoleDto {
   })
   description?: string;
 
+  @ApiPropertyOptional({
+    description: 'Sanitized HTML rendered from `description`; only populated on the public portfolio response',
+  })
+  descriptionHtml?: string;
+
   @ApiPropertyOptional({ example: 'Amsterdam, Netherlands' })
   location?: string | null;
 

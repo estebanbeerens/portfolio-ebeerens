@@ -672,7 +672,12 @@ components:
           example: Full-stack developer
         bio:
           type: string
-          description: Longer biography text
+          description: Markdown source for the biography, as authored in admin
+        bioHtml:
+          type: string
+          description: >-
+            Sanitized HTML rendered from `bio`; only populated on the public
+            portfolio response
         avatarUrl:
           type: string
           description: URL of the profile avatar image
@@ -774,6 +779,11 @@ components:
           example: >-
             Built **accessible** Angular interfaces and mentored frontend
             engineers.
+        descriptionHtml:
+          type: string
+          description: >-
+            Sanitized HTML rendered from `description`; only populated on the
+            public portfolio response
         location:
           type: string
           example: Amsterdam, Netherlands
@@ -841,13 +851,16 @@ components:
           maxLength: 255
         description:
           type: string
-          description: >-
-            Markdown source for the project description, rendered client-side
-            with ngx-markdown
+          description: Markdown source for the project description, as authored in admin
           example: |-
             ## Overview
 
             Built with **Angular** and *NestJS*.
+        descriptionHtml:
+          type: string
+          description: >-
+            Sanitized HTML rendered from `description`; only populated on the
+            public portfolio response
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -921,14 +934,17 @@ components:
         profile:
           $ref: '#/components/schemas/ProfileDto'
         roles:
+          description: Public professional roles
           type: array
           items:
             $ref: '#/components/schemas/RoleDto'
         projects:
+          description: Public portfolio projects
           type: array
           items:
             $ref: '#/components/schemas/ProjectDto'
         featureFlags:
+          description: Feature flags controlling public sections
           type: array
           items:
             $ref: '#/components/schemas/FeatureFlagDto'
@@ -949,7 +965,7 @@ components:
           example: Full-stack developer
         bio:
           type: string
-          description: Markdown source for the public biography
+          description: Markdown source for the biography, as authored in admin
         avatarUrl:
           type: string
           description: URL of the profile avatar image
@@ -1031,9 +1047,7 @@ components:
           maxLength: 255
         description:
           type: string
-          description: >-
-            Markdown source for the project description, rendered client-side
-            with ngx-markdown
+          description: Markdown source for the project description, as authored in admin
           example: |-
             ## Overview
 
@@ -1098,9 +1112,7 @@ components:
           maxLength: 255
         description:
           type: string
-          description: >-
-            Markdown source for the project description, rendered client-side
-            with ngx-markdown
+          description: Markdown source for the project description, as authored in admin
           example: |-
             ## Overview
 

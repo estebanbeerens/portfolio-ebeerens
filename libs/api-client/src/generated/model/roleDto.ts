@@ -24,6 +24,10 @@ export interface RoleDto {
    * Markdown source describing responsibilities and achievements in this role
    */
   description?: string;
+  /**
+   * Sanitized HTML rendered from `description`; only populated on the public portfolio response
+   */
+  descriptionHtml?: string;
   location?: string;
   employmentType?: RoleDto.EmploymentTypeEnum;
   /**

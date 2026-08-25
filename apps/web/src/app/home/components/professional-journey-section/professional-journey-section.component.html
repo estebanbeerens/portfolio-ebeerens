@@ -89,8 +89,8 @@
                             }
                           </div>
                         </div>
-                        @if (role.description) {
-                          <web-role-description [description]="role.description" [roleTitle]="role.jobTitle" />
+                        @if (role.descriptionHtml) {
+                          <web-role-description [descriptionHtml]="role.descriptionHtml" [roleTitle]="role.jobTitle" />
                         }
                         @if (role.skills.length > 0) {
                           <p class="dark:text-accent mt-3 truncate font-mono text-xs text-cyan-900">

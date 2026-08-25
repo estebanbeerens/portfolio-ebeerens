@@ -14,7 +14,16 @@ import { ProfileDto } from './profileDto';
 
 export interface PublicPortfolioDto {
   profile?: ProfileDto;
+  /**
+   * Public professional roles
+   */
   roles: Array<RoleDto>;
+  /**
+   * Public portfolio projects
+   */
   projects: Array<ProjectDto>;
+  /**
+   * Feature flags controlling public sections
+   */
   featureFlags: Array<FeatureFlagDto>;
 }

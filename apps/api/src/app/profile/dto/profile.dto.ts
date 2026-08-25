@@ -19,8 +19,13 @@ export class ProfileDto {
   })
   headline?: string;
 
-  @ApiPropertyOptional({ description: 'Plain-text biography shown on the public portfolio' })
+  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin' })
   bio?: string;
+
+  @ApiPropertyOptional({
+    description: 'Sanitized HTML rendered from `bio`; only populated on the public portfolio response',
+  })
+  bioHtml?: string;
 
   @ApiPropertyOptional({
     description: 'URL of the profile avatar image',

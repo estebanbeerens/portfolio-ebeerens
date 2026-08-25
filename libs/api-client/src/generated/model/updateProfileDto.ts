@@ -18,7 +18,7 @@ export interface UpdateProfileDto {
    */
   headline?: string;
   /**
-   * Markdown source for the public biography
+   * Markdown source for the biography, as authored in admin
    */
   bio?: string;
   /**

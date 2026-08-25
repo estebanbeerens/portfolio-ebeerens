@@ -28,7 +28,7 @@ export class CreateProjectDto {
   shortDescription: string;
 
   @ApiProperty({
-    description: 'Markdown source for the project description, rendered client-side with ngx-markdown',
+    description: 'Markdown source for the project description, as authored in admin',
     example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
   })
   @IsString()

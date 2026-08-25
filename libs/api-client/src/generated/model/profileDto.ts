@@ -22,9 +22,13 @@ export interface ProfileDto {
    */
   headline?: string;
   /**
-   * Longer biography text
+   * Markdown source for the biography, as authored in admin
    */
   bio?: string;
+  /**
+   * Sanitized HTML rendered from `bio`; only populated on the public portfolio response
+   */
+  bioHtml?: string;
   /**
    * URL of the profile avatar image
    */

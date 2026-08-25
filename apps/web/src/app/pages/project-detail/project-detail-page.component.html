@@ -60,7 +60,10 @@
           </div>
           <div class="border-border border-t"></div>
         }
-        <p class="project-markdown text-text-muted whitespace-pre-line">{{ project.description }}</p>
+        <div
+          class="project-markdown text-text-muted [&_a]:text-accent [&_strong]:text-text space-y-3 [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+          [innerHTML]="project.descriptionHtml"
+        ></div>
       </div>
       <aside
         class="border-border bg-glass backdrop-blur-glass shadow-elevation flex h-fit flex-col gap-6 rounded-xl border p-8"

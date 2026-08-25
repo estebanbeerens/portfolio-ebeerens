@@ -20,7 +20,7 @@ export class RoleDescription {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');
 
-  readonly description = input.required<string>();
+  readonly descriptionHtml = input.required<string>();
   readonly roleTitle = input.required<string>();
   protected readonly expanded = signal(false);
   protected readonly overflows = signal(false);
