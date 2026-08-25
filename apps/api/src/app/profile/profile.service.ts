@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Profile } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { MarkdownRenderService } from '../shared/markdown-render.service';
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PublicPortfolioDto } from './dto/public-portfolio.dto';
@@ -10,7 +11,8 @@ import { PublicPortfolioDto } from './dto/public-portfolio.dto';
 export class ProfileService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly activity: ActivityService
+    private readonly activity: ActivityService,
+    private readonly markdown: MarkdownRenderService
   ) {}
 
   async findProfile() {
@@ -36,12 +38,19 @@ export class ProfileService {
     ]);
 
     return {
-      profile: profile ? this.toDto(profile) : undefined,
+      profile: profile
+        ? { ...this.toDto(profile), bioHtml: profile.bio ? this.markdown.render(profile.bio) : undefined }
+        : undefined,
       roles: roles.map((role) => {
         const { description, ...rest } = role;
-        return description === null ? rest : { ...rest, description };
+        return description === null
+          ? rest
+          : { ...rest, description, descriptionHtml: this.markdown.render(description) };
       }),
-      projects,
+      projects: projects.map((project) => ({
+        ...project,
+        descriptionHtml: this.markdown.render(project.description),
+      })),
       featureFlags,
     };
   }

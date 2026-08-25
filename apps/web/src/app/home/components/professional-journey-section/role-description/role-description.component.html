@@ -1,11 +1,10 @@
 <div
   #content
-  class="text-text-muted mt-3 text-sm whitespace-pre-line"
+  class="text-text-muted mt-3 text-sm"
   [class.line-clamp-2]="!expanded()"
   [attr.data-expanded]="expanded()"
->
-  {{ description() }}
-</div>
+  [innerHTML]="descriptionHtml()"
+></div>
 @if (overflows() && !expanded()) {
   <button
     type="button"

@@ -7,8 +7,8 @@
     >
       Crafting fluid <span class="text-accent">interactive</span> architectures
     </h1>
-    @if (profile()?.bio; as bio) {
-      <p class="text-text-muted max-w-3xl text-base leading-7 whitespace-pre-line sm:leading-8">{{ bio }}</p>
+    @if (profile()?.bioHtml; as bioHtml) {
+      <div class="text-text-muted max-w-3xl text-base leading-7 sm:leading-8" [innerHTML]="bioHtml"></div>
     }
     <div class="flex flex-wrap gap-4">
       <a uiButton routerLink="/projects" i18n="@@hero.seeProjects">See My Projects</a>

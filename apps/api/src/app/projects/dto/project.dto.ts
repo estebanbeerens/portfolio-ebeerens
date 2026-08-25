@@ -25,10 +25,15 @@ export class ProjectDto {
   shortDescription: string;
 
   @ApiProperty({
-    description: 'Markdown source for the project description, rendered client-side with ngx-markdown',
+    description: 'Markdown source for the project description, as authored in admin',
     example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
   })
   description: string;
+
+  @ApiPropertyOptional({
+    description: 'Sanitized HTML rendered from `description`; only populated on the public portfolio response',
+  })
+  descriptionHtml?: string;
 
   @ApiPropertyOptional({
     example: 'https://cdn.example.com/projects/portfolio.png',

@@ -12,6 +12,7 @@ const project: ProjectDto = {
   slug: 'aether-dashboard',
   shortDescription: 'A real-time analytics cockpit.',
   description: '**Long** description',
+  descriptionHtml: '<p><strong>Long</strong> description</p>',
   startDate: '2024-01-01',
   liveUrl: 'https://example.com',
   skills: [{ id: 'skill-1', name: 'TypeScript' }],
@@ -25,6 +26,7 @@ const relatedProject: ProjectDto = {
   slug: 'vertex-portfolio-cms',
   shortDescription: 'A headlessly integrated portfolio compiler.',
   description: 'Long description',
+  descriptionHtml: '<p>Long description</p>',
   startDate: '2022-01-01',
   skills: [{ id: 'skill-1', name: 'TypeScript' }],
   createdAt: '2026-01-01',
@@ -66,6 +68,7 @@ describe('ProjectDetailPage', () => {
     expect(text).toContain('TypeScript');
     const backLink = compiled.querySelector('a[href="/projects"]');
     expect(backLink?.textContent).toContain('Go back to project directory');
+    expect(compiled.querySelector('.project-markdown strong')?.textContent).toBe('Long');
   });
 
   it('renders an external-link icon with the live project action', async () => {

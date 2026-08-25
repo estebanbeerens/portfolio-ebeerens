@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { HeroSection } from './hero-section.component';
 
 describe('HeroSection', () => {
-  it('renders plain-text biography and route CTAs when profile data is provided', async () => {
+  it('renders sanitized-HTML biography and route CTAs when profile data is provided', async () => {
     await TestBed.configureTestingModule({
       imports: [HeroSection],
       providers: [provideRouter([])],
@@ -15,6 +15,7 @@ describe('HeroSection', () => {
       name: 'John Beerens',
       headline: 'Frontend Engineer',
       bio: 'Builds useful interfaces.',
+      bioHtml: '<p>Builds useful interfaces.</p>',
       location: 'Amsterdam, Netherlands',
       updatedAt: '2026-01-01',
     });

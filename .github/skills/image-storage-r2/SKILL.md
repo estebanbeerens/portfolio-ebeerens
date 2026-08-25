@@ -1,6 +1,6 @@
 ---
 name: image-storage-r2
-description: 'Implement image upload/delete via Cloudflare R2 presigned URLs (never proxying file bytes through the API), and store/render Markdown project descriptions safely. Use when implementing the upload/presign endpoints, wiring the admin markdown editor, or rendering rich-text project descriptions (including SSR).'
+description: 'Implement image upload/delete via Cloudflare R2 presigned URLs (never proxying file bytes through the API), and store/render Markdown-authored content (project descriptions, role descriptions, profile bio) safely. Use when implementing the upload/presign endpoints, wiring the admin markdown editor, or rendering rich-text content for the public app (including SSR).'
 ---
 
 # Image Storage (R2) & Rich Text
@@ -9,7 +9,7 @@ description: 'Implement image upload/delete via Cloudflare R2 presigned URLs (ne
 
 - Implementing image upload, replace, or delete for a `Project`
 - Adding the presigned-upload backend endpoints
-- Wiring the Markdown editor/preview in the admin UI, or rendering its stored content anywhere (admin preview, public SSR)
+- Wiring the Markdown editor/preview in the admin UI, or rendering its stored content anywhere (admin preview, public portfolio response)
 
 ## Why This Is Its Own Skill
 
@@ -28,14 +28,14 @@ Quick flow:
 
 ## Rich Text: Markdown → Sanitized HTML (architecture plan §10)
 
-`Project.description` is a `String`/`text` column holding raw Markdown source, not HTML or a structured document. See [richtext-sanitization.md](./references/richtext-sanitization.md) for the editor/renderer/sanitizer setup.
+`Project.description`, `Role.description`, and `Profile.bio` are `String`/`text` columns holding raw Markdown source, not HTML or a structured document. See [richtext-sanitization.md](./references/richtext-sanitization.md) for the editor/renderer/sanitizer setup.
 
 Quick flow:
 
 1. Admin UI's plain `<textarea>` holds the Markdown source directly — store that string as-is (no JSON encoding/parsing).
-2. At render time (admin live preview or public SSR), render the Markdown with `ngx-markdown`'s `MarkdownComponent`/`MarkdownService` (`marked` under the hood).
-3. Rely on `ngx-markdown`'s default `SANITIZE` provider (Angular `DomSanitizer`, `SecurityContext.HTML`) to strip disallowed tags/attributes — this is the primary XSS defense for markdown-authored content.
-4. Never accept or store raw HTML from a client directly, and never bypass the sanitizer (`disableSanitizer`) for user-authored content.
+2. Admin's own live preview renders the Markdown client-side with `ngx-markdown`'s `MarkdownComponent`/`MarkdownService` (`marked` under the hood) — this is an authenticated-only convenience, not the public-facing defense.
+3. The **public** portfolio response (`ProfileService.findPublicPortfolio()`) renders Markdown to sanitized HTML **server-side**, via `MarkdownRenderService` (`marked` + the `xss` package), exposing it as a sibling `*Html` field (`descriptionHtml`, `bioHtml`) alongside the raw Markdown field. This keeps a Markdown parser out of the public browser bundle — `web` only ever binds the pre-sanitized HTML via `[innerHTML]` (still passing through Angular's own `DomSanitizer` as defense in depth).
+4. Never accept or store raw HTML from a client directly, and never bypass Angular's sanitizer (`bypassSecurityTrustHtml`) for this content.
 
 ## Reference Files
 
@@ -48,5 +48,6 @@ Quick flow:
 - Content-type/size are validated server-side before a presigned URL is issued, not just client-side
 - Presigned URLs expire quickly (minutes, not hours)
 - Deleting a project/image deletes the R2 object too, not just the database row
-- The rich-text renderer's sanitizer stays enabled on every render path — don't set `disableSanitizer`/`SecurityContext.NONE` for content that came from a client
-- Sanitization runs on every render path, not just once at save time
+- The public portfolio response's `MarkdownRenderService` sanitization stays enabled on every render path — never expose an unsanitized Markdown-derived HTML field to the public app
+- Sanitization runs on every render (Markdown is re-rendered on read, not cached as HTML in the database), not just once at save time
+- `web` binds rendered content via `[innerHTML]`, never `bypassSecurityTrustHtml`, so Angular's own sanitizer still applies as defense in depth

@@ -19,7 +19,7 @@ export interface UpdateProjectDto {
    */
   shortDescription?: string;
   /**
-   * Markdown source for the project description, rendered client-side with ngx-markdown
+   * Markdown source for the project description, as authored in admin
    */
   description?: string;
   imageUrl?: string;

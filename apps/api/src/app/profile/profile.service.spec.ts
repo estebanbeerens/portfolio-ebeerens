@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { MarkdownRenderService } from '../shared/markdown-render.service';
 import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
@@ -27,6 +28,9 @@ describe('ProfileService', () => {
         create: jest.fn(),
         update: jest.fn(),
       },
+      role: { findMany: jest.fn() },
+      project: { findMany: jest.fn() },
+      featureFlag: { findMany: jest.fn() },
     };
     const activity = { record: jest.fn() };
     const moduleRef = await Test.createTestingModule({
@@ -34,6 +38,7 @@ describe('ProfileService', () => {
         ProfileService,
         { provide: PrismaService, useValue: prisma },
         { provide: ActivityService, useValue: activity },
+        MarkdownRenderService,
       ],
     }).compile();
 
@@ -98,5 +103,29 @@ describe('ProfileService', () => {
       },
     });
     expect(activity.record).toHaveBeenCalledWith(expect.objectContaining({ action: 'UPDATED' }));
+  });
+
+  it('renders Markdown bio/role/project descriptions to sanitized HTML on the public portfolio', async () => {
+    const { service, prisma } = await build();
+    prisma.profile.findFirst.mockResolvedValue({ ...profile, bio: 'Built **accessible** interfaces.' });
+    prisma.role.findMany.mockResolvedValue([
+      {
+        id: 'role-1',
+        jobTitle: 'Engineer',
+        organization: { id: 'org-1', name: 'Acme' },
+        description: 'Shipped <script>alert(1)</script> features.',
+        skills: [],
+      },
+    ]);
+    prisma.project.findMany.mockResolvedValue([
+      { id: 'project-1', title: 'Portfolio', description: 'A [link](https://example.com) project.', skills: [] },
+    ]);
+    prisma.featureFlag.findMany.mockResolvedValue([]);
+
+    const result = await service.findPublicPortfolio();
+
+    expect(result.profile?.bioHtml).toBe('<p>Built <strong>accessible</strong> interfaces.</p>\n');
+    expect(result.roles[0]).toMatchObject({ descriptionHtml: expect.not.stringContaining('<script>') });
+    expect(result.projects[0].descriptionHtml).toContain('<a href="https://example.com">link</a>');
   });
 });

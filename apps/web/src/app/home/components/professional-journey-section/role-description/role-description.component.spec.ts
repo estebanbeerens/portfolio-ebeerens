@@ -7,7 +7,7 @@ describe('RoleDescription', () => {
       imports: [RoleDescription],
     }).compileComponents();
     const fixture = TestBed.createComponent(RoleDescription);
-    fixture.componentRef.setInput('description', 'Built accessible interfaces.');
+    fixture.componentRef.setInput('descriptionHtml', '<p>Built accessible interfaces.</p>');
     fixture.componentRef.setInput('roleTitle', 'Frontend Engineer');
     await fixture.whenStable();
 
@@ -27,7 +27,7 @@ describe('RoleDescription', () => {
         imports: [RoleDescription],
       }).compileComponents();
       const fixture = TestBed.createComponent(RoleDescription);
-      fixture.componentRef.setInput('description', 'A longer role description.');
+      fixture.componentRef.setInput('descriptionHtml', '<p>A longer role description.</p>');
       fixture.componentRef.setInput('roleTitle', 'Senior Engineer');
       await fixture.whenStable();
 
