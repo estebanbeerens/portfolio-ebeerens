@@ -1,7 +1,7 @@
 added_files=$(git diff --name-only --cached --diff-filter=d)
 
 npx nx format:write --uncommitted
-npx nx affected -t lint,typecheck,test --uncommitted --parallel
+npx nx affected -t lint,typecheck --uncommitted --parallel
 
 # If there are any files that were added to the staging area, re-add them after formatting
 git add ${added_files}

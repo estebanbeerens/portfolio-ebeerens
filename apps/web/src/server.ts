@@ -30,7 +30,14 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Serve static files from /browser
  */
-for (const asset of ['robots.txt', 'sitemap.xml', 'manifest.webmanifest', 'logo-light.svg', 'logo-dark.svg']) {
+for (const asset of [
+  'robots.txt',
+  'sitemap.xml',
+  'manifest.webmanifest',
+  'logo-light.svg',
+  'logo-dark.svg',
+  'runtime-config.json',
+]) {
   app.get(`/${asset}`, (_req, res) => {
     res.sendFile(resolve(defaultLocaleBrowserDistFolder, asset));
   });
