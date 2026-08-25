@@ -27,6 +27,21 @@ CMD ["node", "main.js"]
 - `USER app` — never run the production process as root.
 - Read all config (`DATABASE_URL`, `GITHUB_CLIENT_SECRET`, etc.) via environment variables passed at `docker run`/compose time — nothing baked into the image.
 
+## Runtime Dependencies: per-app `package.json` (not the root lockfile)
+
+Each runtime image installs **only the deps that app actually uses**, never the whole monorepo tree. The mechanism differs by bundler:
+
+- **api** (`@nx/webpack`): `generatePackageJson: true` emits a complete `dist/apps/api/package.json` from the import graph. The hand-written [apps/api/package.json](../../../apps/api/package.json) only _supplements_ it — e.g. `@prisma/client`, whose generated client import is gitignored so Nx can't detect it. The runtime stage copies `dist/apps/api` and runs `npm install --omit=dev`.
+- **web / admin** (`@angular/build:application`): the Angular builder does **not** generate a per-app `package.json`, so [apps/web/package.json](../../../apps/web/package.json) and [apps/admin/package.json](../../../apps/admin/package.json) are **hand-maintained**, and the runtime stage copies just that file and runs `npm install --omit=dev` against it. The Angular SSR bundle inlines almost everything (only `iconv-lite`, pulled in transitively by `express`, is externalized), but the manifest still lists the app's full source-dependency set so the image stays correct if the bundler externalizes more later.
+
+**When you add or remove a runtime import in `web`/`admin`, update that app's `package.json`.** This is enforced by the `@nx/dependency-checks` ESLint rule — added to each app's `eslint.config.mjs`, scoped to `**/package.json`:
+
+- `nx lint web` / `nx lint admin` fail on a missing or obsolete dependency.
+- `nx lint web --fix` auto-syncs the manifest from the import graph (versions come from the root `package.json`).
+- Bundled workspace libs (e.g. `@portfolio-ebeerens/api-client`) go under the rule's `ignoredDependencies` because they're inlined, not installed from a registry — **never** add them to the manifest or the runtime `npm install` will 404.
+
+Runtime install uses `npm install` (not `npm ci`): these sub-manifests have no lockfile — the same trade-off api already makes.
+
 ## arm64 Cross-Build
 
 The Oracle VPS is **Ampere A1 (arm64)**; GitHub's hosted runners are amd64. Build with `buildx` + QEMU emulation:

@@ -14,8 +14,11 @@ RUN npx nx build admin --configuration=production
 FROM node:22-alpine AS runtime
 WORKDIR /app
 RUN addgroup -S app && adduser -S app -G app
-COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+# Install only the admin app's own runtime deps (apps/admin/package.json, kept complete by
+# @nx/dependency-checks) instead of the entire monorepo dependency tree. No lockfile for this
+# sub-manifest, so `npm install` rather than `npm ci` — matches the api runtime stage.
+COPY --from=build /app/apps/admin/package.json ./package.json
+RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
 COPY --from=build /app/dist/apps/admin ./dist/apps/admin
 USER app
 ENV NODE_ENV=production

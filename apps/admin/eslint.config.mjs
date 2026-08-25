@@ -1,4 +1,5 @@
 import nx from '@nx/eslint-plugin';
+import jsoncParser from 'jsonc-eslint-parser';
 import baseConfig from '../../eslint.config.mjs';
 
 export default [
@@ -30,5 +31,22 @@ export default [
     files: ['**/*.html'],
     // Override or add rules here
     rules: {},
+  },
+  {
+    // The SSR bundle inlines most deps, but the runtime image installs this app's own dependency
+    // subtree (not the whole monorepo), so keep apps/admin/package.json complete and in sync with
+    // the source imports. Autofix with `nx lint admin --fix`.
+    files: ['**/package.json'],
+    languageOptions: { parser: jsoncParser },
+    rules: {
+      '@nx/dependency-checks': [
+        'error',
+        {
+          ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'],
+          // Workspace libs are bundled into the SSR output, not installed from a registry.
+          ignoredDependencies: ['@portfolio-ebeerens/api-client'],
+        },
+      ],
+    },
   },
 ];

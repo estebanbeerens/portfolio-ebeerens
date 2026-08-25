@@ -47,6 +47,7 @@ SSH/firewall hardening, `pg_dump` → R2 backup cron, basic logging/uptime monit
 
 - Every image is built for **arm64** — verify with `docker buildx build --platform linux/arm64`, don't assume a locally-built amd64 image will run on the VPS
 - Non-root user in every runtime image; `HEALTHCHECK` on every service
+- Runtime images install each app's **own** `package.json` deps, not the root lockfile — keep `apps/web/package.json` and `apps/admin/package.json` in sync when adding/removing runtime imports (enforced by `@nx/dependency-checks`; run `nx lint <app> --fix`)
 - Postgres is never exposed to the public internet — only reachable from other containers on the compose network
 - The `deploy` SSH key can only run one forced command — never a general-purpose shell
 - Secrets live in GitHub Actions encrypted secrets / the VPS's `.env`, never committed

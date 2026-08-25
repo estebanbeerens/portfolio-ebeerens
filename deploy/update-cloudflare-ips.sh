@@ -14,6 +14,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT="${1:-${SCRIPT_DIR}/../nginx/cloudflare-real-ip.conf}"
 
+# Docker creates a missing bind-mount source as a root-owned *directory*, so if nginx ever started
+# before this file was generated, ${OUT} is now a directory the deploy user can't `mv` onto.
+if [ -d "${OUT}" ]; then
+	echo "ERROR: ${OUT} is a directory, not a file — Docker created it as a bind-mount source" >&2
+	echo "before the trust list was generated. Remove it and re-run: sudo rm -rf '${OUT}'" >&2
+	exit 1
+fi
+
 V4_URL="https://www.cloudflare.com/ips-v4"
 V6_URL="https://www.cloudflare.com/ips-v6"
 
