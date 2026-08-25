@@ -80,14 +80,14 @@ services:
     # admin stays client-rendered (see build guide Stage 6) — no API_URL needed server-side.
 
   # only nginx is published to the host; api/web/admin stay on the internal compose network.
-  # HTTP-only for now (Stage 10) — Stage 11 adds `443:443` + a `./nginx/certs` mount once the
-  # Cloudflare Origin CA cert exists.
+  # Cloudflare terminates the public edge connection; Nginx also serves HTTPS for the origin leg.
   nginx:
     image: nginx:1.27-alpine
     container_name: portfolio-nginx
     restart: unless-stopped
     ports:
       - '80:80'
+      - '443:443'
     # nginx.conf is git-tracked, so its single-file bind mount is always a real file. But
     # cloudflare-real-ip.conf is gitignored/generated and can be briefly absent, and a single-file
     # bind mount of a missing source makes Docker create a root-owned *directory* there, which then
@@ -96,6 +96,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx:/etc/nginx/portfolio:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - api
       - web
