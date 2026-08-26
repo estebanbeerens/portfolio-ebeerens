@@ -2,7 +2,7 @@ import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorList
 import { IMAGE_LOADER, isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, TitleStrategy, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { provideApi } from '@portfolio-ebeerens/api-client';
 import { catchError, firstValueFrom, filter, of, timeout } from 'rxjs';
@@ -26,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     ),
     { provide: TitleStrategy, useExisting: PortfolioTitleStrategy },
     { provide: IMAGE_LOADER, useValue: r2ProjectImageLoader },
-    provideHttpClient(withFetch()),
+    provideHttpClient(),
     // Generated paths already include the API's global "/api" prefix — leave basePath empty.
     provideApi({ basePath: '', withCredentials: true }),
     // Resolve feature flags once before the app renders, so nav/pages never flash ungated content.

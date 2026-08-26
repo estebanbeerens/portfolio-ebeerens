@@ -62,7 +62,7 @@
             }
           ],
           "outputHashing": "all",
-          "localize": true
+          "localize": ["en"]
         },
         "development": {
           "optimization": false,
