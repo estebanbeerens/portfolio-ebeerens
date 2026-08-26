@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { ImageDerivativesService } from '../storage/image-derivatives.service';
 import { R2Service } from '../storage/r2.service';
 import { ProjectsService } from './projects.service';
 
@@ -38,16 +39,18 @@ describe('ProjectsService', () => {
     };
     const activity = { record: jest.fn() };
     const r2 = { isConfigured: false, presignPut: jest.fn(), deleteObject: jest.fn() };
+    const derivatives = { generate: jest.fn(), delete: jest.fn() };
     const moduleRef = await Test.createTestingModule({
       providers: [
         ProjectsService,
         { provide: PrismaService, useValue: prisma },
         { provide: ActivityService, useValue: activity },
         { provide: R2Service, useValue: r2 },
+        { provide: ImageDerivativesService, useValue: derivatives },
       ],
     }).compile();
 
-    return { service: moduleRef.get(ProjectsService), prisma };
+    return { service: moduleRef.get(ProjectsService), prisma, r2, derivatives };
   }
 
   describe('findRelated', () => {
@@ -142,6 +145,66 @@ describe('ProjectsService', () => {
       const result = await service.findRelated('target', 2);
 
       expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('create', () => {
+    it('generates image derivatives when the project has an image', async () => {
+      const { service, prisma, derivatives } = await build();
+      prisma.project.create.mockResolvedValue(project({ imageObjectKey: 'projects/abc123.png' }));
+
+      await service.create({
+        title: 'Project',
+        slug: 'project',
+        shortDescription: 'Short',
+        description: 'Long',
+        startDate: '2024-01-01T00:00:00.000Z',
+        skills: [],
+      } as never);
+
+      expect(derivatives.generate).toHaveBeenCalledTimes(1);
+      expect(derivatives.generate.mock.calls[0][1]).toBe('projects/abc123.png');
+    });
+
+    it('skips derivative generation when the project has no image', async () => {
+      const { service, prisma, derivatives } = await build();
+      prisma.project.create.mockResolvedValue(project({ imageObjectKey: null }));
+
+      await service.create({
+        title: 'Project',
+        slug: 'project',
+        shortDescription: 'Short',
+        description: 'Long',
+        startDate: '2024-01-01T00:00:00.000Z',
+        skills: [],
+      } as never);
+
+      expect(derivatives.generate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('update', () => {
+    it('generates derivatives for a newly uploaded image and cleans up the old one', async () => {
+      const { service, prisma, r2, derivatives } = await build();
+      r2.isConfigured = true;
+      prisma.project.findUnique.mockResolvedValue(project({ imageObjectKey: 'projects/old.png' }));
+      prisma.project.update.mockResolvedValue(project({ imageObjectKey: 'projects/new.png' }));
+
+      await service.update('project-1', { imageObjectKey: 'projects/new.png' } as never);
+
+      expect(r2.deleteObject).toHaveBeenCalledWith(process.env.R2_IMAGES_BUCKET, 'projects/old.png');
+      expect(derivatives.delete).toHaveBeenCalledWith(process.env.R2_IMAGES_BUCKET, 'projects/old.png');
+      expect(derivatives.generate).toHaveBeenCalledWith(process.env.R2_IMAGES_BUCKET, 'projects/new.png');
+    });
+
+    it('does not regenerate derivatives when the image is unchanged', async () => {
+      const { service, prisma, derivatives } = await build();
+      prisma.project.findUnique.mockResolvedValue(project({ imageObjectKey: 'projects/same.png' }));
+      prisma.project.update.mockResolvedValue(project({ imageObjectKey: 'projects/same.png' }));
+
+      await service.update('project-1', { imageObjectKey: 'projects/same.png' } as never);
+
+      expect(derivatives.generate).not.toHaveBeenCalled();
     });
   });
 });

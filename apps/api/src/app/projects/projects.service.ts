@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { Prisma } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { ImageDerivativesService } from '../storage/image-derivatives.service';
 import { R2Service } from '../storage/r2.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateProjectImageUploadUrlDto } from './dto/create-project-image-upload-url.dto';
@@ -15,7 +16,8 @@ export class ProjectsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly activity: ActivityService,
-    private readonly r2: R2Service
+    private readonly r2: R2Service,
+    private readonly derivatives: ImageDerivativesService
   ) {}
 
   private get imagesBucket(): string {
@@ -82,6 +84,9 @@ export class ProjectsService {
         },
         include: { skills: true },
       });
+      if (project.imageObjectKey) {
+        await this.derivatives.generate(this.imagesBucket, project.imageObjectKey);
+      }
       await this.activity.record({
         entityType: 'PROJECT',
         action: 'CREATED',
@@ -120,6 +125,9 @@ export class ProjectsService {
       if (existing.imageObjectKey && existing.imageObjectKey !== project.imageObjectKey) {
         await this.deleteImageObject(existing.imageObjectKey);
       }
+      if (project.imageObjectKey && project.imageObjectKey !== existing.imageObjectKey) {
+        await this.derivatives.generate(this.imagesBucket, project.imageObjectKey);
+      }
       await this.activity.record({
         entityType: 'PROJECT',
         action: 'UPDATED',
@@ -157,6 +165,7 @@ export class ProjectsService {
     } catch (error) {
       this.logger.warn(`Failed to delete stale project image "${objectKey}" from R2: ${error}`);
     }
+    await this.derivatives.delete(this.imagesBucket, objectKey);
   }
 
   // Reuses existing skills by name (case-insensitively normalized), creating new ones as needed.

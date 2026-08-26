@@ -3,14 +3,17 @@
     density="compact"
     class="shadow-elevation hover:bg-glass-hover active:bg-glass-active h-full transition-colors"
   >
-    @if (project().imageUrl) {
-      <img
-        class="h-44 w-full rounded-md object-cover"
-        [src]="project().imageUrl"
-        [alt]="project().title + ' project preview'"
-        loading="lazy"
-        decoding="async"
-      />
+    @if (project().imageUrl; as imageUrl) {
+      <div class="relative h-44 w-full overflow-hidden rounded-md">
+        <img
+          [ngSrc]="imageUrl"
+          [ngSrcset]="imageNgSrcset"
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+          fill
+          class="object-cover"
+          [alt]="project().title + ' project preview'"
+        />
+      </div>
     } @else {
       <div
         class="h-44 w-full rounded-md bg-linear-to-r to-transparent opacity-90"

@@ -37,6 +37,26 @@ export class R2Service {
     await this.getClient().send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
   }
 
+  async getObjectBuffer(bucket: string, objectKey: string): Promise<Buffer> {
+    const response = await this.getClient().send(new GetObjectCommand({ Bucket: bucket, Key: objectKey }));
+    if (!response.Body) {
+      throw new Error(`Object "${objectKey}" has no body`);
+    }
+    return Buffer.from(await response.Body.transformToByteArray());
+  }
+
+  async putObject(bucket: string, objectKey: string, body: Buffer, contentType: string, cacheControl: string) {
+    await this.getClient().send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: objectKey,
+        Body: body,
+        ContentType: contentType,
+        CacheControl: cacheControl,
+      })
+    );
+  }
+
   // Lazily built so the API still boots (and the non-R2 routes still work) without credentials.
   private getClient(): S3Client {
     if (!this.isConfigured) {

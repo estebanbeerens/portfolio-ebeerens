@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
+import { NgOptimizedImage } from '@angular/common';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
@@ -10,12 +11,13 @@ import { ProjectCard } from '../../shared/project-card/project-card.component';
 import { projectDuration, projectYear } from '../../shared/project-summary.util';
 import { PortfolioContentService } from '../../shared/portfolio-content.service';
 import { PortfolioTitleStrategy } from '../../portfolio-title.strategy';
+import { PROJECT_IMAGE_NG_SRCSET } from '../../shared/r2-image-loader';
 
 const RELATED_PROJECTS_LIMIT = 3;
 
 @Component({
   selector: 'web-project-detail-page',
-  imports: [RouterLink, Button, LucideDynamicIcon, ProjectCard],
+  imports: [RouterLink, Button, LucideDynamicIcon, NgOptimizedImage, ProjectCard],
   templateUrl: './project-detail-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,6 +34,7 @@ export class ProjectDetailPage {
   protected readonly project = computed(() => this.content.projectBySlug(this.slug()));
   protected readonly backIcon = LucideArrowLeft;
   protected readonly externalLinkIcon = LucideExternalLink;
+  protected readonly imageNgSrcset = PROJECT_IMAGE_NG_SRCSET;
 
   protected readonly projectYear = projectYear;
   protected readonly projectDuration = projectDuration;
