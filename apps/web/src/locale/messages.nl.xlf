@@ -6,6 +6,10 @@
         <source>Skip to content</source>
         <target>Naar de inhoud</target>
       </trans-unit>
+      <trans-unit id="admin.skipToMainContent" datatype="html">
+        <source>Skip to main content</source>
+        <target>Naar de hoofdinhoud</target>
+      </trans-unit>
       <trans-unit id="basicInfo.role" datatype="html">
         <source>Role</source>
         <target>Functie</target>

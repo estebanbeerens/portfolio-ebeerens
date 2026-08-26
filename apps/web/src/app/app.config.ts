@@ -19,7 +19,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideClientHydration(withEventReplay()),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(appRoutes, withViewTransitions(), withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
+    provideRouter(
+      appRoutes,
+      withViewTransitions({ skipInitialTransition: true }),
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'top' })
+    ),
     { provide: TitleStrategy, useExisting: PortfolioTitleStrategy },
     { provide: IMAGE_LOADER, useValue: r2ProjectImageLoader },
     provideHttpClient(withFetch()),

@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, TitleStrategy, withViewTransitions } from '@angular/router';
+import { provideRouter, TitleStrategy, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideApi } from '@portfolio-ebeerens/api-client';
 import { appRoutes } from './app.routes';
@@ -11,7 +11,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideClientHydration(withEventReplay()),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(appRoutes, withViewTransitions()),
+    provideRouter(
+      appRoutes,
+      withViewTransitions({ skipInitialTransition: true }),
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'top' })
+    ),
     { provide: TitleStrategy, useClass: AdminTitleStrategy },
     provideHttpClient(withFetch()),
     // Generated paths already include the API's global "/api" prefix — leave basePath empty.

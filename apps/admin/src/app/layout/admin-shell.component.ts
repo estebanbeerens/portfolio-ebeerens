@@ -57,6 +57,15 @@ export class AdminShell {
     this.navOpen.set(false);
   }
 
+  protected skipToMain(event: Event): void {
+    event.preventDefault();
+    const el = document.getElementById('main');
+    if (el) {
+      el.focus();
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   protected logout(): void {
     this.session.logout();
   }

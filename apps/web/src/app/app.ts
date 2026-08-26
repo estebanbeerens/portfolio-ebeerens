@@ -15,4 +15,13 @@ import { PortfolioContentService } from './shared/portfolio-content.service';
 })
 export class App {
   protected readonly content = inject(PortfolioContentService);
+
+  protected skipToMain(event: Event): void {
+    event.preventDefault();
+    const el = document.getElementById('main-content');
+    if (el) {
+      el.focus();
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }

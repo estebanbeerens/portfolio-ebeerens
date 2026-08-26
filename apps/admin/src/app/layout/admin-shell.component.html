@@ -4,6 +4,8 @@
   <a
     href="#main"
     class="bg-surface text-text focus-visible:outline-accent sr-only rounded-md px-4 py-2 focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus-visible:outline-2"
+    i18n="@@admin.skipToMainContent"
+    (click)="skipToMain($event)"
   >
     Skip to main content
   </a>
@@ -63,7 +65,7 @@
       </button>
     </div>
 
-    <main id="main" class="flex min-w-0 flex-1 flex-col gap-8 p-6 md:p-10">
+    <main id="main" tabindex="-1" class="flex min-w-0 flex-1 flex-col gap-8 p-6 md:p-10">
       <router-outlet />
     </main>
   </div>
