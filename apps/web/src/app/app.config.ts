@@ -1,6 +1,5 @@
 import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners, inject } from '@angular/core';
-import { IMAGE_LOADER, isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
+import { IMAGE_LOADER } from '@angular/common';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, TitleStrategy, withInMemoryScrolling, withViewTransitions } from '@angular/router';
@@ -29,14 +28,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     // Generated paths already include the API's global "/api" prefix — leave basePath empty.
     provideApi({ basePath: '', withCredentials: true }),
-    // Resolve feature flags once before the app renders, so nav/pages never flash ungated content.
-    // Browser-only: during SSR/prerendering there's no reliable network context to block bootstrap on
-    // (mirrors the isPlatformBrowser guard pattern already used for admin's session checks).
+    // Resolve feature flags/profile once before the app renders, on server AND browser, so SSR's
+    // serialized HTML already reflects the final state — otherwise hydration flips nav/footer from
+    // ungated to gated after first paint, a real user-visible layout shift (not just a CSR flash).
+    // The API origin is reliable on the server too (app.config.server.ts pins an absolute API_URL),
+    // and the timeout/catchError below still guard against a slow/unreachable API either way.
     provideAppInitializer(() => {
-      if (!isPlatformBrowser(inject(PLATFORM_ID))) {
-        return Promise.resolve();
-      }
-
       const content = inject(PortfolioContentService);
       return firstValueFrom(
         toObservable(content.portfolio.status).pipe(

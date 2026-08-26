@@ -3,8 +3,12 @@
 
 @source '../../../libs/ui';
 
-/* You can add global styles to this file, and also import other style files */
 html,
 body {
   margin: 0;
+}
+
+html {
+  /* Reserve scrollbar space up front so its appearance/disappearance doesn't shift percentage-centered elements (e.g. ambient-backdrop blobs). */
+  scrollbar-gutter: stable;
 }
