@@ -211,7 +211,23 @@ Do not remove the forced-command entry for the GitHub Actions key. If no sudo-ca
 works, use the provider console to perform these same commands; a local SSH command cannot repair
 an account when every usable authorized key has been removed or restricted.
 
-## 6. Add GitHub Actions secrets
+## 6. Create the backup bucket and add backup env vars
+
+Create a private `portfolio-backups` bucket in the same R2 account as the images/documents buckets.
+It should stay private and should have its own scoped API token; do not reuse the same bucket for
+project images or document uploads.
+
+Add these values to the VPS `.env` file alongside the existing R2 settings:
+
+```env
+R2_BACKUPS_BUCKET=portfolio-backups
+```
+
+The production backup job is implemented in `deploy/backup-db.sh` and can be run manually or from a
+cron entry. It dumps the Postgres database from the running `portfolio-postgres` container, compresses
+it, and uploads the `.sql.gz` file to the separate R2 bucket.
+
+## 7. Add GitHub Actions secrets
 
 Repo → **Settings → Secrets and variables → Actions → New repository secret**:
 

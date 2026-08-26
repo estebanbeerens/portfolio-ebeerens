@@ -1,0 +1,51 @@
+name: Public health check
+run-name: Health check ${{ inputs.public_url }}${{ inputs.admin_url != '' && ' + ' || '' }}${{ inputs.admin_url }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      public_url:
+        description: 'Public URL to check (for example https://ebeerens.com)'
+        required: true
+        default: 'https://ebeerens.com'
+      admin_url:
+        description: 'Optional admin URL to check as well'
+        required: false
+        default: 'https://admin.ebeerens.com'
+
+jobs:
+  health:
+    name: Check public site health
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check site health on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.ADMIN_USER }}
+          key: ${{ secrets.ADMIN_SSH_KEY }}
+          port: 22
+          script: |
+            set -euo pipefail
+
+            urls=("${{ inputs.public_url }}")
+            if [[ -n "${{ inputs.admin_url }}" ]]; then
+              urls+=("${{ inputs.admin_url }}")
+            fi
+
+            for url in "${urls[@]}"; do
+              echo "Checking $url"
+              /opt/deploy/check-public-health.sh "$url"
+            done
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Public health check" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checked: ${{ inputs.public_url }}" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "${{ inputs.admin_url }}" ]]; then
+            echo "Also checked: ${{ inputs.admin_url }}" >> "$GITHUB_STEP_SUMMARY"
+          fi

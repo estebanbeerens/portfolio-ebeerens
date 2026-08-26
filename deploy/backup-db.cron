@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Nightly Postgres backup to the private R2 bucket.
+0 2 * * * deploy /opt/deploy/backup-db.sh >> /var/log/portfolio-backups.log 2>&1
