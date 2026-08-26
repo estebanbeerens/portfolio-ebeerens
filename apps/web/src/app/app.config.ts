@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { IMAGE_LOADER, isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { provideHttpClient, withFetch } from '@angular/common/http';
@@ -10,6 +10,7 @@ import { appRoutes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { PortfolioContentService } from './shared/portfolio-content.service';
 import { PortfolioTitleStrategy } from './portfolio-title.strategy';
+import { r2ProjectImageLoader } from './shared/r2-image-loader';
 
 // Bounds how long bootstrap waits for flags before rendering ungated (guards against a slow/unreachable API).
 const FEATURE_FLAGS_INIT_TIMEOUT_MS = 3000;
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes, withViewTransitions(), withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
     { provide: TitleStrategy, useExisting: PortfolioTitleStrategy },
+    { provide: IMAGE_LOADER, useValue: r2ProjectImageLoader },
     provideHttpClient(withFetch()),
     // Generated paths already include the API's global "/api" prefix — leave basePath empty.
     provideApi({ basePath: '', withCredentials: true }),
