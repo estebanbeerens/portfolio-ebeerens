@@ -27,4 +27,10 @@ export const appRoutes: Route[] = [
     title: 'Contact',
     loadComponent: () => import('./pages/contact/contact-page.component').then((component) => component.ContactPage),
   },
+  {
+    path: '**',
+    title: 'Page not found',
+    loadComponent: () =>
+      import('./pages/not-found/not-found-page.component').then((component) => component.NotFoundPage),
+  },
 ];
