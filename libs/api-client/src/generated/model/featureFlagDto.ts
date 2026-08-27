@@ -18,7 +18,7 @@ export namespace FeatureFlagDto {
     Contact: 'CONTACT',
     Projects: 'PROJECTS',
     Roles: 'ROLES',
-    Skills: 'SKILLS',
+    Resume: 'RESUME',
   } as const;
   export type KeyEnum = (typeof KeyEnum)[keyof typeof KeyEnum];
 }

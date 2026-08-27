@@ -477,7 +477,7 @@ paths:
               - CONTACT
               - PROJECTS
               - ROLES
-              - SKILLS
+              - RESUME
             type: string
       requestBody:
         required: true
@@ -545,6 +545,32 @@ paths:
           description: The message was deleted
         '401':
           description: No valid session
+      tags: *ref_6
+    patch:
+      operationId: ContactController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactMessageDto'
+      responses:
+        '200':
+          description: The message was updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactMessageDto'
+        '401':
+          description: No valid session
+        '404':
+          description: The message was not found
       tags: *ref_6
   /api/resume/upload-url:
     post:
@@ -915,7 +941,7 @@ components:
             - CONTACT
             - PROJECTS
             - ROLES
-            - SKILLS
+            - RESUME
           example: PROJECTS
         enabled:
           type: boolean
@@ -1380,6 +1406,9 @@ components:
         message:
           type: string
           example: Hi, I'd like to discuss a project with you.
+        isRead:
+          type: boolean
+          example: false
         createdAt:
           format: date-time
           type: string
@@ -1390,7 +1419,17 @@ components:
         - email
         - subject
         - message
+        - isRead
         - createdAt
+    UpdateContactMessageDto:
+      type: object
+      properties:
+        isRead:
+          type: boolean
+          example: true
+          description: Whether the message has been read
+      required:
+        - isRead
     CreateResumeUploadUrlDto:
       type: object
       properties:

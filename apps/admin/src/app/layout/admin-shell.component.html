@@ -29,10 +29,16 @@
       <span class="font-display text-text text-lg font-bold">{{ adminName() }}</span>
     </a>
 
-    @for (item of navItems; track item.route) {
-      <a uiNavItem [routerLink]="item.route" [icon]="item.icon" [active]="isActive(item.route)" (click)="closeNav()">{{
-        item.label
-      }}</a>
+    @for (item of navItems(); track item.route) {
+      <a
+        uiNavItem
+        [routerLink]="item.route"
+        [icon]="item.icon"
+        [active]="isActive(item.route)"
+        [badge]="item.badge"
+        (click)="closeNav()"
+        >{{ item.label }}</a
+      >
     }
 
     <div sidenavFooter class="flex w-full flex-col gap-3">

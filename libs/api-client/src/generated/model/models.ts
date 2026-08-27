@@ -23,6 +23,7 @@ export * from './resumeDto';
 export * from './resumeUploadUrlDto';
 export * from './roleDto';
 export * from './skillDto';
+export * from './updateContactMessageDto';
 export * from './updateFeatureFlagDto';
 export * from './updateOrganizationDto';
 export * from './updateProfileDto';

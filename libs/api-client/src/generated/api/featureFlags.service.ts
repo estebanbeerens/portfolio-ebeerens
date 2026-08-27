@@ -107,28 +107,28 @@ export class FeatureFlagsService extends BaseService {
    * @param options additional options
    */
   public featureFlagsControllerUpdate(
-    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'SKILLS',
+    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'RESUME',
     updateFeatureFlagDto: UpdateFeatureFlagDto,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<FeatureFlagDto>;
   public featureFlagsControllerUpdate(
-    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'SKILLS',
+    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'RESUME',
     updateFeatureFlagDto: UpdateFeatureFlagDto,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpResponse<FeatureFlagDto>>;
   public featureFlagsControllerUpdate(
-    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'SKILLS',
+    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'RESUME',
     updateFeatureFlagDto: UpdateFeatureFlagDto,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpEvent<FeatureFlagDto>>;
   public featureFlagsControllerUpdate(
-    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'SKILLS',
+    key: 'CONTACT' | 'PROJECTS' | 'ROLES' | 'RESUME',
     updateFeatureFlagDto: UpdateFeatureFlagDto,
     observe: any = 'body',
     reportProgress: boolean = false,
@@ -173,7 +173,7 @@ export class FeatureFlagsService extends BaseService {
       }
     }
 
-    let localVarPath = `/api/feature-flags/${this.configuration.encodeParam({ name: 'key', value: key, in: 'path', style: 'simple', explode: false, dataType: "'CONTACT' | 'PROJECTS' | 'ROLES' | 'SKILLS'", dataFormat: undefined })}`;
+    let localVarPath = `/api/feature-flags/${this.configuration.encodeParam({ name: 'key', value: key, in: 'path', style: 'simple', explode: false, dataType: "'CONTACT' | 'PROJECTS' | 'ROLES' | 'RESUME'", dataFormat: undefined })}`;
     const { basePath, withCredentials } = this.configuration;
     return this.httpClient.request<FeatureFlagDto>('put', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,

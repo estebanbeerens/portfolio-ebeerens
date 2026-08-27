@@ -122,3 +122,21 @@
 * {
   scrollbar-width: thin;
 }
+
+/* Opt-in narrower, muted, inset scrollbar for individually-scrollable panes (e.g. inbox-style lists). */
+.scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-muted) transparent;
+}
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background-color: var(--color-text-muted);
+  border-radius: var(--radius-xs);
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}

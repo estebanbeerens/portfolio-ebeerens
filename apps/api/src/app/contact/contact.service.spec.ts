@@ -1,5 +1,6 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma.service';
 import { ContactService } from './contact.service';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
@@ -23,6 +24,7 @@ describe('ContactService', () => {
         findMany: jest.fn(),
         delete: jest.fn(),
         create: jest.fn(),
+        update: jest.fn(),
       },
     };
     const moduleRef = await Test.createTestingModule({
@@ -111,5 +113,27 @@ describe('ContactService', () => {
     expect(prisma.contactMessage.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ organization: null }) })
     );
+  });
+
+  it('updates the isRead flag', async () => {
+    const { service, prisma } = await build();
+    const updated = { id: 'message-1', ...dto, isRead: true };
+    prisma.contactMessage.update.mockResolvedValue(updated);
+
+    await expect(service.update('message-1', { isRead: true })).resolves.toBe(updated);
+
+    expect(prisma.contactMessage.update).toHaveBeenCalledWith({
+      where: { id: 'message-1' },
+      data: { isRead: true },
+    });
+  });
+
+  it('throws NotFoundException when updating a missing message', async () => {
+    const { service, prisma } = await build();
+    prisma.contactMessage.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('mock', { code: 'P2025', clientVersion: 'mock' })
+    );
+
+    await expect(service.update('missing-id', { isRead: true })).rejects.toBeInstanceOf(NotFoundException);
   });
 });

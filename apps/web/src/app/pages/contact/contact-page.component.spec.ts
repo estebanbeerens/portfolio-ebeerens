@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ContactMessageDto, ContactService, CreateContactMessageDto } from '@portfolio-ebeerens/api-client';
@@ -135,8 +136,29 @@ describe('ContactPage', () => {
       false,
       { transferCache: false }
     );
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Your message was sent.');
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Message sent');
+    expect(compiled.querySelector('form')).toBeNull();
     expect(turnstile.reset).toHaveBeenCalled();
+  });
+
+  it('keeps showing the success panel even if resetting the widget re-fires a Turnstile event', async () => {
+    const { fixture } = await createComponent();
+    fillValidForm(fixture);
+    const turnstile = turnstileStub(fixture);
+    turnstile.resolved.emit('turnstile-token');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelector('form')?.dispatchEvent(new SubmitEvent('submit'));
+    fixture.detectChanges();
+
+    // simulate ngx-turnstile's widget firing `timeout`/`errored` as a side effect of our own `.reset()` call
+    turnstile.timeout.emit();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain('Message sent');
+    expect(compiled.querySelector('form')).toBeNull();
   });
 
   it('clears the token when Turnstile expires or errors', async () => {
@@ -155,7 +177,27 @@ describe('ContactPage', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Complete the verification before sending.');
   });
 
-  it('shows a generic error when the API rejects submission', async () => {
+  it('shows a generic error when the API rejects submission, linked to the form for a11y', async () => {
+    const { fixture } = await createComponent({ create: () => throwError(() => new Error('server error')) });
+    fillValidForm(fixture);
+    const turnstile = turnstileStub(fixture);
+    turnstile.resolved.emit('turnstile-token');
+    fixture.detectChanges();
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector('form');
+    form?.dispatchEvent(new SubmitEvent('submit'));
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const errorBanner = compiled.querySelector('#contact-form-error');
+    expect(errorBanner?.textContent).toContain('Something went wrong. Please try again.');
+    expect(errorBanner?.getAttribute('role')).toBe('alert');
+    expect(form?.getAttribute('aria-describedby')).toBe('contact-form-error');
+    expect((compiled.querySelector('#contact-full-name') as HTMLInputElement)?.value).toBe('Jane Doe');
+    expect(turnstile.reset).toHaveBeenCalled();
+  });
+
+  it('keeps showing the error banner even if resetting the widget re-fires a Turnstile event', async () => {
     const { fixture } = await createComponent({ create: () => throwError(() => new Error('server error')) });
     fillValidForm(fixture);
     const turnstile = turnstileStub(fixture);
@@ -165,8 +207,36 @@ describe('ContactPage', () => {
     (fixture.nativeElement as HTMLElement).querySelector('form')?.dispatchEvent(new SubmitEvent('submit'));
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Something went wrong. Please try again.');
-    expect(turnstile.reset).toHaveBeenCalled();
+    // simulate ngx-turnstile's widget firing `timeout`/`errored` as a side effect of our own `.reset()` call
+    turnstile.timeout.emit();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('#contact-form-error')?.textContent).toContain(
+      'Something went wrong. Please try again.'
+    );
+  });
+
+  it('shows the specific API error message when provided', async () => {
+    const { fixture } = await createComponent({
+      create: () =>
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 400,
+              error: { message: 'Turnstile verification failed' },
+            })
+        ),
+    });
+    fillValidForm(fixture);
+    const turnstile = turnstileStub(fixture);
+    turnstile.resolved.emit('turnstile-token');
+    fixture.detectChanges();
+
+    (fixture.nativeElement as HTMLElement).querySelector('form')?.dispatchEvent(new SubmitEvent('submit'));
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Turnstile verification failed');
   });
 
   it('shows a verification configuration error when the runtime site key is missing', async () => {

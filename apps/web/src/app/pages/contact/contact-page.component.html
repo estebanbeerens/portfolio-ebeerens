@@ -16,87 +16,113 @@
       class="shadow-elevation"
       density="comfortable"
     >
-      <form class="grid gap-5" [formGroup]="form" (ngSubmit)="submit()">
-        <div class="grid gap-4 md:grid-cols-2">
-          <ui-input
-            controlId="contact-full-name"
-            label="Full name"
-            i18n-label="@@contact.field.fullName.label"
-            autocomplete="name"
-            [required]="true"
-            [error]="fieldError('fullName')"
-            formControlName="fullName"
-          />
-          <ui-input
-            controlId="contact-email"
-            label="Email"
-            i18n-label="@@contact.field.email.label"
-            type="email"
-            autocomplete="email"
-            [required]="true"
-            [error]="fieldError('email')"
-            formControlName="email"
-          />
+      @if (submissionState() === 'success') {
+        <div #successPanel tabindex="-1" role="status" class="grid gap-2 py-6 text-center focus:outline-none">
+          <p class="text-success font-display text-2xl font-semibold" i18n="@@contact.success.heading">Message sent</p>
+          <p class="text-text-muted" i18n="@@contact.success.body">
+            Thanks for reaching out. I&rsquo;ll get back to you as soon as I can.
+          </p>
         </div>
-
-        <ui-input
-          controlId="contact-organization"
-          label="Organization"
-          i18n-label="@@contact.field.organization.label"
-          autocomplete="organization"
-          [error]="fieldError('organization')"
-          formControlName="organization"
-        />
-
-        <ui-input
-          controlId="contact-subject"
-          label="Subject"
-          i18n-label="@@contact.field.subject.label"
-          [required]="true"
-          [error]="fieldError('subject')"
-          formControlName="subject"
-        />
-
-        <ui-textarea
-          controlId="contact-message"
-          label="Message"
-          i18n-label="@@contact.field.message.label"
-          [required]="true"
-          [rows]="7"
-          [maxlength]="5000"
-          [error]="fieldError('message')"
-          formControlName="message"
-        />
-
-        <div class="grid gap-2">
-          @if (turnstileSiteKey(); as siteKey) {
-            <ngx-turnstile
-              #turnstile
-              [siteKey]="siteKey"
-              action="contact"
-              theme="auto"
-              size="flexible"
-              [tabIndex]="0"
-              [responseField]="false"
-              (resolved)="onTurnstileResolved($event)"
-              (errored)="onTurnstileProblem()"
-              (timeout)="onTurnstileProblem()"
-              (unsupported)="onTurnstileProblem()"
+      } @else {
+        <form
+          class="grid gap-5"
+          [formGroup]="form"
+          [attr.aria-describedby]="submissionState() === 'error' ? 'contact-form-error' : null"
+          (ngSubmit)="submit()"
+        >
+          <div class="grid gap-4 md:grid-cols-2">
+            <ui-input
+              controlId="contact-full-name"
+              label="Full name"
+              i18n-label="@@contact.field.fullName.label"
+              autocomplete="name"
+              [required]="true"
+              [error]="fieldError('fullName')"
+              formControlName="fullName"
             />
-          } @else {
-            <p class="text-error text-sm" role="alert" i18n="@@contact.verificationUnavailable">
-              Contact verification is not configured.
+            <ui-input
+              controlId="contact-email"
+              label="Email"
+              i18n-label="@@contact.field.email.label"
+              type="email"
+              autocomplete="email"
+              [required]="true"
+              [error]="fieldError('email')"
+              formControlName="email"
+            />
+          </div>
+
+          <ui-input
+            controlId="contact-organization"
+            label="Organization"
+            i18n-label="@@contact.field.organization.label"
+            autocomplete="organization"
+            [error]="fieldError('organization')"
+            formControlName="organization"
+          />
+
+          <ui-input
+            controlId="contact-subject"
+            label="Subject"
+            i18n-label="@@contact.field.subject.label"
+            [required]="true"
+            [error]="fieldError('subject')"
+            formControlName="subject"
+          />
+
+          <ui-textarea
+            controlId="contact-message"
+            label="Message"
+            i18n-label="@@contact.field.message.label"
+            [required]="true"
+            [rows]="7"
+            [maxlength]="5000"
+            [error]="fieldError('message')"
+            formControlName="message"
+          />
+
+          <div class="grid gap-2">
+            @if (turnstileSiteKey(); as siteKey) {
+              <ngx-turnstile
+                #turnstile
+                [siteKey]="siteKey"
+                action="contact"
+                theme="auto"
+                size="flexible"
+                [tabIndex]="0"
+                [responseField]="false"
+                (resolved)="onTurnstileResolved($event)"
+                (errored)="onTurnstileProblem()"
+                (timeout)="onTurnstileProblem()"
+                (unsupported)="onTurnstileProblem()"
+              />
+            } @else {
+              <p class="text-error text-sm" role="alert" i18n="@@contact.verificationUnavailable">
+                Contact verification is not configured.
+              </p>
+            }
+          </div>
+
+          @if (submissionState() === 'error') {
+            <p
+              #errorBanner
+              id="contact-form-error"
+              tabindex="-1"
+              role="alert"
+              class="border-error text-error rounded-md border px-4 py-3 text-sm focus:outline-none"
+            >
+              {{ submitErrorMessage() }}
             </p>
           }
-        </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <button uiButton type="submit" [disabled]="submissionState() === 'submitting'">
-            {{ submitLabel() }}
-          </button>
-          <p class="text-text-muted text-sm" aria-live="polite">{{ statusMessage() }}</p>
-        </div>
-      </form>
+          <div class="flex flex-wrap items-center gap-3">
+            <button uiButton type="submit" [disabled]="submissionState() === 'submitting'">
+              {{ submitLabel() }}
+            </button>
+            <p class="text-text-muted text-sm" aria-live="polite">{{ helperMessage() }}</p>
+          </div>
+        </form>
+      }
     </ui-card>
 
     <web-basic-info-card [profile]="content.profileValue()" />

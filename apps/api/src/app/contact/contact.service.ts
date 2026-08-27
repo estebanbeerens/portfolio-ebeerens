@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { Prisma } from '../../generated/prisma/client';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
+import { UpdateContactMessageDto } from './dto/update-contact-message.dto';
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const CONTACT_TURNSTILE_ACTION = 'contact';
@@ -26,6 +28,20 @@ export class ContactService {
 
   async remove(id: string) {
     await this.prisma.contactMessage.delete({ where: { id } });
+  }
+
+  async update(id: string, dto: UpdateContactMessageDto) {
+    try {
+      return await this.prisma.contactMessage.update({
+        where: { id },
+        data: { isRead: dto.isRead },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new NotFoundException(`Contact message "${id}" not found`);
+      }
+      throw error;
+    }
   }
 
   async create(dto: CreateContactMessageDto) {

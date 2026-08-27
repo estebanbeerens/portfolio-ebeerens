@@ -102,6 +102,7 @@ model ContactMessage {
   organization String?
   subject      String
   message      String
+  isRead       Boolean  @default(false)
   createdAt    DateTime @default(now())
 }
 
@@ -109,7 +110,7 @@ enum FeatureFlagKey {
   CONTACT
   PROJECTS
   ROLES
-  SKILLS
+  RESUME
 }
 
 model FeatureFlag {

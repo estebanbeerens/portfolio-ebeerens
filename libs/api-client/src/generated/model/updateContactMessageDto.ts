@@ -8,16 +8,9 @@
  * Do not edit the class manually.
  */
 
-export interface ContactMessageDto {
+export interface UpdateContactMessageDto {
   /**
-   * Unique identifier of the message
+   * Whether the message has been read
    */
-  id: string;
-  fullName: string;
-  email: string;
-  organization?: string;
-  subject: string;
-  message: string;
   isRead: boolean;
-  createdAt: string;
 }

@@ -36,6 +36,11 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./projects/projects.component').then((m) => m.Projects),
       },
       {
+        path: 'messages',
+        title: 'Messages',
+        loadComponent: () => import('./messages/messages.component').then((m) => m.Messages),
+      },
+      {
         path: 'feature-flags',
         title: 'Feature Flags',
         loadComponent: () => import('./feature-flags/feature-flags.component').then((m) => m.FeatureFlags),
