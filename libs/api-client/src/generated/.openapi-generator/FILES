@@ -43,6 +43,7 @@ model/resumeDto.ts
 model/resumeUploadUrlDto.ts
 model/roleDto.ts
 model/skillDto.ts
+model/updateContactMessageDto.ts
 model/updateFeatureFlagDto.ts
 model/updateOrganizationDto.ts
 model/updateProfileDto.ts

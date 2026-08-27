@@ -1,0 +1,42 @@
+<ui-card class="min-w-0 flex-1 xl:sticky xl:top-6 xl:max-h-[calc(100dvh-14.5rem)]" heading="Inbox" density="compact">
+  <div class="scrollbar-subtle -mr-2 min-h-0 flex-1 overflow-y-auto pr-2">
+    @if (loading()) {
+      <p class="text-text-muted" aria-live="polite">Loading messages...</p>
+    } @else if (error(); as message) {
+      <div class="border-error/40 bg-error/10 rounded border p-4" role="alert">
+        <p>{{ message }}</p>
+        <button type="button" class="text-accent mt-3 underline" (click)="retry.emit()">Try again</button>
+      </div>
+    } @else if (messages().length === 0) {
+      <div class="border-border rounded border border-dashed p-8 text-center">
+        <p class="text-text-muted">No messages yet.</p>
+      </div>
+    } @else {
+      <ul class="flex flex-col gap-2" aria-label="Messages">
+        @for (item of messages(); track item.id) {
+          <li>
+            <button
+              type="button"
+              class="focus-visible:outline-accent hover:bg-glass flex w-full flex-col gap-1 rounded-md border px-4 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+              [class.border-border-subtle]="item.id === selectedId()"
+              [class.bg-glass-active]="item.id === selectedId()"
+              [class.border-transparent]="item.id !== selectedId()"
+              (click)="messageSelected.emit(item.id)"
+            >
+              <span class="flex items-center justify-between gap-2">
+                <span [class.font-semibold]="!item.isRead" class="min-w-0 truncate">{{ item.fullName }}</span>
+                @if (!item.isRead) {
+                  <span class="bg-accent inline-block size-2 shrink-0 rounded-full" aria-hidden="true"></span>
+                  <span class="sr-only">Unread</span>
+                }
+              </span>
+              <span [class.font-semibold]="!item.isRead" class="truncate text-sm">{{ item.subject }}</span>
+              <span class="text-text-muted truncate text-sm">{{ preview(item.message) }}</span>
+              <span class="text-text-muted text-xs">{{ item.createdAt | date: 'MMM d, y' }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</ui-card>

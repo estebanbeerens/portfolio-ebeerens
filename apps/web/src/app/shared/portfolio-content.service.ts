@@ -50,7 +50,7 @@ export class PortfolioContentService {
   readonly rolesEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Roles));
   readonly projectsEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Projects));
   readonly contactEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Contact));
-  readonly skillsEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Skills));
+  readonly resumeEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Resume));
 
   readonly loadError = computed(() =>
     this.portfolio.error() ? 'Portfolio content could not be loaded. Try refreshing the page.' : undefined

@@ -170,9 +170,13 @@
         <source>Sending your message...</source>
         <target>Je bericht wordt verzonden...</target>
       </trans-unit>
-      <trans-unit id="contact.status.success" datatype="html">
-        <source>Your message was sent.</source>
-        <target>Je bericht is verzonden.</target>
+      <trans-unit id="contact.success.heading" datatype="html">
+        <source> Message sent </source>
+        <target> Bericht verzonden </target>
+      </trans-unit>
+      <trans-unit id="contact.success.body" datatype="html">
+        <source> Thanks for reaching out. I’ll get back to you as soon as I can. </source>
+        <target> Bedankt voor je bericht. Ik neem zo snel mogelijk contact met je op. </target>
       </trans-unit>
       <trans-unit id="contact.status.error" datatype="html">
         <source>Something went wrong. Please try again.</source>

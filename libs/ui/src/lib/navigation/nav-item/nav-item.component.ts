@@ -18,6 +18,7 @@ import { LucideDynamicIcon, type LucideIconInput } from '@lucide/angular';
 export class NavItem {
   readonly icon = input.required<LucideIconInput>();
   readonly active = input(false);
+  readonly badge = input<number | undefined>();
 
   protected readonly hostClass = computed(() =>
     [

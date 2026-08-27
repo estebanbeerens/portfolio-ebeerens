@@ -11,7 +11,7 @@ const FEATURE_FLAG_LABELS: Record<FeatureFlagKey, string> = {
   CONTACT: 'Contact',
   PROJECTS: 'Projects',
   ROLES: 'Roles',
-  SKILLS: 'Skills',
+  RESUME: 'Resume',
 };
 
 @Component({

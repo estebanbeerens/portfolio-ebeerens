@@ -1,0 +1,26 @@
+@if (message(); as message) {
+  <div
+    class="bg-overlay/60 fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 starting:opacity-0"
+    role="presentation"
+    (click)="dismiss.emit()"
+  >
+    <div
+      class="bg-surface border-border w-full max-w-md rounded border p-6 shadow-xl transition-all duration-200 starting:scale-95 starting:opacity-0"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-message-title"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keydown.escape)="dismiss.emit()"
+    >
+      <h2 id="delete-message-title" class="text-lg font-semibold">Delete message from {{ message.fullName }}?</h2>
+      <p class="text-text-muted mt-2">This action cannot be undone.</p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button uiButton variant="outlined" type="button" (click)="dismiss.emit()">Cancel</button>
+        <button uiButton variant="filled" tone="danger" type="button" [disabled]="deleting()" (click)="confirm.emit()">
+          {{ deleting() ? 'Deleting...' : 'Delete message' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

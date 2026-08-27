@@ -22,7 +22,7 @@ describe('App', () => {
                   { key: FeatureFlagDto.KeyEnum.Contact, enabled: false, updatedAt: '2026-01-01' },
                   { key: FeatureFlagDto.KeyEnum.Projects, enabled: false, updatedAt: '2026-01-01' },
                   { key: FeatureFlagDto.KeyEnum.Roles, enabled: false, updatedAt: '2026-01-01' },
-                  { key: FeatureFlagDto.KeyEnum.Skills, enabled: false, updatedAt: '2026-01-01' },
+                  { key: FeatureFlagDto.KeyEnum.Resume, enabled: false, updatedAt: '2026-01-01' },
                 ],
               }),
           },

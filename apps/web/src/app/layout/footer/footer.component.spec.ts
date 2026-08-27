@@ -1,11 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { PortfolioContentService } from '../../shared/portfolio-content.service';
 import { axe } from 'vitest-axe';
 import { Footer } from './footer.component';
 
 describe('Footer', () => {
+  const providers = [
+    provideRouter([]),
+    { provide: PortfolioContentService, useValue: { resumeEnabled: signal(true) } },
+  ];
+
   it('renders all social links provided by the profile, including Instagram and YouTube', async () => {
-    await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [Footer], providers }).compileComponents();
 
     const fixture = TestBed.createComponent(Footer);
     fixture.componentRef.setInput('profile', {
@@ -26,7 +33,7 @@ describe('Footer', () => {
   });
 
   it('omits social links that are not provided', async () => {
-    await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [Footer], providers }).compileComponents();
 
     const fixture = TestBed.createComponent(Footer);
     fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });
@@ -38,7 +45,7 @@ describe('Footer', () => {
   });
 
   it('has no accessibility violations', async () => {
-    await TestBed.configureTestingModule({ imports: [Footer], providers: [provideRouter([])] }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [Footer], providers }).compileComponents();
 
     const fixture = TestBed.createComponent(Footer);
     fixture.componentRef.setInput('profile', { id: 'profile-1', name: 'John Beerens', updatedAt: '2026-01-01' });

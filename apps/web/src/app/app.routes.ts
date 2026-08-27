@@ -1,4 +1,6 @@
+import { inject } from '@angular/core';
 import { Route } from '@angular/router';
+import { PortfolioContentService } from './shared/portfolio-content.service';
 
 export const appRoutes: Route[] = [
   {
@@ -9,6 +11,7 @@ export const appRoutes: Route[] = [
   {
     path: 'resume',
     title: 'Resume',
+    canMatch: [() => inject(PortfolioContentService).resumeEnabled()],
     loadComponent: () => import('./pages/resume/resume-page.component').then((component) => component.ResumePage),
   },
   {

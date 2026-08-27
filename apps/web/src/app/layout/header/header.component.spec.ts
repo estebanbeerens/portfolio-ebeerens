@@ -9,7 +9,7 @@ const allFlagsEnabled = [
   { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
   { key: FeatureFlagDto.KeyEnum.Projects, enabled: true, updatedAt: '2026-01-01' },
   { key: FeatureFlagDto.KeyEnum.Contact, enabled: true, updatedAt: '2026-01-01' },
-  { key: FeatureFlagDto.KeyEnum.Skills, enabled: true, updatedAt: '2026-01-01' },
+  { key: FeatureFlagDto.KeyEnum.Resume, enabled: true, updatedAt: '2026-01-01' },
 ];
 
 function configure(flags: Partial<FeatureFlagDto>[] = allFlagsEnabled) {
@@ -44,7 +44,10 @@ describe('Header', () => {
   });
 
   it('hides gated nav links when their feature flag is disabled', async () => {
-    await configure([{ key: FeatureFlagDto.KeyEnum.Roles, enabled: false, updatedAt: '2026-01-01' }]);
+    await configure([
+      { key: FeatureFlagDto.KeyEnum.Roles, enabled: false, updatedAt: '2026-01-01' },
+      { key: FeatureFlagDto.KeyEnum.Resume, enabled: false, updatedAt: '2026-01-01' },
+    ]);
 
     const fixture = TestBed.createComponent(Header);
     await fixture.whenStable();

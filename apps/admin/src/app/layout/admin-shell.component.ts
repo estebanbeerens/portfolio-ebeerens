@@ -5,6 +5,7 @@ import { AmbientBackdrop, NavItem, Sidenav, Toast, ThemeToggle, UserBadge } from
 import { LucideDynamicIcon, LucideLogOut, LucideMenu } from '@lucide/angular';
 import { filter, map } from 'rxjs';
 import { SessionService } from '../auth/session.service';
+import { ContactMessagesService } from '../messages/contact-messages.service';
 import { ADMIN_NAV } from './nav.config';
 
 @Component({
@@ -26,8 +27,13 @@ import { ADMIN_NAV } from './nav.config';
 export class AdminShell {
   private readonly router = inject(Router);
   private readonly session = inject(SessionService);
+  private readonly contactMessages = inject(ContactMessagesService);
 
-  protected readonly navItems = ADMIN_NAV;
+  protected readonly navItems = computed(() =>
+    ADMIN_NAV.map((item) =>
+      item.route === '/messages' ? { ...item, badge: this.contactMessages.unreadCount() } : item
+    )
+  );
   protected readonly menuIcon = LucideMenu;
   protected readonly logoutIcon = LucideLogOut;
   protected readonly navOpen = signal(false);

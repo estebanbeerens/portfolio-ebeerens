@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -11,6 +12,7 @@ import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { ContactService } from './contact.service';
 import { ContactMessageDto } from './dto/contact-message.dto';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
+import { UpdateContactMessageDto } from './dto/update-contact-message.dto';
 
 @ApiTags('contact')
 @Controller('contact')
@@ -45,5 +47,17 @@ export class ContactController {
   @ApiUnauthorizedResponse({ description: 'No valid session' })
   remove(@Param('id') id: string) {
     return this.contactService.remove(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(SessionAuthGuard)
+  @ApiOkResponse({
+    description: 'The message was updated',
+    type: ContactMessageDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  @ApiNotFoundResponse({ description: 'The message was not found' })
+  update(@Param('id') id: string, @Body() dto: UpdateContactMessageDto) {
+    return this.contactService.update(id, dto);
   }
 }

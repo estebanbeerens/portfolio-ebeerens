@@ -1,6 +1,16 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal, viewChild } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  PLATFORM_ID,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -30,15 +40,28 @@ export class ContactPage {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   protected readonly content = inject(PortfolioContentService);
 
-  constructor() {
-    const meta = inject(Meta);
-    meta.updateTag({ name: 'description', content: 'Get in touch about a project or collaboration.' });
-  }
-
   private readonly turnstile = viewChild<{ reset: () => void }>('turnstile');
   protected readonly turnstileToken = signal<string | undefined>(undefined);
   protected readonly submissionState = signal<SubmissionState>('idle');
   protected readonly submittedInvalid = signal(false);
+  protected readonly submitErrorMessage = signal<string | undefined>(undefined);
+
+  private readonly successPanel = viewChild<ElementRef<HTMLElement>>('successPanel');
+  private readonly errorBanner = viewChild<ElementRef<HTMLElement>>('errorBanner');
+
+  constructor() {
+    const meta = inject(Meta);
+    meta.updateTag({ name: 'description', content: 'Get in touch about a project or collaboration.' });
+
+    effect(() => {
+      const state = this.submissionState();
+      if (state === 'success') {
+        this.successPanel()?.nativeElement.focus();
+      } else if (state === 'error') {
+        this.errorBanner()?.nativeElement.focus();
+      }
+    });
+  }
 
   protected readonly form = this.formBuilder.nonNullable.group({
     fullName: ['', [Validators.required, Validators.maxLength(200)]],
@@ -59,18 +82,12 @@ export class ContactPage {
       ? $localize`:@@contact.form.submitting:Sending...`
       : $localize`:@@contact.form.submit:Send message`
   );
-  protected readonly statusMessage = computed(() => {
+  protected readonly helperMessage = computed(() => {
     if (!this.turnstileSiteKey()) {
       return $localize`:@@contact.status.verificationUnavailable:Verification is unavailable right now.`;
     }
     if (this.submissionState() === 'submitting') {
       return $localize`:@@contact.status.sending:Sending your message...`;
-    }
-    if (this.submissionState() === 'success') {
-      return $localize`:@@contact.status.success:Your message was sent.`;
-    }
-    if (this.submissionState() === 'error') {
-      return $localize`:@@contact.status.error:Something went wrong. Please try again.`;
     }
     if (this.submittedInvalid() && this.form.invalid) {
       return $localize`:@@contact.status.invalid:Complete the required fields before sending.`;
@@ -96,17 +113,14 @@ export class ContactPage {
 
   protected onTurnstileResolved(token: string | null): void {
     this.turnstileToken.set(token || undefined);
-    if (!token && this.submissionState() !== 'submitting') {
-      this.submissionState.set('idle');
-    }
   }
 
   protected onTurnstileProblem(): void {
+    // Resetting the widget after success/error also re-fires this callback; token is already cleared there.
     this.turnstileToken.set(undefined);
-    if (this.submissionState() !== 'submitting') {
-      this.submissionState.set('idle');
-    }
   }
+
+  private readonly genericErrorMessage = $localize`:@@contact.status.error:Something went wrong. Please try again.`;
 
   protected submit(): void {
     this.form.markAllAsTouched();
@@ -138,11 +152,15 @@ export class ContactPage {
       .subscribe({
         next: () => {
           this.submissionState.set('success');
-          this.form.reset();
           this.turnstileToken.set(undefined);
           this.turnstile()?.reset();
         },
-        error: () => {
+        error: (error: unknown) => {
+          this.submitErrorMessage.set(
+            error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+              ? error.error.message
+              : this.genericErrorMessage
+          );
           this.submissionState.set('error');
           this.turnstileToken.set(undefined);
           this.turnstile()?.reset();

@@ -22,6 +22,9 @@ export class ContactMessageDto {
   @ApiProperty({ example: "Hi, I'd like to discuss a project with you." })
   message: string;
 
+  @ApiProperty({ example: false })
+  isRead: boolean;
+
   @ApiProperty({ example: '2026-08-17T12:00:00.000Z' })
   createdAt: Date;
 }

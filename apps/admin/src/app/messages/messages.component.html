@@ -1,0 +1,22 @@
+<ui-page-header title="Messages" subtitle="Contact form submissions." />
+
+<div class="flex flex-col gap-6 transition-all duration-300 xl:flex-row">
+  <admin-message-list
+    [messages]="list()"
+    [selectedId]="selectedId()"
+    [loading]="isLoading()"
+    [error]="requestError()"
+    (messageSelected)="select($event)"
+    (retry)="retry()"
+  />
+
+  <admin-message-detail [message]="selected()" (toggleRead)="toggleRead()" (delete)="askToDelete()" />
+</div>
+
+<admin-message-delete-dialog
+  class="contents"
+  [message]="pendingDelete()"
+  [deleting]="isDeleting()"
+  (confirm)="confirmDelete()"
+  (dismiss)="cancelDelete()"
+/>
