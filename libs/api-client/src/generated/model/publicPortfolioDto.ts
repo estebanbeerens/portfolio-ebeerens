@@ -7,21 +7,21 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ProjectDto } from './projectDto';
-import { RoleDto } from './roleDto';
+import { PublicProjectDto } from './publicProjectDto';
 import { FeatureFlagDto } from './featureFlagDto';
-import { ProfileDto } from './profileDto';
+import { PublicRoleDto } from './publicRoleDto';
+import { PublicProfileDto } from './publicProfileDto';
 
 export interface PublicPortfolioDto {
-  profile?: ProfileDto;
+  profile?: PublicProfileDto;
   /**
    * Public professional roles
    */
-  roles: Array<RoleDto>;
+  roles: Array<PublicRoleDto>;
   /**
    * Public portfolio projects
    */
-  projects: Array<ProjectDto>;
+  projects: Array<PublicProjectDto>;
   /**
    * Feature flags controlling public sections
    */

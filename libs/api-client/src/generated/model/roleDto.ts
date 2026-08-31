@@ -21,13 +21,13 @@ export interface RoleDto {
    */
   organization: OrganizationDto;
   /**
-   * Markdown source describing responsibilities and achievements in this role
+   * Markdown source describing responsibilities and achievements in this role (English)
    */
-  description?: string;
+  descriptionEn?: string;
   /**
-   * Sanitized HTML rendered from `description`; only populated on the public portfolio response
+   * Markdown source describing responsibilities and achievements in this role (Dutch)
    */
-  descriptionHtml?: string;
+  descriptionNl?: string;
   location?: string;
   employmentType?: RoleDto.EmploymentTypeEnum;
   /**

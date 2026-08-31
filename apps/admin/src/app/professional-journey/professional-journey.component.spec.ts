@@ -146,7 +146,7 @@ describe('ProfessionalJourney', () => {
 
     expect(createOrganization).not.toHaveBeenCalled();
     expect(createRole).toHaveBeenCalledWith(
-      expect.objectContaining({ organizationId: 'org-1', description: 'Built **accessible** interfaces.' })
+      expect.objectContaining({ organizationId: 'org-1', descriptionEn: 'Built **accessible** interfaces.' })
     );
   });
 
@@ -162,7 +162,9 @@ describe('ProfessionalJourney', () => {
     ).click();
     fixture.detectChanges();
 
-    const tabs = fixture.nativeElement.querySelectorAll('[role="tab"]') as NodeListOf<HTMLButtonElement>;
+    const tabs = fixture.nativeElement.querySelectorAll(
+      '[aria-label="Role description editor"] [role="tab"]'
+    ) as NodeListOf<HTMLButtonElement>;
     expect(tabs[0].getAttribute('aria-selected')).toBe('true');
     tabs[1].click();
     await fixture.whenStable();

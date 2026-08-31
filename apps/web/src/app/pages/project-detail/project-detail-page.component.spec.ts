@@ -1,12 +1,12 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
+import { ProjectsService, PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { Observable, of } from 'rxjs';
 import { PortfolioContentService } from '../../shared/portfolio-content.service';
 import { ProjectDetailPage } from './project-detail-page.component';
 
-const project: ProjectDto = {
+const project: PublicProjectDto = {
   id: 'project-1',
   title: 'Aether Dashboard',
   slug: 'aether-dashboard',
@@ -20,7 +20,7 @@ const project: ProjectDto = {
   updatedAt: '2026-01-01',
 };
 
-const relatedProject: ProjectDto = {
+const relatedProject: PublicProjectDto = {
   id: 'project-2',
   title: 'Vertex Portfolio CMS',
   slug: 'vertex-portfolio-cms',
@@ -36,8 +36,8 @@ const relatedProject: ProjectDto = {
 describe('ProjectDetailPage', () => {
   function configure(options: {
     slug: string;
-    projectBySlug: () => ProjectDto | undefined;
-    findRelated?: () => Observable<ProjectDto[]>;
+    projectBySlug: () => PublicProjectDto | undefined;
+    findRelated?: () => Observable<PublicProjectDto[]>;
   }) {
     return TestBed.configureTestingModule({
       imports: [ProjectDetailPage],

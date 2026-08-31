@@ -16,12 +16,20 @@ export class CreateRoleDto {
   organizationId: string;
 
   @ApiPropertyOptional({
-    description: 'Markdown source describing responsibilities and achievements in this role',
+    description: 'Markdown source describing responsibilities and achievements in this role (English)',
     example: 'Built **accessible** Angular interfaces and mentored frontend engineers.',
   })
   @IsOptional()
   @IsString()
-  description?: string;
+  descriptionEn?: string;
+
+  @ApiPropertyOptional({
+    description: 'Markdown source describing responsibilities and achievements in this role (Dutch)',
+    example: 'Bouwde **toegankelijke** Angular interfaces en begeleidde frontend engineers.',
+  })
+  @IsOptional()
+  @IsString()
+  descriptionNl?: string;
 
   @ApiPropertyOptional({ example: 'Amsterdam, Netherlands' })
   @IsOptional()

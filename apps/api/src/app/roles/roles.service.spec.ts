@@ -19,7 +19,8 @@ describe('RolesService', () => {
     jobTitle: 'Engineer',
     organizationId: 'org-1',
     organization,
-    description: null,
+    descriptionEn: null,
+    descriptionNl: null,
     location: null,
     employmentType: null,
     startDate: new Date('2024-01-15T00:00:00.000Z'),
@@ -66,7 +67,9 @@ describe('RolesService', () => {
     const { service, prisma } = await build();
     prisma.role.findMany.mockResolvedValue([role]);
 
-    await expect(service.findAll()).resolves.toEqual([expect.not.objectContaining({ description: expect.anything() })]);
+    await expect(service.findAll()).resolves.toEqual([
+      expect.not.objectContaining({ descriptionEn: expect.anything(), descriptionNl: expect.anything() }),
+    ]);
     expect(prisma.role.findMany).toHaveBeenCalledWith({
       orderBy: { startDate: 'desc' },
       include: { organization: true, skills: true },
@@ -106,7 +109,7 @@ describe('RolesService', () => {
 
   it('persists a Markdown description and omits an absent database description from responses', async () => {
     const { service, prisma } = await build();
-    prisma.role.create.mockResolvedValue({ ...role, description: '**Built** accessible interfaces.' });
+    prisma.role.create.mockResolvedValue({ ...role, descriptionEn: '**Built** accessible interfaces.' });
     prisma.role.findMany.mockResolvedValue([role]);
 
     await expect(
@@ -114,14 +117,16 @@ describe('RolesService', () => {
         jobTitle: 'Engineer',
         organizationId: 'org-1',
         startDate: '2024-01-15',
-        description: '**Built** accessible interfaces.',
+        descriptionEn: '**Built** accessible interfaces.',
       })
-    ).resolves.toEqual(expect.objectContaining({ description: '**Built** accessible interfaces.' }));
+    ).resolves.toEqual(expect.objectContaining({ descriptionEn: '**Built** accessible interfaces.' }));
     expect(prisma.role.create).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ description: '**Built** accessible interfaces.' }) })
+      expect.objectContaining({ data: expect.objectContaining({ descriptionEn: '**Built** accessible interfaces.' }) })
     );
 
-    await expect(service.findAll()).resolves.toEqual([expect.not.objectContaining({ description: expect.anything() })]);
+    await expect(service.findAll()).resolves.toEqual([
+      expect.not.objectContaining({ descriptionEn: expect.anything(), descriptionNl: expect.anything() }),
+    ]);
   });
 
   it('maps a missing organization on create to NotFoundException', async () => {
@@ -157,7 +162,8 @@ describe('RolesService', () => {
     expect(prisma.role.update).toHaveBeenCalledWith({
       where: { id: 'role-1' },
       data: {
-        description: null,
+        descriptionEn: null,
+        descriptionNl: null,
         location: null,
         employmentType: null,
         startDate: undefined,
@@ -173,13 +179,13 @@ describe('RolesService', () => {
   it('updates a role description when supplied', async () => {
     const { service, prisma } = await build();
     prisma.role.findUnique.mockResolvedValue(role);
-    prisma.role.update.mockResolvedValue({ ...role, description: 'Led the **frontend** practice.' });
+    prisma.role.update.mockResolvedValue({ ...role, descriptionEn: 'Led the **frontend** practice.' });
 
-    await expect(service.update('role-1', { description: 'Led the **frontend** practice.' })).resolves.toEqual(
-      expect.objectContaining({ description: 'Led the **frontend** practice.' })
+    await expect(service.update('role-1', { descriptionEn: 'Led the **frontend** practice.' })).resolves.toEqual(
+      expect.objectContaining({ descriptionEn: 'Led the **frontend** practice.' })
     );
     expect(prisma.role.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ description: 'Led the **frontend** practice.' }) })
+      expect.objectContaining({ data: expect.objectContaining({ descriptionEn: 'Led the **frontend** practice.' }) })
     );
   });
 

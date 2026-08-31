@@ -62,7 +62,13 @@ paths:
   /api/profile/public-portfolio:
     get:
       operationId: ProfileController_getPublicPortfolio
-      parameters: []
+      parameters:
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
       responses:
         '200':
           description: All public portfolio content for the initial view
@@ -142,6 +148,12 @@ paths:
           description: Max related projects to return (default 3)
           schema:
             type: number
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
       responses:
         '200':
           description: Other projects related by shared skills
@@ -150,7 +162,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProjectDto'
+                  $ref: '#/components/schemas/PublicProjectDto'
         '404':
           description: No project with this id exists
       tags: *ref_2
@@ -696,14 +708,12 @@ components:
           type: string
           description: Short professional headline
           example: Full-stack developer
-        bio:
+        bioEn:
           type: string
-          description: Markdown source for the biography, as authored in admin
-        bioHtml:
+          description: Markdown source for the biography, as authored in admin (English)
+        bioNl:
           type: string
-          description: >-
-            Sanitized HTML rendered from `bio`; only populated on the public
-            portfolio response
+          description: Markdown source for the biography, as authored in admin (Dutch)
         avatarUrl:
           type: string
           description: URL of the profile avatar image
@@ -737,6 +747,66 @@ components:
           type: string
           description: Timestamp of the last update
           example: '2026-08-14T12:00:00.000Z'
+      required:
+        - id
+        - name
+        - updatedAt
+    PublicProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the profile
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          description: Full name shown on the portfolio
+          example: Jane Doe
+        headline:
+          type: string
+          description: Short professional headline
+          example: Full-stack developer
+        avatarUrl:
+          type: string
+          description: URL of the profile avatar image
+          example: https://cdn.example.com/avatar.png
+        location:
+          type: string
+          description: Residence location shown on the portfolio
+          example: Amsterdam, Netherlands
+        linkedinUrl:
+          type: string
+          description: LinkedIn profile URL
+          example: https://www.linkedin.com/in/jane-doe
+        githubUrl:
+          type: string
+          description: GitHub profile URL
+          example: https://github.com/jane-doe
+        instagramUrl:
+          type: string
+          description: Instagram profile URL
+          example: https://www.instagram.com/jane-doe
+        xUrl:
+          type: string
+          description: X profile URL
+          example: https://x.com/jane-doe
+        youtubeUrl:
+          type: string
+          description: YouTube channel URL
+          example: https://www.youtube.com/@jane-doe
+        updatedAt:
+          format: date-time
+          type: string
+          description: Timestamp of the last update
+          example: '2026-08-14T12:00:00.000Z'
+        bio:
+          type: string
+          description: >-
+            Markdown source for the biography, resolved to the requested
+            language
+        bioHtml:
+          type: string
+          description: Sanitized HTML rendered from `bio`
       required:
         - id
         - name
@@ -783,7 +853,7 @@ components:
       required:
         - id
         - name
-    RoleDto:
+    PublicRoleDto:
       type: object
       properties:
         id:
@@ -797,25 +867,12 @@ components:
           description: The organization this role was held at
           allOf:
             - $ref: '#/components/schemas/OrganizationDto'
-        description:
-          type: string
-          description: >-
-            Markdown source describing responsibilities and achievements in this
-            role
-          example: >-
-            Built **accessible** Angular interfaces and mentored frontend
-            engineers.
-        descriptionHtml:
-          type: string
-          description: >-
-            Sanitized HTML rendered from `description`; only populated on the
-            public portfolio response
         location:
           type: string
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum:
+          enum: &ref_9
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -848,6 +905,14 @@ components:
           format: date-time
           type: string
           example: '2026-08-17T12:00:00.000Z'
+        description:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role, resolved to the requested language
+        descriptionHtml:
+          type: string
+          description: Sanitized HTML rendered from `description`
       required:
         - id
         - jobTitle
@@ -856,7 +921,7 @@ components:
         - skills
         - createdAt
         - updatedAt
-    ProjectDto:
+    PublicProjectDto:
       type: object
       properties:
         id:
@@ -870,23 +935,6 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
-        shortDescription:
-          type: string
-          description: Short summary shown alongside the project
-          example: A fast, accessible portfolio built with Angular and NestJS.
-          maxLength: 255
-        description:
-          type: string
-          description: Markdown source for the project description, as authored in admin
-          example: |-
-            ## Overview
-
-            Built with **Angular** and *NestJS*.
-        descriptionHtml:
-          type: string
-          description: >-
-            Sanitized HTML rendered from `description`; only populated on the
-            public portfolio response
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -922,16 +970,35 @@ components:
           format: date-time
           type: string
           example: '2026-08-14T12:00:00.000Z'
+        shortDescription:
+          type: string
+          description: >-
+            Short summary shown alongside the project, resolved to the requested
+            language
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
+        description:
+          type: string
+          description: >-
+            Markdown source for the project description, resolved to the
+            requested language
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
+        descriptionHtml:
+          type: string
+          description: Sanitized HTML rendered from `description`
       required:
         - id
         - title
         - slug
-        - shortDescription
-        - description
         - startDate
         - skills
         - createdAt
         - updatedAt
+        - shortDescription
+        - description
     FeatureFlagDto:
       type: object
       properties:
@@ -958,17 +1025,17 @@ components:
       type: object
       properties:
         profile:
-          $ref: '#/components/schemas/ProfileDto'
+          $ref: '#/components/schemas/PublicProfileDto'
         roles:
           description: Public professional roles
           type: array
           items:
-            $ref: '#/components/schemas/RoleDto'
+            $ref: '#/components/schemas/PublicRoleDto'
         projects:
           description: Public portfolio projects
           type: array
           items:
-            $ref: '#/components/schemas/ProjectDto'
+            $ref: '#/components/schemas/PublicProjectDto'
         featureFlags:
           description: Feature flags controlling public sections
           type: array
@@ -989,9 +1056,12 @@ components:
           type: string
           description: Short professional headline
           example: Full-stack developer
-        bio:
+        bioEn:
           type: string
-          description: Markdown source for the biography, as authored in admin
+          description: Markdown source for the biography, as authored in admin (English)
+        bioNl:
+          type: string
+          description: Markdown source for the biography, as authored in admin (Dutch)
         avatarUrl:
           type: string
           description: URL of the profile avatar image
@@ -1056,6 +1126,93 @@ components:
         - uploadUrl
         - objectKey
         - publicUrl
+    ProjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the project
+          example: cly1x8f9z0000abcd1234efgh
+        title:
+          type: string
+          example: Personal Portfolio
+        slug:
+          type: string
+          description: URL-safe unique identifier
+          example: personal-portfolio
+        shortDescriptionEn:
+          type: string
+          description: Short summary shown alongside the project (English)
+          example: A fast, accessible portfolio built with Angular and NestJS.
+          maxLength: 255
+        shortDescriptionNl:
+          type: string
+          description: Short summary shown alongside the project (Dutch)
+          example: Een snelle, toegankelijke portfolio gebouwd met Angular en NestJS.
+          maxLength: 255
+        descriptionEn:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (English)
+          example: |-
+            ## Overview
+
+            Built with **Angular** and *NestJS*.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (Dutch)
+          example: |-
+            ## Overzicht
+
+            Gebouwd met **Angular** en *NestJS*.
+        imageUrl:
+          type: string
+          example: https://cdn.example.com/projects/portfolio.png
+        client:
+          type: string
+          example: Acme Corp
+        jobRole:
+          type: string
+          example: Lead Frontend Engineer
+        liveUrl:
+          type: string
+          example: https://portfolio.example.com
+        startDate:
+          format: date-time
+          type: string
+          description: When work on the project started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When work on the project ended — absent means still ongoing
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used on this project
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-14T12:00:00.000Z'
+      required:
+        - id
+        - title
+        - slug
+        - shortDescriptionEn
+        - descriptionEn
+        - startDate
+        - skills
+        - createdAt
+        - updatedAt
     CreateProjectDto:
       type: object
       properties:
@@ -1066,18 +1223,34 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
-        shortDescription:
+        shortDescriptionEn:
           type: string
-          description: Short summary shown alongside the project
+          description: Short summary shown alongside the project (English)
           example: A fast, accessible portfolio built with Angular and NestJS.
           maxLength: 255
-        description:
+        shortDescriptionNl:
           type: string
-          description: Markdown source for the project description, as authored in admin
+          description: Short summary shown alongside the project (Dutch)
+          example: Een snelle, toegankelijke portfolio gebouwd met Angular en NestJS.
+          maxLength: 255
+        descriptionEn:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (English)
           example: |-
             ## Overview
 
             Built with **Angular** and *NestJS*.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (Dutch)
+          example: |-
+            ## Overzicht
+
+            Gebouwd met **Angular** en *NestJS*.
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -1118,8 +1291,8 @@ components:
       required:
         - title
         - slug
-        - shortDescription
-        - description
+        - shortDescriptionEn
+        - descriptionEn
         - startDate
     UpdateProjectDto:
       type: object
@@ -1131,18 +1304,34 @@ components:
           type: string
           description: URL-safe unique identifier
           example: personal-portfolio
-        shortDescription:
+        shortDescriptionEn:
           type: string
-          description: Short summary shown alongside the project
+          description: Short summary shown alongside the project (English)
           example: A fast, accessible portfolio built with Angular and NestJS.
           maxLength: 255
-        description:
+        shortDescriptionNl:
           type: string
-          description: Markdown source for the project description, as authored in admin
+          description: Short summary shown alongside the project (Dutch)
+          example: Een snelle, toegankelijke portfolio gebouwd met Angular en NestJS.
+          maxLength: 255
+        descriptionEn:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (English)
           example: |-
             ## Overview
 
             Built with **Angular** and *NestJS*.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source for the project description, as authored in admin
+            (Dutch)
+          example: |-
+            ## Overzicht
+
+            Gebouwd met **Angular** en *NestJS*.
         imageUrl:
           type: string
           example: https://cdn.example.com/projects/portfolio.png
@@ -1249,6 +1438,74 @@ components:
         website:
           type: string
           example: https://acme.example.com
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the role
+          example: cly1x8f9z0000abcd1234efgh
+        jobTitle:
+          type: string
+          example: Senior Frontend Engineer
+        organization:
+          description: The organization this role was held at
+          allOf:
+            - $ref: '#/components/schemas/OrganizationDto'
+        descriptionEn:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role (English)
+          example: >-
+            Built **accessible** Angular interfaces and mentored frontend
+            engineers.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role (Dutch)
+          example: >-
+            Bouwde **toegankelijke** Angular interfaces en begeleidde frontend
+            engineers.
+        location:
+          type: string
+          example: Amsterdam, Netherlands
+        employmentType:
+          type: string
+          enum: *ref_9
+          example: FULL_TIME
+        startDate:
+          format: date-time
+          type: string
+          description: When this role started
+          example: '2024-01-15T00:00:00.000Z'
+        endDate:
+          format: date-time
+          type: string
+          description: When this role ended — absent means still current
+          example: '2024-06-30T00:00:00.000Z'
+        skills:
+          description: Skills used in this role
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-08-17T12:00:00.000Z'
+      required:
+        - id
+        - jobTitle
+        - organization
+        - startDate
+        - skills
+        - createdAt
+        - updatedAt
     CreateRoleDto:
       type: object
       properties:
@@ -1259,20 +1516,28 @@ components:
           type: string
           description: Id of the organization this role was held at
           example: cly1x8f9z0000abcd1234efgh
-        description:
+        descriptionEn:
           type: string
           description: >-
             Markdown source describing responsibilities and achievements in this
-            role
+            role (English)
           example: >-
             Built **accessible** Angular interfaces and mentored frontend
+            engineers.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role (Dutch)
+          example: >-
+            Bouwde **toegankelijke** Angular interfaces en begeleidde frontend
             engineers.
         location:
           type: string
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_9
+          enum: &ref_10
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -1294,7 +1559,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: &ref_10
+          example: &ref_11
             - Angular
             - NestJS
             - Figma
@@ -1315,20 +1580,28 @@ components:
           type: string
           description: Id of the organization this role was held at
           example: cly1x8f9z0000abcd1234efgh
-        description:
+        descriptionEn:
           type: string
           description: >-
             Markdown source describing responsibilities and achievements in this
-            role
+            role (English)
           example: >-
             Built **accessible** Angular interfaces and mentored frontend
+            engineers.
+        descriptionNl:
+          type: string
+          description: >-
+            Markdown source describing responsibilities and achievements in this
+            role (Dutch)
+          example: >-
+            Bouwde **toegankelijke** Angular interfaces en begeleidde frontend
             engineers.
         location:
           type: string
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_9
+          enum: *ref_10
           example: FULL_TIME
         startDate:
           type: string
@@ -1342,7 +1615,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: *ref_10
+          example: *ref_11
           type: array
           items:
             type: string

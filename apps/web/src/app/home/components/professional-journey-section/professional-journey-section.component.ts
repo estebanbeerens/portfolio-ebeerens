@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { RoleDto } from '@portfolio-ebeerens/api-client';
+import { PublicRoleDto } from '@portfolio-ebeerens/api-client';
 import { Button, Card } from '@portfolio-ebeerens/ui';
 import { RoleCompanyGroup } from '../../../shared/portfolio-content.service';
 import { RoleDescription } from './role-description/role-description.component';
@@ -49,7 +49,7 @@ export class ProfessionalJourneySection {
     return `${start} - ${end} \u00b7 ${formatDuration(startDate, endDate)}`;
   }
 
-  protected roleSkillSummary(role: RoleDto): string {
+  protected roleSkillSummary(role: PublicRoleDto): string {
     return role.skills
       .map((skill) => skill.name)
       .slice(0, 3)

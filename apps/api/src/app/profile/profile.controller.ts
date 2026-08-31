@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, Put, Req, UseGuards } from '@nestjs/common';
+import { ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
+import { resolveLocale } from '../shared/locale.util';
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileService } from './profile.service';
@@ -20,8 +21,13 @@ export class ProfileController {
 
   @Get('public-portfolio')
   @ApiOkResponse({ description: 'All public portfolio content for the initial view', type: PublicPortfolioDto })
-  getPublicPortfolio() {
-    return this.profileService.findPublicPortfolio();
+  @ApiHeader({
+    name: 'x-accept-language',
+    required: false,
+    description: 'Requested content language (en/nl); defaults to en',
+  })
+  getPublicPortfolio(@Headers('x-accept-language') language?: string) {
+    return this.profileService.findPublicPortfolio(resolveLocale(language));
   }
 
   @Put()

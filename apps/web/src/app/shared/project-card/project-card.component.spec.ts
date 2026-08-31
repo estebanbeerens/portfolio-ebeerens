@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
+import { PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { ProjectCard } from './project-card.component';
 
 describe('ProjectCard', () => {
-  const project: ProjectDto = {
+  const project: PublicProjectDto = {
     id: 'project-1',
     title: 'Aether Dashboard',
     slug: 'aether-dashboard',
@@ -14,7 +14,7 @@ describe('ProjectCard', () => {
     skills: [{ id: 'skill-1', name: 'TypeScript' }],
     createdAt: '2026-01-01',
     updatedAt: '2026-01-01',
-  } as unknown as ProjectDto;
+  } as unknown as PublicProjectDto;
 
   async function createComponent() {
     await TestBed.configureTestingModule({

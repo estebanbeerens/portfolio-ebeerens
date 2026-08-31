@@ -18,22 +18,30 @@ export class ProjectDto {
   slug: string;
 
   @ApiProperty({
-    description: 'Short summary shown alongside the project',
+    description: 'Short summary shown alongside the project (English)',
     example: 'A fast, accessible portfolio built with Angular and NestJS.',
     maxLength: 255,
   })
-  shortDescription: string;
-
-  @ApiProperty({
-    description: 'Markdown source for the project description, as authored in admin',
-    example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
-  })
-  description: string;
+  shortDescriptionEn: string;
 
   @ApiPropertyOptional({
-    description: 'Sanitized HTML rendered from `description`; only populated on the public portfolio response',
+    description: 'Short summary shown alongside the project (Dutch)',
+    example: 'Een snelle, toegankelijke portfolio gebouwd met Angular en NestJS.',
+    maxLength: 255,
   })
-  descriptionHtml?: string;
+  shortDescriptionNl?: string;
+
+  @ApiProperty({
+    description: 'Markdown source for the project description, as authored in admin (English)',
+    example: '## Overview\n\nBuilt with **Angular** and *NestJS*.',
+  })
+  descriptionEn: string;
+
+  @ApiPropertyOptional({
+    description: 'Markdown source for the project description, as authored in admin (Dutch)',
+    example: '## Overzicht\n\nGebouwd met **Angular** en *NestJS*.',
+  })
+  descriptionNl?: string;
 
   @ApiPropertyOptional({
     example: 'https://cdn.example.com/projects/portfolio.png',

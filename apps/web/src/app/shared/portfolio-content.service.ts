@@ -3,15 +3,15 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import {
   FeatureFlagDto,
   OrganizationDto,
-  ProfileDto,
   ProfileService,
-  ProjectDto,
-  RoleDto,
+  PublicProfileDto,
+  PublicProjectDto,
+  PublicRoleDto,
 } from '@portfolio-ebeerens/api-client';
 
 export interface RoleCompanyGroup {
   organization: OrganizationDto;
-  roles: RoleDto[];
+  roles: PublicRoleDto[];
   startDate: string;
   endDate?: string;
 }
@@ -22,11 +22,11 @@ export class PortfolioContentService {
 
   readonly portfolio = rxResource({ stream: () => this.publicPortfolioApi.profileControllerGetPublicPortfolio() });
 
-  readonly profileValue = computed<ProfileDto | undefined>(() =>
+  readonly profileValue = computed<PublicProfileDto | undefined>(() =>
     this.portfolio.hasValue() ? this.portfolio.value().profile : undefined
   );
 
-  readonly sortedRoles = computed<RoleDto[]>(() => {
+  readonly sortedRoles = computed<PublicRoleDto[]>(() => {
     if (!this.portfolio.hasValue()) {
       return [];
     }
@@ -35,7 +35,7 @@ export class PortfolioContentService {
 
   readonly roleCompanyGroups = computed<RoleCompanyGroup[]>(() => groupRolesByCompany(this.sortedRoles()));
 
-  readonly sortedProjects = computed<ProjectDto[]>(() => {
+  readonly sortedProjects = computed<PublicProjectDto[]>(() => {
     if (!this.portfolio.hasValue()) {
       return [];
     }
@@ -44,7 +44,7 @@ export class PortfolioContentService {
     );
   });
 
-  readonly selectedProjects = computed<ProjectDto[]>(() => this.sortedProjects().slice(0, 6));
+  readonly selectedProjects = computed<PublicProjectDto[]>(() => this.sortedProjects().slice(0, 6));
 
   readonly projectsLoaded = computed(() => this.portfolio.hasValue());
   readonly rolesEnabled = computed(() => this.flagEnabled(FeatureFlagDto.KeyEnum.Roles));
@@ -56,7 +56,7 @@ export class PortfolioContentService {
     this.portfolio.error() ? 'Portfolio content could not be loaded. Try refreshing the page.' : undefined
   );
 
-  projectBySlug(slug: string): ProjectDto | undefined {
+  projectBySlug(slug: string): PublicProjectDto | undefined {
     return this.sortedProjects().find((project) => project.slug === slug);
   }
 
@@ -68,7 +68,7 @@ export class PortfolioContentService {
   }
 }
 
-function groupRolesByCompany(roles: RoleDto[]): RoleCompanyGroup[] {
+function groupRolesByCompany(roles: PublicRoleDto[]): RoleCompanyGroup[] {
   const groups = new Map<string, RoleCompanyGroup>();
 
   for (const role of roles) {

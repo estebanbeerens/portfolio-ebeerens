@@ -6,7 +6,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class:
-      'border-border bg-overlay backdrop-blur-glass fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 flex-col gap-10 border-r px-6 py-8 transition-transform md:sticky md:top-0 md:h-dvh md:translate-x-0',
+      'border-border backdrop-blur-glass fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 flex-col gap-10 border-r px-6 py-8 transition-transform md:sticky md:top-0 md:h-dvh md:translate-x-0',
     '[class.translate-x-0]': 'open()',
     '[class.-translate-x-full]': '!open()',
     '(document:keydown.escape)': 'closed.emit()',

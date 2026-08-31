@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { FeatureFlagDto, ProfileService } from '@portfolio-ebeerens/api-client';
 import { axe } from 'vitest-axe';
 import { of } from 'rxjs';
+import { appRoutes } from '../../app.routes';
 import { Header } from './header.component';
 
 const allFlagsEnabled = [
@@ -16,7 +17,7 @@ function configure(flags: Partial<FeatureFlagDto>[] = allFlagsEnabled) {
   return TestBed.configureTestingModule({
     imports: [Header],
     providers: [
-      provideRouter([]),
+      provideRouter(appRoutes),
       {
         provide: ProfileService,
         useValue: {
@@ -77,5 +78,45 @@ describe('Header', () => {
     const results = await axe(fixture.nativeElement);
     // vitest-axe's ambient `Assertion` augmentation doesn't merge cleanly under this vitest version's types.
     (expect(results) as unknown as { toHaveNoViolations: () => void }).toHaveNoViolations();
+  });
+
+  it('opens and closes the mobile navigation drawer', async () => {
+    await configure();
+
+    const fixture = TestBed.createComponent(Header);
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const menuButton = compiled.querySelector('button[aria-label="Open navigation"]') as HTMLButtonElement;
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+
+    menuButton.click();
+    await fixture.whenStable();
+    expect(menuButton.getAttribute('aria-expanded')).toBe('true');
+
+    const backdrop = compiled.querySelector('button[aria-label="Close navigation"]') as HTMLButtonElement;
+    backdrop.click();
+    await fixture.whenStable();
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('renders the mobile drawer nav links and closes on click', async () => {
+    await configure();
+
+    const fixture = TestBed.createComponent(Header);
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const menuButton = compiled.querySelector('button[aria-label="Open navigation"]') as HTMLButtonElement;
+    menuButton.click();
+    await fixture.whenStable();
+
+    const drawer = compiled.querySelector('#mobile-nav') as HTMLElement;
+    const projectsLink = drawer.querySelector('a[href="/projects"]') as HTMLAnchorElement;
+    expect(projectsLink).toBeTruthy();
+
+    projectsLink.click();
+    await fixture.whenStable();
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
   });
 });

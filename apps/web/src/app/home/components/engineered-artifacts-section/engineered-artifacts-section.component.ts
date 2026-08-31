@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
+import { PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { Card } from '@portfolio-ebeerens/ui';
 import { ProjectCard } from '../../../shared/project-card/project-card.component';
 
@@ -10,5 +10,5 @@ import { ProjectCard } from '../../../shared/project-card/project-card.component
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EngineeredArtifactsSection {
-  readonly projects = input<readonly ProjectDto[]>([]);
+  readonly projects = input<readonly PublicProjectDto[]>([]);
 }

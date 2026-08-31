@@ -3,6 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { Prisma } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { Locale } from '../shared/locale.util';
+import { MarkdownRenderService } from '../shared/markdown-render.service';
+import { toPublicProject } from '../shared/public-content.util';
 import { ImageDerivativesService } from '../storage/image-derivatives.service';
 import { R2Service } from '../storage/r2.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -17,7 +20,8 @@ export class ProjectsService {
     private readonly prisma: PrismaService,
     private readonly activity: ActivityService,
     private readonly r2: R2Service,
-    private readonly derivatives: ImageDerivativesService
+    private readonly derivatives: ImageDerivativesService,
+    private readonly markdown: MarkdownRenderService
   ) {}
 
   private get imagesBucket(): string {
@@ -51,7 +55,7 @@ export class ProjectsService {
   }
 
   // Ranks by shared-skill count then recency, padding with other recent projects if too few overlap.
-  async findRelated(id: string, limit = 3) {
+  async findRelated(id: string, limit = 3, locale: Locale = 'en') {
     const project = await this.findOne(id);
     const skillIds = new Set(project.skills.map((skill) => skill.id));
 
@@ -69,7 +73,7 @@ export class ProjectsService {
       return recencyValue(b) - recencyValue(a);
     });
 
-    return ranked.slice(0, limit);
+    return ranked.slice(0, limit).map((related) => toPublicProject(related, locale, this.markdown));
   }
 
   async create(dto: CreateProjectDto, actor?: string) {

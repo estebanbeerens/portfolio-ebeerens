@@ -26,11 +26,17 @@ export class UpdateProfileDto {
   @MaxLength(200)
   headline?: string;
 
-  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin' })
+  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin (English)' })
   @IsOptional()
   @IsString()
   @MaxLength(20000)
-  bio?: string;
+  bioEn?: string;
+
+  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin (Dutch)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20000)
+  bioNl?: string;
 
   @ApiPropertyOptional({
     description: 'URL of the profile avatar image',

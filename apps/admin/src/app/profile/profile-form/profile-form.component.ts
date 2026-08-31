@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileDto } from '@portfolio-ebeerens/api-client';
-import { Button, Card, TextInput } from '@portfolio-ebeerens/ui';
+import { Button, Card, FormLanguage, LanguageTabs, TextInput } from '@portfolio-ebeerens/ui';
 import { MarkdownComponent } from 'ngx-markdown';
 
 export interface ProfileFormValue {
   name: string;
   headline: string;
   location: string;
-  bio: string;
+  bioEn: string;
+  bioNl: string;
   avatarUrl: string;
   linkedinUrl: string;
   githubUrl: string;
@@ -19,7 +20,7 @@ export interface ProfileFormValue {
 
 @Component({
   selector: 'admin-profile-form',
-  imports: [Button, Card, MarkdownComponent, ReactiveFormsModule, TextInput],
+  imports: [Button, Card, LanguageTabs, MarkdownComponent, ReactiveFormsModule, TextInput],
   templateUrl: './profile-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,11 +33,13 @@ export class ProfileForm {
   readonly saved = output<ProfileFormValue>();
 
   protected readonly biographyView = signal<'markdown' | 'preview'>('markdown');
+  protected readonly biographyLanguage = signal<FormLanguage>('en');
   protected readonly form = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(/\S/)]],
     headline: ['', Validators.maxLength(200)],
     location: ['', Validators.maxLength(200)],
-    bio: ['', Validators.maxLength(20000)],
+    bioEn: ['', Validators.maxLength(20000)],
+    bioNl: ['', Validators.maxLength(20000)],
     avatarUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
     linkedinUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
     githubUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
@@ -45,15 +48,21 @@ export class ProfileForm {
     youtubeUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
   });
 
+  protected readonly activeBioControl = computed(() =>
+    this.biographyLanguage() === 'en' ? this.form.controls.bioEn : this.form.controls.bioNl
+  );
+
   constructor() {
     effect(() => {
       const profile = this.profile();
       this.biographyView.set('markdown');
+      this.biographyLanguage.set('en');
       this.form.reset({
         name: profile?.name ?? '',
         headline: profile?.headline ?? '',
         location: profile?.location ?? '',
-        bio: profile?.bio ?? '',
+        bioEn: profile?.bioEn ?? '',
+        bioNl: profile?.bioNl ?? '',
         avatarUrl: profile?.avatarUrl ?? '',
         linkedinUrl: profile?.linkedinUrl ?? '',
         githubUrl: profile?.githubUrl ?? '',

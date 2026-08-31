@@ -23,6 +23,8 @@ import { ProjectDto } from '../model/projectDto';
 // @ts-ignore
 import { ProjectImageUploadUrlDto } from '../model/projectImageUploadUrlDto';
 // @ts-ignore
+import { PublicProjectDto } from '../model/publicProjectDto';
+// @ts-ignore
 import { UpdateProjectDto } from '../model/updateProjectDto';
 
 // @ts-ignore
@@ -341,6 +343,7 @@ export class ProjectsService extends BaseService {
    * @endpoint get /api/projects/{id}/related
    * @param id
    * @param limit Max related projects to return (default 3)
+   * @param xAcceptLanguage Requested content language (en/nl); defaults to en
    * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
    * @param reportProgress flag to report request and response progress.
    * @param options additional options
@@ -348,27 +351,31 @@ export class ProjectsService extends BaseService {
   public projectsControllerFindRelated(
     id: string,
     limit?: number,
+    xAcceptLanguage?: string,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<Array<ProjectDto>>;
+  ): Observable<Array<PublicProjectDto>>;
   public projectsControllerFindRelated(
     id: string,
     limit?: number,
+    xAcceptLanguage?: string,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpResponse<Array<ProjectDto>>>;
+  ): Observable<HttpResponse<Array<PublicProjectDto>>>;
   public projectsControllerFindRelated(
     id: string,
     limit?: number,
+    xAcceptLanguage?: string,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpEvent<Array<ProjectDto>>>;
+  ): Observable<HttpEvent<Array<PublicProjectDto>>>;
   public projectsControllerFindRelated(
     id: string,
     limit?: number,
+    xAcceptLanguage?: string,
     observe: any = 'body',
     reportProgress: boolean = false,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
@@ -388,6 +395,9 @@ export class ProjectsService extends BaseService {
     );
 
     let localVarHeaders = this.defaultHeaders;
+    if (xAcceptLanguage !== undefined && xAcceptLanguage !== null) {
+      localVarHeaders = localVarHeaders.set('x-accept-language', String(xAcceptLanguage));
+    }
 
     const localVarHttpHeaderAcceptSelected: string | undefined =
       options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
@@ -412,7 +422,7 @@ export class ProjectsService extends BaseService {
 
     let localVarPath = `/api/projects/${this.configuration.encodeParam({ name: 'id', value: id, in: 'path', style: 'simple', explode: false, dataType: 'string', dataFormat: undefined })}/related`;
     const { basePath, withCredentials } = this.configuration;
-    return this.httpClient.request<Array<ProjectDto>>('get', `${basePath}${localVarPath}`, {
+    return this.httpClient.request<Array<PublicProjectDto>>('get', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
       params: localVarQueryParameters.toHttpParams(),
       responseType: <any>responseType_,

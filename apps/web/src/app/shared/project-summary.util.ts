@@ -1,10 +1,10 @@
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
+import { PublicProjectDto } from '@portfolio-ebeerens/api-client';
 
-export function projectYear(project: ProjectDto): number {
+export function projectYear(project: PublicProjectDto): number {
   return new Date(project.endDate ?? project.startDate).getFullYear();
 }
 
-export function projectSkillSummary(project: ProjectDto): string {
+export function projectSkillSummary(project: PublicProjectDto): string {
   return (
     project.skills
       .map((skill) => skill.name)
@@ -15,7 +15,7 @@ export function projectSkillSummary(project: ProjectDto): string {
   );
 }
 
-export function projectDuration(project: ProjectDto): string {
+export function projectDuration(project: PublicProjectDto): string {
   if (!project.endDate) {
     return 'Ongoing';
   }

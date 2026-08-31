@@ -20,17 +20,21 @@ export interface ProjectDto {
    */
   slug: string;
   /**
-   * Short summary shown alongside the project
+   * Short summary shown alongside the project (English)
    */
-  shortDescription: string;
+  shortDescriptionEn: string;
   /**
-   * Markdown source for the project description, as authored in admin
+   * Short summary shown alongside the project (Dutch)
    */
-  description: string;
+  shortDescriptionNl?: string;
   /**
-   * Sanitized HTML rendered from `description`; only populated on the public portfolio response
+   * Markdown source for the project description, as authored in admin (English)
    */
-  descriptionHtml?: string;
+  descriptionEn: string;
+  /**
+   * Markdown source for the project description, as authored in admin (Dutch)
+   */
+  descriptionNl?: string;
   imageUrl?: string;
   client?: string;
   jobRole?: string;

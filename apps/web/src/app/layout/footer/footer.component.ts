@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ProfileDto } from '@portfolio-ebeerens/api-client';
+import { PublicProfileDto } from '@portfolio-ebeerens/api-client';
 import { PortfolioContentService } from '../../shared/portfolio-content.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { PortfolioContentService } from '../../shared/portfolio-content.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Footer {
-  readonly profile = input<ProfileDto | undefined>();
+  readonly profile = input<PublicProfileDto | undefined>();
   protected readonly content = inject(PortfolioContentService);
   protected readonly currentYear = new Date().getFullYear();
 }

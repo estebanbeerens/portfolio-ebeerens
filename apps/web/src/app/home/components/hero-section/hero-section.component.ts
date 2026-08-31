@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ProfileDto } from '@portfolio-ebeerens/api-client';
+import { PublicProfileDto } from '@portfolio-ebeerens/api-client';
 import { Button } from '@portfolio-ebeerens/ui';
 import { BasicInfoCard } from '../basic-info-card/basic-info-card.component';
 
@@ -11,5 +11,5 @@ import { BasicInfoCard } from '../basic-info-card/basic-info-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroSection {
-  readonly profile = input<ProfileDto | undefined>();
+  readonly profile = input<PublicProfileDto | undefined>();
 }

@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { MarkdownRenderService } from '../shared/markdown-render.service';
 import { ImageDerivativesService } from '../storage/image-derivatives.service';
 import { R2Service } from '../storage/r2.service';
 import { ProjectsService } from './projects.service';
@@ -12,8 +13,10 @@ describe('ProjectsService', () => {
       id: 'project-1',
       title: 'Project',
       slug: 'project',
-      shortDescription: 'Short',
-      description: 'Long',
+      shortDescriptionEn: 'Short',
+      shortDescriptionNl: null,
+      descriptionEn: 'Long',
+      descriptionNl: null,
       imageUrl: null,
       client: null,
       jobRole: null,
@@ -47,6 +50,7 @@ describe('ProjectsService', () => {
         { provide: ActivityService, useValue: activity },
         { provide: R2Service, useValue: r2 },
         { provide: ImageDerivativesService, useValue: derivatives },
+        MarkdownRenderService,
       ],
     }).compile();
 
@@ -156,8 +160,8 @@ describe('ProjectsService', () => {
       await service.create({
         title: 'Project',
         slug: 'project',
-        shortDescription: 'Short',
-        description: 'Long',
+        shortDescriptionEn: 'Short',
+        descriptionEn: 'Long',
         startDate: '2024-01-01T00:00:00.000Z',
         skills: [],
       } as never);
@@ -173,8 +177,8 @@ describe('ProjectsService', () => {
       await service.create({
         title: 'Project',
         slug: 'project',
-        shortDescription: 'Short',
-        description: 'Long',
+        shortDescriptionEn: 'Short',
+        descriptionEn: 'Long',
         startDate: '2024-01-01T00:00:00.000Z',
         skills: [],
       } as never);

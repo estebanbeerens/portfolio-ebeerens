@@ -114,6 +114,18 @@
         <source>Contact</source>
         <target>Contact</target>
       </trans-unit>
+      <trans-unit id="header.nav.openMenu" datatype="html">
+        <source>Open navigation</source>
+        <target>Navigatie openen</target>
+      </trans-unit>
+      <trans-unit id="header.nav.closeMenu" datatype="html">
+        <source>Close navigation</source>
+        <target>Navigatie sluiten</target>
+      </trans-unit>
+      <trans-unit id="header.nav.mobileLabel" datatype="html">
+        <source>Main navigation</source>
+        <target>Hoofdnavigatie</target>
+      </trans-unit>
       <trans-unit id="contact.eyebrow" datatype="html">
         <source>Contact</source>
         <target>Contact</target>
@@ -269,6 +281,22 @@
       <trans-unit id="resume.comingSoon" datatype="html">
         <source>A dedicated resume page is coming soon.</source>
         <target>Een aparte cv-pagina volgt binnenkort.</target>
+      </trans-unit>
+      <trans-unit id="notFound.code" datatype="html">
+        <source>404</source>
+        <target>404</target>
+      </trans-unit>
+      <trans-unit id="notFound.heading" datatype="html">
+        <source>Page not found</source>
+        <target>Pagina niet gevonden</target>
+      </trans-unit>
+      <trans-unit id="notFound.body" datatype="html">
+        <source>These are not the pages you are looking for ...</source>
+        <target>Dit zijn niet de pagina's die je zoekt ...</target>
+      </trans-unit>
+      <trans-unit id="notFound.backHome" datatype="html">
+        <source>Back to home</source>
+        <target>Terug naar home</target>
       </trans-unit>
     </body>
   </file>

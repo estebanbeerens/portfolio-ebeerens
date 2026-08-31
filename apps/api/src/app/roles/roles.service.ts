@@ -66,7 +66,8 @@ export class RolesService {
         data: {
           ...rest,
           // Cleared optional fields are omitted by the client, so null them explicitly rather than leaving them unchanged.
-          description: rest.description || null,
+          descriptionEn: rest.descriptionEn || null,
+          descriptionNl: rest.descriptionNl || null,
           location: rest.location || null,
           employmentType: rest.employmentType || null,
           startDate: startDate ? new Date(startDate) : undefined,
@@ -122,12 +123,13 @@ export class RolesService {
     return error;
   }
 
-  private normalizeDescription<T extends { description: string | null }>(
+  private normalizeDescription<T extends { descriptionEn: string | null; descriptionNl: string | null }>(
     role: T
-  ): Omit<T, 'description'> & {
-    description?: string;
+  ): Omit<T, 'descriptionEn' | 'descriptionNl'> & {
+    descriptionEn?: string;
+    descriptionNl?: string;
   } {
-    const { description, ...rest } = role;
-    return description === null ? rest : { ...rest, description };
+    const { descriptionEn, descriptionNl, ...rest } = role;
+    return { ...rest, descriptionEn: descriptionEn ?? undefined, descriptionNl: descriptionNl ?? undefined };
   }
 }

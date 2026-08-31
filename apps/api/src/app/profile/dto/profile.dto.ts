@@ -19,13 +19,11 @@ export class ProfileDto {
   })
   headline?: string;
 
-  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin' })
-  bio?: string;
+  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin (English)' })
+  bioEn?: string;
 
-  @ApiPropertyOptional({
-    description: 'Sanitized HTML rendered from `bio`; only populated on the public portfolio response',
-  })
-  bioHtml?: string;
+  @ApiPropertyOptional({ description: 'Markdown source for the biography, as authored in admin (Dutch)' })
+  bioNl?: string;
 
   @ApiPropertyOptional({
     description: 'URL of the profile avatar image',

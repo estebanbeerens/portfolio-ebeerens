@@ -22,22 +22,50 @@
       [error]="fieldInvalid('slug') ? 'Use a lowercase, hyphen-separated slug.' : undefined"
     />
 
-    <ui-textarea
-      controlId="project-short-description"
-      label="Short description"
-      formControlName="shortDescription"
-      [required]="true"
-      [maxlength]="255"
-      hint="A concise summary, up to 255 characters."
-      [error]="fieldInvalid('shortDescription') ? 'Enter a short description of 255 characters or fewer.' : undefined"
-    />
+    <div>
+      <ui-language-tabs
+        label="Short description language"
+        panelId="project-short-description-panel"
+        [(language)]="shortDescriptionLanguage"
+      />
+      <div id="project-short-description-panel" role="tabpanel">
+        @if (shortDescriptionLanguage() === 'en') {
+          <ui-textarea
+            controlId="project-short-description"
+            label="Short description (English)"
+            [formControl]="form.controls.shortDescriptionEn"
+            [required]="true"
+            [maxlength]="255"
+            hint="A concise summary, up to 255 characters."
+            [error]="
+              fieldInvalid('shortDescriptionEn') ? 'Enter a short description of 255 characters or fewer.' : undefined
+            "
+          />
+        } @else {
+          <ui-textarea
+            controlId="project-short-description-nl"
+            label="Short description (Dutch)"
+            [formControl]="form.controls.shortDescriptionNl"
+            [maxlength]="255"
+            hint="A concise summary, up to 255 characters."
+            [error]="fieldInvalid('shortDescriptionNl') ? 'Keep it to 255 characters or fewer.' : undefined"
+          />
+        }
+      </div>
+    </div>
 
     <div>
       <label class="text-sm font-medium" for="project-description">
         Description <span aria-hidden="true" class="text-error">*</span><span class="sr-only"> required</span>
       </label>
       <p class="text-text-muted mt-1 text-xs">Markdown is supported (headings, bold, lists, links...).</p>
-      <div class="border-border mt-1 flex gap-1 border-b" role="tablist">
+      <ui-language-tabs
+        class="mt-1 block"
+        label="Description language"
+        panelId="project-description-panel"
+        [(language)]="descriptionLanguage"
+      />
+      <div class="border-border flex gap-1 border-b" role="tablist">
         <button
           type="button"
           role="tab"
@@ -72,16 +100,15 @@
           <textarea
             id="project-description"
             class="border-border bg-surface min-h-48 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm"
-            formControlName="description"
-            required
+            [formControl]="activeDescriptionControl()"
           ></textarea>
         } @else {
           <div class="border-border bg-surface-raised min-h-48 overflow-auto rounded-b border border-t-0 p-3">
-            <markdown [data]="form.controls.description.value" ngPreserveWhitespaces />
+            <markdown [data]="activeDescriptionControl().value" ngPreserveWhitespaces />
           </div>
         }
       </div>
-      @if (fieldInvalid('description')) {
+      @if (fieldInvalid('descriptionEn')) {
         <p class="text-error mt-1 text-xs">Enter a description.</p>
       }
     </div>
