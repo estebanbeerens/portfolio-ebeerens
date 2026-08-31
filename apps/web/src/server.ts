@@ -43,8 +43,17 @@ for (const asset of [
   });
 }
 
-// Hashed browser bundles are emitted under the locale subfolder (build runs with localize),
-// but the rendered HTML references them at the root, so serve that folder at '/'.
+// Hashed browser bundles are emitted under locale subfolders (build runs with localize),
+// and localized HTML can reference them with either a locale prefix or the root base href.
+app.use(
+  express.static(browserDistFolder, {
+    maxAge: '1y',
+    immutable: true,
+    index: false,
+    redirect: false,
+  })
+);
+
 app.use(
   express.static(defaultLocaleBrowserDistFolder, {
     maxAge: '1y',
