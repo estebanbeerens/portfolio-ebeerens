@@ -43,9 +43,12 @@ for (const asset of [
   });
 }
 
+// Hashed browser bundles are emitted under the locale subfolder (build runs with localize),
+// but the rendered HTML references them at the root, so serve that folder at '/'.
 app.use(
-  express.static(browserDistFolder, {
+  express.static(defaultLocaleBrowserDistFolder, {
     maxAge: '1y',
+    immutable: true,
     index: false,
     redirect: false,
   })
