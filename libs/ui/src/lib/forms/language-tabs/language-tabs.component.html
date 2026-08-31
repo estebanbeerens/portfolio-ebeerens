@@ -1,0 +1,26 @@
+<div class="border-border flex gap-1 border-b" role="tablist" [attr.aria-label]="label()">
+  <button
+    type="button"
+    role="tab"
+    class="text-text rounded-t px-3 py-1.5 text-xs font-semibold uppercase"
+    [class.border-accent]="language() === 'en'"
+    [class.border-b-2]="language() === 'en'"
+    [attr.aria-selected]="language() === 'en'"
+    [attr.aria-controls]="panelId()"
+    (click)="language.set('en')"
+  >
+    English
+  </button>
+  <button
+    type="button"
+    role="tab"
+    class="text-text rounded-t px-3 py-1.5 text-xs font-semibold uppercase"
+    [class.border-accent]="language() === 'nl'"
+    [class.border-b-2]="language() === 'nl'"
+    [attr.aria-selected]="language() === 'nl'"
+    [attr.aria-controls]="panelId()"
+    (click)="language.set('nl')"
+  >
+    Dutch
+  </button>
+</div>

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -15,6 +16,7 @@ import {
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiHeader,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -23,10 +25,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
+import { resolveLocale } from '../shared/locale.util';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateProjectImageUploadUrlDto } from './dto/create-project-image-upload-url.dto';
 import { ProjectDto } from './dto/project.dto';
 import { ProjectImageUploadUrlDto } from './dto/project-image-upload-url.dto';
+import { PublicProjectDto } from './dto/public-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
 
@@ -50,11 +54,20 @@ export class ProjectsController {
   }
 
   @Get(':id/related')
-  @ApiOkResponse({ description: 'Other projects related by shared skills', type: [ProjectDto] })
+  @ApiOkResponse({ description: 'Other projects related by shared skills', type: [PublicProjectDto] })
   @ApiNotFoundResponse({ description: 'No project with this id exists' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max related projects to return (default 3)' })
-  findRelated(@Param('id') id: string, @Query('limit') limit?: string) {
-    return this.projectsService.findRelated(id, limit ? Number(limit) : undefined);
+  @ApiHeader({
+    name: 'x-accept-language',
+    required: false,
+    description: 'Requested content language (en/nl); defaults to en',
+  })
+  findRelated(
+    @Param('id') id: string,
+    @Query('limit') limit?: string,
+    @Headers('x-accept-language') language?: string
+  ) {
+    return this.projectsService.findRelated(id, limit ? Number(limit) : undefined, resolveLocale(language));
   }
 
   @Get(':id')

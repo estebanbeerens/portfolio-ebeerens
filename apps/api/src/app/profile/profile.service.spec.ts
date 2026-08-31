@@ -10,7 +10,8 @@ describe('ProfileService', () => {
     id: 'profile-1',
     name: 'Jane Doe',
     headline: null,
-    bio: null,
+    bioEn: null,
+    bioNl: null,
     avatarUrl: null,
     location: null,
     linkedinUrl: null,
@@ -66,7 +67,7 @@ describe('ProfileService', () => {
     prisma.profile.update.mockResolvedValue({
       ...profile,
       headline: 'Frontend engineer',
-      bio: '# About',
+      bioEn: '# About',
       location: 'Amsterdam, Netherlands',
       githubUrl: 'https://github.com/jane-doe',
     });
@@ -75,14 +76,14 @@ describe('ProfileService', () => {
       service.upsertProfile({
         name: 'Jane Doe',
         headline: 'Frontend engineer',
-        bio: '# About',
+        bioEn: '# About',
         location: 'Amsterdam, Netherlands',
         githubUrl: 'https://github.com/jane-doe',
       })
     ).resolves.toMatchObject({
       name: 'Jane Doe',
       headline: 'Frontend engineer',
-      bio: '# About',
+      bioEn: '# About',
       location: 'Amsterdam, Netherlands',
       githubUrl: 'https://github.com/jane-doe',
     });
@@ -92,7 +93,8 @@ describe('ProfileService', () => {
       data: {
         name: 'Jane Doe',
         headline: 'Frontend engineer',
-        bio: '# About',
+        bioEn: '# About',
+        bioNl: null,
         avatarUrl: null,
         location: 'Amsterdam, Netherlands',
         linkedinUrl: null,
@@ -107,18 +109,27 @@ describe('ProfileService', () => {
 
   it('renders Markdown bio/role/project descriptions to sanitized HTML on the public portfolio', async () => {
     const { service, prisma } = await build();
-    prisma.profile.findFirst.mockResolvedValue({ ...profile, bio: 'Built **accessible** interfaces.' });
+    prisma.profile.findFirst.mockResolvedValue({ ...profile, bioEn: 'Built **accessible** interfaces.' });
     prisma.role.findMany.mockResolvedValue([
       {
         id: 'role-1',
         jobTitle: 'Engineer',
         organization: { id: 'org-1', name: 'Acme' },
-        description: 'Shipped <script>alert(1)</script> features.',
+        descriptionEn: 'Shipped <script>alert(1)</script> features.',
+        descriptionNl: null,
         skills: [],
       },
     ]);
     prisma.project.findMany.mockResolvedValue([
-      { id: 'project-1', title: 'Portfolio', description: 'A [link](https://example.com) project.', skills: [] },
+      {
+        id: 'project-1',
+        title: 'Portfolio',
+        shortDescriptionEn: 'A short summary.',
+        shortDescriptionNl: null,
+        descriptionEn: 'A [link](https://example.com) project.',
+        descriptionNl: null,
+        skills: [],
+      },
     ]);
     prisma.featureFlag.findMany.mockResolvedValue([]);
 

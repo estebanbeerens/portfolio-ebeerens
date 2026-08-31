@@ -15,9 +15,13 @@ export interface UpdateRoleDto {
    */
   organizationId?: string;
   /**
-   * Markdown source describing responsibilities and achievements in this role
+   * Markdown source describing responsibilities and achievements in this role (English)
    */
-  description?: string;
+  descriptionEn?: string;
+  /**
+   * Markdown source describing responsibilities and achievements in this role (Dutch)
+   */
+  descriptionNl?: string;
   location?: string;
   employmentType?: UpdateRoleDto.EmploymentTypeEnum;
   /**

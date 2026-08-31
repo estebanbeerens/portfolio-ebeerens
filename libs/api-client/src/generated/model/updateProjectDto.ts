@@ -15,13 +15,21 @@ export interface UpdateProjectDto {
    */
   slug?: string;
   /**
-   * Short summary shown alongside the project
+   * Short summary shown alongside the project (English)
    */
-  shortDescription?: string;
+  shortDescriptionEn?: string;
   /**
-   * Markdown source for the project description, as authored in admin
+   * Short summary shown alongside the project (Dutch)
    */
-  description?: string;
+  shortDescriptionNl?: string;
+  /**
+   * Markdown source for the project description, as authored in admin (English)
+   */
+  descriptionEn?: string;
+  /**
+   * Markdown source for the project description, as authored in admin (Dutch)
+   */
+  descriptionNl?: string;
   imageUrl?: string;
   /**
    * R2 object key returned by the image presign endpoint, paired with `imageUrl`

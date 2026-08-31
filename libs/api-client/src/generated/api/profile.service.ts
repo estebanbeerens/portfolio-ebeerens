@@ -102,31 +102,39 @@ export class ProfileService extends BaseService {
 
   /**
    * @endpoint get /api/profile/public-portfolio
+   * @param xAcceptLanguage Requested content language (en/nl); defaults to en
    * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
    * @param reportProgress flag to report request and response progress.
    * @param options additional options
    */
   public profileControllerGetPublicPortfolio(
+    xAcceptLanguage?: string,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<PublicPortfolioDto>;
   public profileControllerGetPublicPortfolio(
+    xAcceptLanguage?: string,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpResponse<PublicPortfolioDto>>;
   public profileControllerGetPublicPortfolio(
+    xAcceptLanguage?: string,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpEvent<PublicPortfolioDto>>;
   public profileControllerGetPublicPortfolio(
+    xAcceptLanguage?: string,
     observe: any = 'body',
     reportProgress: boolean = false,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<any> {
     let localVarHeaders = this.defaultHeaders;
+    if (xAcceptLanguage !== undefined && xAcceptLanguage !== null) {
+      localVarHeaders = localVarHeaders.set('x-accept-language', String(xAcceptLanguage));
+    }
 
     const localVarHttpHeaderAcceptSelected: string | undefined =
       options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);

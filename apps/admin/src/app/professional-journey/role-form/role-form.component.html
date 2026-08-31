@@ -36,7 +36,13 @@
     <div>
       <label class="text-sm font-medium" for="role-description">Description</label>
       <p class="text-text-muted mt-1 text-xs">Markdown is supported (headings, bold, lists, links...).</p>
-      <div class="border-border mt-1 flex gap-1 border-b" role="tablist" aria-label="Role description editor">
+      <ui-language-tabs
+        class="mt-1 block"
+        label="Description language"
+        panelId="role-description-panel"
+        [(language)]="descriptionLanguage"
+      />
+      <div class="border-border flex gap-1 border-b" role="tablist" aria-label="Role description editor">
         <button
           type="button"
           role="tab"
@@ -71,11 +77,11 @@
           <textarea
             id="role-description"
             class="border-border bg-surface focus-visible:outline-accent min-h-40 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
-            formControlName="description"
+            [formControl]="activeDescriptionControl()"
           ></textarea>
         } @else {
           <div class="border-border bg-surface-raised min-h-40 overflow-auto rounded-b border border-t-0 p-3">
-            <ui-markdown [source]="form.controls.description.value" />
+            <ui-markdown [source]="activeDescriptionControl().value" />
           </div>
         }
       </div>

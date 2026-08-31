@@ -1,9 +1,18 @@
 <button
   type="button"
-  class="border-border bg-surface text-text hover:bg-bg focus-visible:outline-accent inline-flex size-11 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2"
-  [attr.aria-pressed]="themeService.theme() === 'dark'"
-  aria-label="Toggle dark mode"
+  role="switch"
+  class="border-border bg-surface focus-visible:outline-accent relative inline-flex h-11 w-20 shrink-0 items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  [attr.aria-checked]="themeService.theme() === 'dark'"
+  aria-label="Switch between light and dark theme"
   (click)="themeService.toggle()"
 >
-  <svg [lucideIcon]="icon()"></svg>
+  <svg class="text-text-muted absolute left-2.5 size-4" [lucideIcon]="sunIcon" aria-hidden="true"></svg>
+  <svg class="text-text-muted absolute right-2.5 size-4" [lucideIcon]="moonIcon" aria-hidden="true"></svg>
+  <span
+    class="bg-accent absolute inline-flex size-9 items-center justify-center rounded-full shadow transition-transform"
+    [class.translate-x-1]="themeService.theme() === 'light'"
+    [class.translate-x-10]="themeService.theme() === 'dark'"
+  >
+    <svg class="text-neutral-0 size-4 dark:text-neutral-950" [lucideIcon]="icon()" aria-hidden="true"></svg>
+  </span>
 </button>

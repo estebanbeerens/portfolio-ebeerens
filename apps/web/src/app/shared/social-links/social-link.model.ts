@@ -1,4 +1,4 @@
-import { ProfileDto } from '@portfolio-ebeerens/api-client';
+import { PublicProfileDto } from '@portfolio-ebeerens/api-client';
 
 export type SocialPlatform = 'github' | 'linkedin' | 'instagram' | 'youtube' | 'x';
 
@@ -11,7 +11,7 @@ export interface SocialLink {
 const SOCIAL_PLATFORMS: {
   platform: SocialPlatform;
   label: string;
-  getUrl: (profile: ProfileDto) => string | undefined;
+  getUrl: (profile: PublicProfileDto) => string | undefined;
 }[] = [
   { platform: 'github', label: 'GitHub', getUrl: (profile) => profile.githubUrl },
   { platform: 'linkedin', label: 'LinkedIn', getUrl: (profile) => profile.linkedinUrl },
@@ -20,7 +20,7 @@ const SOCIAL_PLATFORMS: {
   { platform: 'x', label: 'X', getUrl: (profile) => profile.xUrl },
 ];
 
-export function socialLinksFor(profile: ProfileDto | undefined): SocialLink[] {
+export function socialLinksFor(profile: PublicProfileDto | undefined): SocialLink[] {
   if (!profile) {
     return [];
   }

@@ -1,11 +1,17 @@
 import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { FeatureFlagDto, ProfileDto, ProfileService, ProjectDto, RoleDto } from '@portfolio-ebeerens/api-client';
+import {
+  FeatureFlagDto,
+  ProfileService,
+  PublicProfileDto,
+  PublicProjectDto,
+  PublicRoleDto,
+} from '@portfolio-ebeerens/api-client';
 import { of } from 'rxjs';
 import { axe } from 'vitest-axe';
 import { HomePage } from './home-page.component';
 
-const profile: ProfileDto = {
+const profile: PublicProfileDto = {
   id: 'profile-1',
   name: 'Alex Mercer',
   headline: 'Full-Stack & Creative Tech',
@@ -16,7 +22,7 @@ const profile: ProfileDto = {
   updatedAt: '2026-01-01T00:00:00.000Z',
 };
 
-const roles: RoleDto[] = [
+const roles: PublicRoleDto[] = [
   {
     id: 'role-1',
     jobTitle: 'Senior Developer',
@@ -28,7 +34,7 @@ const roles: RoleDto[] = [
   },
 ];
 
-const projects: ProjectDto[] = [
+const projects: PublicProjectDto[] = [
   {
     id: 'project-1',
     title: 'Aether Dashboard',

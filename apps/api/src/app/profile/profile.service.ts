@@ -2,7 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Profile } from '../../generated/prisma/client';
 import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
+import { Locale } from '../shared/locale.util';
 import { MarkdownRenderService } from '../shared/markdown-render.service';
+import { toPublicProject, toPublicRole } from '../shared/public-content.util';
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PublicPortfolioDto } from './dto/public-portfolio.dto';
@@ -23,7 +25,7 @@ export class ProfileService {
     return this.toDto(profile);
   }
 
-  async findPublicPortfolio(): Promise<PublicPortfolioDto> {
+  async findPublicPortfolio(locale: Locale = 'en'): Promise<PublicPortfolioDto> {
     const [profile, roles, projects, featureFlags] = await Promise.all([
       this.prisma.profile.findFirst(),
       this.prisma.role.findMany({
@@ -38,19 +40,9 @@ export class ProfileService {
     ]);
 
     return {
-      profile: profile
-        ? { ...this.toDto(profile), bioHtml: profile.bio ? this.markdown.render(profile.bio) : undefined }
-        : undefined,
-      roles: roles.map((role) => {
-        const { description, ...rest } = role;
-        return description === null
-          ? rest
-          : { ...rest, description, descriptionHtml: this.markdown.render(description) };
-      }),
-      projects: projects.map((project) => ({
-        ...project,
-        descriptionHtml: this.markdown.render(project.description),
-      })),
+      profile: profile ? this.toPublicProfileDto(profile, locale) : undefined,
+      roles: roles.map((role) => toPublicRole(role, locale, this.markdown)),
+      projects: projects.map((project) => toPublicProject(project, locale, this.markdown)),
       featureFlags,
     };
   }
@@ -77,7 +69,8 @@ export class ProfileService {
     return {
       name: dto.name,
       headline: dto.headline || null,
-      bio: dto.bio?.trim() ? dto.bio : null,
+      bioEn: dto.bioEn?.trim() ? dto.bioEn : null,
+      bioNl: dto.bioNl?.trim() ? dto.bioNl : null,
       avatarUrl: dto.avatarUrl || null,
       location: dto.location || null,
       linkedinUrl: dto.linkedinUrl || null,
@@ -93,7 +86,8 @@ export class ProfileService {
       id: profile.id,
       name: profile.name,
       headline: profile.headline ?? undefined,
-      bio: profile.bio ?? undefined,
+      bioEn: profile.bioEn ?? undefined,
+      bioNl: profile.bioNl ?? undefined,
       avatarUrl: profile.avatarUrl ?? undefined,
       location: profile.location ?? undefined,
       linkedinUrl: profile.linkedinUrl ?? undefined,
@@ -103,5 +97,11 @@ export class ProfileService {
       youtubeUrl: profile.youtubeUrl ?? undefined,
       updatedAt: profile.updatedAt,
     };
+  }
+
+  private toPublicProfileDto(profile: Profile, locale: Locale) {
+    const { bioEn, bioNl, ...rest } = this.toDto(profile);
+    const bio = locale === 'nl' ? bioNl : bioEn;
+    return { ...rest, bio, bioHtml: bio ? this.markdown.render(bio) : undefined };
   }
 }

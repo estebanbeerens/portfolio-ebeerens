@@ -82,8 +82,10 @@ export class Projects {
     const payload: CreateProjectDto = {
       title: value.title,
       slug: value.slug,
-      shortDescription: value.shortDescription,
-      description: value.description,
+      shortDescriptionEn: value.shortDescriptionEn,
+      descriptionEn: value.descriptionEn,
+      ...(value.shortDescriptionNl ? { shortDescriptionNl: value.shortDescriptionNl } : {}),
+      ...(value.descriptionNl ? { descriptionNl: value.descriptionNl } : {}),
       startDate: value.startDate,
       ...(value.imageUrl ? { imageUrl: value.imageUrl } : {}),
       ...(value.imageObjectKey ? { imageObjectKey: value.imageObjectKey } : {}),

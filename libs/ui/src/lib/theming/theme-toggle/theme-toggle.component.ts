@@ -10,5 +10,7 @@ import { LucideDynamicIcon, LucideSun, LucideMoon } from '@lucide/angular';
 })
 export class ThemeToggle {
   protected readonly themeService = inject(ThemeService);
+  protected readonly sunIcon = LucideSun;
+  protected readonly moonIcon = LucideMoon;
   protected readonly icon = computed(() => (this.themeService.theme() === 'light' ? LucideSun : LucideMoon));
 }

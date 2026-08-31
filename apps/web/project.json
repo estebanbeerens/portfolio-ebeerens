@@ -6,10 +6,7 @@
   "sourceRoot": "apps/web/src",
   "tags": [],
   "i18n": {
-    "sourceLocale": {
-      "code": "en",
-      "baseHref": ""
-    },
+    "sourceLocale": "en",
     "locales": {
       "nl": "apps/web/src/locale/messages.nl.xlf"
     }
@@ -65,7 +62,7 @@
             }
           ],
           "outputHashing": "all",
-          "localize": ["en"]
+          "localize": true
         },
         "development": {
           "optimization": false,

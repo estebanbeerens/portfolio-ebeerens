@@ -12,7 +12,8 @@ model Profile {
   id           String   @id @default(cuid())
   name         String
   headline     String?
-  bio          String?
+  bioEn        String?
+  bioNl        String?
   avatarUrl    String?
   location     String?
   linkedinUrl  String?
@@ -24,21 +25,23 @@ model Profile {
 }
 
 model Project {
-  id               String    @id @default(cuid())
-  title            String
-  slug             String    @unique
-  shortDescription String    @db.VarChar(255)
-  description      String    @db.Text
-  imageUrl         String?
-  imageObjectKey   String?
-  client           String?
-  jobRole          String?
-  liveUrl          String?
-  startDate        DateTime
-  endDate          DateTime?
-  skills           Skill[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  title              String
+  slug               String    @unique
+  shortDescriptionEn String    @db.VarChar(255)
+  shortDescriptionNl String?   @db.VarChar(255)
+  descriptionEn      String    @db.Text
+  descriptionNl      String?   @db.Text
+  imageUrl           String?
+  imageObjectKey     String?
+  client             String?
+  jobRole            String?
+  liveUrl            String?
+  startDate          DateTime
+  endDate            DateTime?
+  skills             Skill[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
 
 model Skill {
@@ -75,7 +78,8 @@ model Role {
   jobTitle       String
   organizationId String
   organization   Organization    @relation(fields: [organizationId], references: [id])
-  description    String?         @db.Text
+  descriptionEn  String?         @db.Text
+  descriptionNl  String?         @db.Text
   location       String?
   employmentType EmploymentType?
   startDate      DateTime

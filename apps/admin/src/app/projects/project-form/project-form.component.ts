@@ -1,7 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateProjectImageUploadUrlDto, ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
-import { Button, Card, FileDropzone, TagCombobox, TextInput, Textarea, ToastService } from '@portfolio-ebeerens/ui';
+import {
+  Button,
+  Card,
+  FileDropzone,
+  FormLanguage,
+  LanguageTabs,
+  TagCombobox,
+  TextInput,
+  Textarea,
+  ToastService,
+} from '@portfolio-ebeerens/ui';
 import { MarkdownComponent } from 'ngx-markdown';
 import { firstValueFrom } from 'rxjs';
 
@@ -11,8 +21,10 @@ const PROJECT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export interface ProjectFormValue {
   title: string;
   slug: string;
-  shortDescription: string;
-  description: string;
+  shortDescriptionEn: string;
+  shortDescriptionNl: string;
+  descriptionEn: string;
+  descriptionNl: string;
   imageUrl: string;
   imageObjectKey: string;
   client: string;
@@ -28,7 +40,17 @@ export interface ProjectFormValue {
  */
 @Component({
   selector: 'admin-project-form',
-  imports: [Button, Card, FileDropzone, MarkdownComponent, ReactiveFormsModule, TagCombobox, TextInput, Textarea],
+  imports: [
+    Button,
+    Card,
+    FileDropzone,
+    LanguageTabs,
+    MarkdownComponent,
+    ReactiveFormsModule,
+    TagCombobox,
+    TextInput,
+    Textarea,
+  ],
   templateUrl: './project-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,6 +72,8 @@ export class ProjectForm {
 
   protected readonly isEditing = computed(() => this.project() !== undefined);
   protected readonly descriptionView = signal<'markdown' | 'preview'>('markdown');
+  protected readonly shortDescriptionLanguage = signal<FormLanguage>('en');
+  protected readonly descriptionLanguage = signal<FormLanguage>('en');
   // Not a form control: the client only ever learns a *new* object key from a fresh upload
   // (ProjectDto doesn't expose the existing one), so this stays empty until an upload succeeds.
   protected readonly imageObjectKey = signal('');
@@ -57,8 +81,10 @@ export class ProjectForm {
   protected readonly form = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
-    shortDescription: ['', [Validators.required, Validators.maxLength(255)]],
-    description: ['', Validators.required],
+    shortDescriptionEn: ['', [Validators.required, Validators.maxLength(255)]],
+    shortDescriptionNl: ['', Validators.maxLength(255)],
+    descriptionEn: ['', Validators.required],
+    descriptionNl: [''],
     imageUrl: ['', Validators.pattern(/^https?:\/\/.+/)],
     client: ['', Validators.maxLength(200)],
     jobRole: ['', Validators.maxLength(200)],
@@ -67,6 +93,10 @@ export class ProjectForm {
     endDate: [''],
     skills: this.formBuilder.nonNullable.control<string[]>([]),
   });
+
+  protected readonly activeDescriptionControl = computed(() =>
+    this.descriptionLanguage() === 'en' ? this.form.controls.descriptionEn : this.form.controls.descriptionNl
+  );
 
   constructor() {
     effect(() => {
@@ -129,6 +159,8 @@ export class ProjectForm {
 
   private resetForm(): void {
     this.descriptionView.set('markdown');
+    this.shortDescriptionLanguage.set('en');
+    this.descriptionLanguage.set('en');
     this.imageObjectKey.set('');
     const project = this.project();
     this.form.reset(
@@ -136,8 +168,10 @@ export class ProjectForm {
         ? {
             title: project.title,
             slug: project.slug,
-            shortDescription: project.shortDescription,
-            description: project.description,
+            shortDescriptionEn: project.shortDescriptionEn,
+            shortDescriptionNl: project.shortDescriptionNl ?? '',
+            descriptionEn: project.descriptionEn,
+            descriptionNl: project.descriptionNl ?? '',
             imageUrl: project.imageUrl ?? '',
             client: project.client ?? '',
             jobRole: project.jobRole ?? '',
@@ -149,8 +183,10 @@ export class ProjectForm {
         : {
             title: '',
             slug: '',
-            shortDescription: '',
-            description: '',
+            shortDescriptionEn: '',
+            shortDescriptionNl: '',
+            descriptionEn: '',
+            descriptionNl: '',
             imageUrl: '',
             client: '',
             jobRole: '',

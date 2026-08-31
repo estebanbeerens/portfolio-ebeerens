@@ -3,7 +3,7 @@ import { Meta } from '@angular/platform-browser';
 import { NgOptimizedImage } from '@angular/common';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ProjectDto, ProjectsService } from '@portfolio-ebeerens/api-client';
+import { ProjectsService, PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { Button } from '@portfolio-ebeerens/ui';
 import { LucideArrowLeft, LucideDynamicIcon, LucideExternalLink } from '@lucide/angular';
 import { map } from 'rxjs';
@@ -44,7 +44,7 @@ export class ProjectDetailPage {
     stream: ({ params: id }) => this.projectsApi.projectsControllerFindRelated(id, RELATED_PROJECTS_LIMIT),
   });
 
-  protected readonly relatedProjectsList = computed<ProjectDto[]>(() =>
+  protected readonly relatedProjectsList = computed<PublicProjectDto[]>(() =>
     this.relatedProjects.hasValue() ? this.relatedProjects.value() : []
   );
 

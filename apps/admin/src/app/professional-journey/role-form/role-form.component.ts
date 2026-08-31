@@ -2,7 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OrganizationDto, RoleDto } from '@portfolio-ebeerens/api-client';
-import { Button, Card, Markdown, Select, SelectOption, TagCombobox, TextInput } from '@portfolio-ebeerens/ui';
+import {
+  Button,
+  Card,
+  FormLanguage,
+  LanguageTabs,
+  Markdown,
+  Select,
+  SelectOption,
+  TagCombobox,
+  TextInput,
+} from '@portfolio-ebeerens/ui';
 import { EMPLOYMENT_TYPE_OPTIONS } from '../employment-type';
 
 export const NEW_ORGANIZATION_VALUE = '__new__';
@@ -11,7 +21,8 @@ export interface RoleFormValue {
   jobTitle: string;
   organizationId: string;
   newOrganizationName: string;
-  description: string;
+  descriptionEn: string;
+  descriptionNl: string;
   location: string;
   employmentType: string;
   startDate: string;
@@ -24,7 +35,7 @@ export interface RoleFormValue {
  */
 @Component({
   selector: 'admin-role-form',
-  imports: [Button, Card, Markdown, ReactiveFormsModule, Select, TagCombobox, TextInput],
+  imports: [Button, Card, LanguageTabs, Markdown, ReactiveFormsModule, Select, TagCombobox, TextInput],
   templateUrl: './role-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -46,6 +57,7 @@ export class RoleForm {
   protected readonly newOrganizationValue = NEW_ORGANIZATION_VALUE;
   protected readonly isEditing = computed(() => this.role() !== undefined);
   protected readonly descriptionView = signal<'markdown' | 'preview'>('markdown');
+  protected readonly descriptionLanguage = signal<FormLanguage>('en');
   protected readonly employmentTypeOptions = EMPLOYMENT_TYPE_OPTIONS;
   protected readonly organizationOptions = computed<SelectOption[]>(() => [
     ...this.organizations().map((organization) => ({ value: organization.id, label: organization.name })),
@@ -56,13 +68,18 @@ export class RoleForm {
     jobTitle: ['', [Validators.required, Validators.maxLength(200)]],
     organizationId: ['', Validators.required],
     newOrganizationName: [''],
-    description: [''],
+    descriptionEn: [''],
+    descriptionNl: [''],
     location: ['', Validators.maxLength(200)],
     employmentType: [''],
     startDate: ['', Validators.required],
     endDate: [''],
     skills: this.formBuilder.nonNullable.control<string[]>([]),
   });
+
+  protected readonly activeDescriptionControl = computed(() =>
+    this.descriptionLanguage() === 'en' ? this.form.controls.descriptionEn : this.form.controls.descriptionNl
+  );
 
   private readonly organizationIdValue = toSignal(this.form.controls.organizationId.valueChanges, {
     initialValue: '',
@@ -99,6 +116,7 @@ export class RoleForm {
 
   private resetForm(): void {
     this.descriptionView.set('markdown');
+    this.descriptionLanguage.set('en');
     const role = this.role();
     this.form.reset(
       role
@@ -106,7 +124,8 @@ export class RoleForm {
             jobTitle: role.jobTitle,
             organizationId: role.organization.id,
             newOrganizationName: '',
-            description: role.description ?? '',
+            descriptionEn: role.descriptionEn ?? '',
+            descriptionNl: role.descriptionNl ?? '',
             location: role.location ?? '',
             employmentType: role.employmentType ?? '',
             startDate: role.startDate.slice(0, 10),
@@ -117,7 +136,8 @@ export class RoleForm {
             jobTitle: '',
             organizationId: '',
             newOrganizationName: '',
-            description: '',
+            descriptionEn: '',
+            descriptionNl: '',
             location: '',
             employmentType: '',
             startDate: '',

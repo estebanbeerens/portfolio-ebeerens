@@ -1,4 +1,4 @@
-import { ProfileDto } from '@portfolio-ebeerens/api-client';
+import { PublicProfileDto } from '@portfolio-ebeerens/api-client';
 import { socialLinksFor } from './social-link.model';
 
 describe('socialLinksFor', () => {
@@ -7,7 +7,7 @@ describe('socialLinksFor', () => {
   });
 
   it('includes only the platforms with a URL, in a stable display order', () => {
-    const profile: ProfileDto = {
+    const profile: PublicProfileDto = {
       id: 'profile-1',
       name: 'John Beerens',
       githubUrl: 'https://github.com/john',

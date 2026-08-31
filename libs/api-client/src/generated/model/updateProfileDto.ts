@@ -18,9 +18,13 @@ export interface UpdateProfileDto {
    */
   headline?: string;
   /**
-   * Markdown source for the biography, as authored in admin
+   * Markdown source for the biography, as authored in admin (English)
    */
-  bio?: string;
+  bioEn?: string;
+  /**
+   * Markdown source for the biography, as authored in admin (Dutch)
+   */
+  bioNl?: string;
   /**
    * URL of the profile avatar image
    */

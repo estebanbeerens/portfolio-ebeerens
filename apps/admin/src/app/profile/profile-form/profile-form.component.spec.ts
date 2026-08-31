@@ -10,7 +10,7 @@ const profile: ProfileDto = {
   name: 'Jane Doe',
   headline: 'Frontend engineer',
   location: 'Amsterdam, Netherlands',
-  bio: '## About',
+  bioEn: '## About',
   githubUrl: 'https://github.com/jane-doe',
   updatedAt: '2026-08-19T00:00:00.000Z',
 };
@@ -85,7 +85,7 @@ describe('ProfileForm', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.savedValue).toMatchObject({
       name: 'Jane Doe',
-      bio: '## Biography\n\nSafe **Markdown**.',
+      bioEn: '## Biography\n\nSafe **Markdown**.',
     });
   });
 

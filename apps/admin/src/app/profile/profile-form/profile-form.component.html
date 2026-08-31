@@ -24,7 +24,13 @@
     <div>
       <label class="text-sm font-medium" for="profile-biography">Biography</label>
       <p class="text-text mt-1 text-sm">Markdown is supported and sanitized when previewed or published.</p>
-      <div class="border-border mt-2 flex gap-1 border-b" role="tablist" aria-label="Biography view">
+      <ui-language-tabs
+        class="mt-2 block"
+        label="Biography language"
+        panelId="profile-biography-panel"
+        [(language)]="biographyLanguage"
+      />
+      <div class="border-border flex gap-1 border-b" role="tablist" aria-label="Biography view">
         <button
           type="button"
           role="tab"
@@ -55,11 +61,11 @@
           <textarea
             id="profile-biography"
             class="border-border bg-surface min-h-56 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm"
-            formControlName="bio"
+            [formControl]="activeBioControl()"
           ></textarea>
         } @else {
           <div class="border-border bg-surface-raised min-h-56 overflow-auto rounded-b border border-t-0 p-4">
-            <markdown [data]="form.controls.bio.value" ngPreserveWhitespaces />
+            <markdown [data]="activeBioControl().value" ngPreserveWhitespaces />
           </div>
         }
       </div>

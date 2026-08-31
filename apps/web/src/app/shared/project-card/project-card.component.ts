@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ProjectDto } from '@portfolio-ebeerens/api-client';
+import { PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { Card } from '@portfolio-ebeerens/ui';
 import { projectSkillSummary, projectYear } from '../project-summary.util';
 import { PROJECT_IMAGE_NG_SRCSET } from '../r2-image-loader';
@@ -14,7 +14,7 @@ import { PROJECT_IMAGE_NG_SRCSET } from '../r2-image-loader';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectCard {
-  readonly project = input.required<ProjectDto>();
+  readonly project = input.required<PublicProjectDto>();
   // Alternates the placeholder gradient tone when a project has no image; pass the item's list index.
   readonly index = input(0);
 
