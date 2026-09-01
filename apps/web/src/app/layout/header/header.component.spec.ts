@@ -42,6 +42,7 @@ describe('Header', () => {
     expect(compiled.querySelector('a[href="/resume"]')?.textContent).toContain('Resume');
     expect(compiled.querySelector('a[href="/projects"]')?.textContent).toContain('Projects');
     expect(compiled.querySelector('a[href="/contact"]')?.textContent).toContain('Contact');
+    expect(compiled.querySelectorAll('ui-language-menu')).toHaveLength(2);
   });
 
   it('hides gated nav links when their feature flag is disabled', async () => {

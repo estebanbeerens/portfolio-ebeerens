@@ -1,0 +1,39 @@
+<button
+  type="button"
+  class="border-border bg-glass text-text hover:border-border-strong hover:bg-glass-hover focus-visible:outline-accent inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  aria-label="Choose language"
+  [attr.aria-expanded]="open()"
+  aria-haspopup="menu"
+  (click)="toggle()"
+>
+  <span aria-hidden="true">{{ currentLanguage().toUpperCase() }}</span>
+  <svg
+    class="size-3.5 transition-transform"
+    [class.rotate-180]="open()"
+    [lucideIcon]="chevronIcon"
+    aria-hidden="true"
+  ></svg>
+</button>
+
+@if (open()) {
+  <div
+    class="border-border bg-surface shadow-elevation absolute top-full right-0 z-50 mt-2 min-w-44 overflow-hidden rounded-sm border p-1"
+    role="menu"
+    aria-label="Language options"
+  >
+    @for (language of languages; track language.code) {
+      <a
+        class="text-text hover:bg-glass-hover focus-visible:outline-accent flex min-h-11 items-center gap-3 rounded-xs px-3 py-2 text-sm font-medium no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+        role="menuitem"
+        [href]="languageHref(language.code)"
+        (click)="close()"
+      >
+        <span class="text-base leading-none" aria-hidden="true">{{ language.flag }}</span>
+        <span class="flex-1">{{ language.label }}</span>
+        @if (language.code === currentLanguage()) {
+          <svg class="text-accent size-4" [lucideIcon]="checkIcon" aria-label="Current language"></svg>
+        }
+      </a>
+    }
+  </div>
+}

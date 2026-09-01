@@ -15,17 +15,7 @@
     </a>
 
     <div class="flex items-center gap-2 sm:gap-6">
-      <button
-        type="button"
-        class="border-border bg-surface text-text focus-visible:outline-accent inline-flex size-11 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 sm:hidden"
-        aria-label="Open navigation"
-        i18n-aria-label="@@header.nav.openMenu"
-        aria-controls="mobile-nav"
-        [attr.aria-expanded]="navOpen()"
-        (click)="toggleNav()"
-      >
-        <svg class="size-4" [lucideIcon]="menuIcon" aria-hidden="true"></svg>
-      </button>
+      <ui-language-menu class="sm:hidden" />
       <a
         class="nav-link"
         routerLink="/"
@@ -49,7 +39,19 @@
           >Contact</a
         >
       }
+      <ui-language-menu class="hidden sm:inline-flex" />
       <ui-theme-toggle class="hidden sm:inline-flex" />
+      <button
+        type="button"
+        class="border-border bg-surface text-text focus-visible:outline-accent inline-flex size-11 items-center justify-center rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 sm:hidden"
+        aria-label="Open navigation"
+        i18n-aria-label="@@header.nav.openMenu"
+        aria-controls="mobile-nav"
+        [attr.aria-expanded]="navOpen()"
+        (click)="toggleNav()"
+      >
+        <svg class="size-4" [lucideIcon]="menuIcon" aria-hidden="true"></svg>
+      </button>
     </div>
   </nav>
 </header>

@@ -18,7 +18,7 @@ export class Button {
 
   protected readonly hostClass = computed(() => {
     const base =
-      'focus-visible:outline-accent inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
+      'focus-visible:outline-accent inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
 
     const styles: Record<'filled' | 'outlined', Record<'default' | 'danger', string>> = {
       filled: {

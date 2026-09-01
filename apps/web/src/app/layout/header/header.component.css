@@ -1,3 +1,7 @@
+.desktop-language-menu {
+  display: none;
+}
+
 .nav-link {
   border-radius: 0.25rem;
   color: var(--color-text-muted-value);
@@ -33,6 +37,10 @@
 }
 
 @media (width >= 640px) {
+  .desktop-language-menu {
+    display: inline-flex;
+  }
+
   .nav-link {
     display: inline-flex;
     align-items: center;
