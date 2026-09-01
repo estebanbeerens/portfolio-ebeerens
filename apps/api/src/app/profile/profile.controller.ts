@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Headers, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { actorOf, RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
 import { resolveLocale } from '../shared/locale.util';
@@ -26,6 +26,7 @@ export class ProfileController {
     required: false,
     description: 'Requested content language (en/nl); defaults to en',
   })
+  @Header('Vary', 'X-Accept-Language')
   getPublicPortfolio(@Headers('x-accept-language') language?: string) {
     return this.profileService.findPublicPortfolio(resolveLocale(language));
   }

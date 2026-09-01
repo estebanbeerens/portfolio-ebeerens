@@ -7,7 +7,7 @@ import { provideRouter, TitleStrategy, withInMemoryScrolling, withViewTransition
 import { provideApi } from '@portfolio-ebeerens/api-client';
 import { catchError, firstValueFrom, filter, of, timeout } from 'rxjs';
 import { appRoutes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions } from '@angular/platform-browser';
 import { languageInterceptor } from './core/http/language.interceptor';
 import { PortfolioContentService } from './shared/portfolio-content.service';
 import { PortfolioTitleStrategy } from './portfolio-title.strategy';
@@ -23,7 +23,7 @@ const FEATURE_FLAGS_SSR_INIT_TIMEOUT_MS = 9000;
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(withEventReplay(), withHttpTransferCacheOptions({ includeHeaders: ['x-accept-language'] })),
     provideBrowserGlobalErrorListeners(),
     provideRouter(
       appRoutes,

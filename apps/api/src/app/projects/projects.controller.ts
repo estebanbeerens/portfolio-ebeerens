@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Headers,
   HttpCode,
   HttpStatus,
@@ -62,6 +63,7 @@ export class ProjectsController {
     required: false,
     description: 'Requested content language (en/nl); defaults to en',
   })
+  @Header('Vary', 'X-Accept-Language')
   findRelated(
     @Param('id') id: string,
     @Query('limit') limit?: string,
