@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { ProjectsService, PublicProjectDto } from '@portfolio-ebeerens/api-client';
 import { Observable, of } from 'rxjs';
-import { PortfolioContentService } from '../../shared/portfolio-content.service';
+import { ProjectsContentService } from '../projects/projects-content.service';
 import { ProjectDetailPage } from './project-detail-page.component';
 
 const project: PublicProjectDto = {
@@ -45,7 +45,7 @@ describe('ProjectDetailPage', () => {
         provideRouter([]),
         { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ slug: options.slug })) } },
         {
-          provide: PortfolioContentService,
+          provide: ProjectsContentService,
           useValue: { projectBySlug: options.projectBySlug, projectsLoaded: signal(true) },
         },
         {

@@ -54,6 +54,18 @@ export class ProjectsController {
     return this.projectsService.findAll();
   }
 
+  @Get('public')
+  @ApiOkResponse({ description: 'Public projects sorted latest to oldest', type: [PublicProjectDto] })
+  @ApiHeader({
+    name: 'x-accept-language',
+    required: false,
+    description: 'Requested content language (en/nl); defaults to en',
+  })
+  @Header('Vary', 'X-Accept-Language')
+  findPublicAll(@Headers('x-accept-language') language?: string) {
+    return this.projectsService.findPublicAll(resolveLocale(language));
+  }
+
   @Get(':id/related')
   @ApiOkResponse({ description: 'Other projects related by shared skills', type: [PublicProjectDto] })
   @ApiNotFoundResponse({ description: 'No project with this id exists' })

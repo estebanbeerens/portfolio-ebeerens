@@ -9,6 +9,8 @@ import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PublicPortfolioDto } from './dto/public-portfolio.dto';
 
+const PUBLIC_PROJECT_LIMIT = 6;
+
 @Injectable()
 export class ProfileService {
   constructor(
@@ -33,6 +35,7 @@ export class ProfileService {
         include: { organization: true, skills: true },
       }),
       this.prisma.project.findMany({
+        take: PUBLIC_PROJECT_LIMIT,
         orderBy: { createdAt: 'desc' },
         include: { skills: true },
       }),

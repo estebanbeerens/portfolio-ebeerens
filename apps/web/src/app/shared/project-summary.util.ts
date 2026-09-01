@@ -4,6 +4,17 @@ export function projectYear(project: PublicProjectDto): number {
   return new Date(project.endDate ?? project.startDate).getFullYear();
 }
 
+export function projectDateRange(project: PublicProjectDto): string {
+  const start = formatMonthYear(project.startDate);
+  return project.endDate ? `${start} - ${formatMonthYear(project.endDate)}` : start;
+}
+
+export function projectYearRange(project: PublicProjectDto): string {
+  const startYear = year(project.startDate);
+  const endYear = project.endDate ? year(project.endDate) : startYear;
+  return startYear === endYear ? String(startYear) : `${startYear}-${endYear}`;
+}
+
 export function projectSkillSummary(project: PublicProjectDto): string {
   return (
     project.skills
@@ -23,4 +34,14 @@ export function projectDuration(project: PublicProjectDto): string {
   const end = new Date(project.endDate);
   const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1);
   return months === 1 ? '1 Month' : `${months} Months`;
+}
+
+function formatMonthYear(value: string): string {
+  return new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(value))
+    .toLowerCase();
+}
+
+function year(value: string): number {
+  return new Date(value).getUTCFullYear();
 }

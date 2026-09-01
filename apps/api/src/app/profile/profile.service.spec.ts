@@ -139,4 +139,20 @@ describe('ProfileService', () => {
     expect(result.roles[0]).toMatchObject({ descriptionHtml: expect.not.stringContaining('<script>') });
     expect(result.projects[0].descriptionHtml).toContain('<a href="https://example.com">link</a>');
   });
+
+  it('gets only the six newest projects for the public portfolio', async () => {
+    const { service, prisma } = await build();
+    prisma.profile.findFirst.mockResolvedValue(null);
+    prisma.role.findMany.mockResolvedValue([]);
+    prisma.project.findMany.mockResolvedValue([]);
+    prisma.featureFlag.findMany.mockResolvedValue([]);
+
+    await service.findPublicPortfolio();
+
+    expect(prisma.project.findMany).toHaveBeenCalledWith({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      include: { skills: true },
+    });
+  });
 });

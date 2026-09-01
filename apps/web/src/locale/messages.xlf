@@ -24,7 +24,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="artifacts.eyebrow" datatype="html">
-        <source>Selected Work</source>
+        <source>Latest Projects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/home/components/engineered-artifacts-section/engineered-artifacts-section.component.html</context>
           <context context-type="linenumber">3,4</context>
@@ -139,14 +139,14 @@
         <source>Resume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/footer/footer.component.html</context>
-          <context context-type="linenumber">22,24</context>
+          <context context-type="linenumber">23,26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.copyright" datatype="html">
         <source> © <x id="INTERPOLATION" equiv-text="{{ currentYear }}"/> <x id="START_BLOCK_IF" equiv-text="@if (profile()?.name; as name) {"/> <x id="INTERPOLATION_1" equiv-text="{{ &apos; &apos; + name }}"/> <x id="CLOSE_BLOCK_IF" equiv-text="}"/> . Designed with Apple Liquid Glass aesthetic. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/footer/footer.component.html</context>
-          <context context-type="linenumber">25,31</context>
+          <context context-type="linenumber">27,33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.ariaLabel" datatype="html">
@@ -156,32 +156,69 @@
           <context context-type="linenumber">4,5</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="header.nav.openMenu" datatype="html">
+        <source>Open navigation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="header.nav.home" datatype="html">
         <source>Home</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">25,26</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">86,87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.projects" datatype="html">
         <source>Projects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">28,31</context>
+          <context context-type="linenumber">39,42</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">97,100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.resume" datatype="html">
         <source>Resume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">33,36</context>
+          <context context-type="linenumber">44,47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">110,113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.contact" datatype="html">
         <source>Contact</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">38,41</context>
+          <context context-type="linenumber">49,52</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">123,127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.nav.closeMenu" datatype="html">
+        <source>Close navigation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">61,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.nav.mobileLabel" datatype="html">
+        <source>Main navigation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">70,71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.eyebrow" datatype="html">
@@ -213,59 +250,59 @@
         </context-group>
       </trans-unit>
       <trans-unit id="contact.success.heading" datatype="html">
-        <source> Message sent </source>
+        <source>Message sent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">22,24</context>
+          <context context-type="linenumber">21,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.success.body" datatype="html">
         <source> Thanks for reaching out. I’ll get back to you as soon as I can. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">25,27</context>
+          <context context-type="linenumber">23,25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.fullName.label" datatype="html">
         <source>Full name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">38,39</context>
+          <context context-type="linenumber">36,37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.email.label" datatype="html">
         <source>Email</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.organization.label" datatype="html">
         <source>Organization</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">59,60</context>
+          <context context-type="linenumber">57,58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.subject.label" datatype="html">
         <source>Subject</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">69</context>
+          <context context-type="linenumber">67</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.message.label" datatype="html">
         <source>Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.verificationUnavailable" datatype="html">
         <source> Contact verification is not configured. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
-          <context context-type="linenumber">103,105</context>
+          <context context-type="linenumber">101,103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.form.submitting" datatype="html">
@@ -356,7 +393,7 @@
         <source>Something went wrong. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">123</context>
         </context-group>
       </trans-unit>
       <trans-unit id="notFound.code" datatype="html">
@@ -468,11 +505,67 @@
           <context context-type="linenumber">121,122</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="resume.title" datatype="html">
-        <source>Resume</source>
+      <trans-unit id="projects.eyebrow" datatype="html">
+        <source>All Projects</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.html</context>
-          <context context-type="linenumber">2,3</context>
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.title" datatype="html">
+        <source> Project Directory </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
+          <context context-type="linenumber">6,8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.listPanelLabel" datatype="html">
+        <source>Project list</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
+          <context context-type="linenumber">24,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.timelinePanelLabel" datatype="html">
+        <source>Project timeline</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
+          <context context-type="linenumber">58,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.empty" datatype="html">
+        <source> Projects are being prepared. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
+          <context context-type="linenumber">116,120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.displayModeLabel" datatype="html">
+        <source>Project display mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.timelinePresent" datatype="html">
+        <source>Present</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.listMode" datatype="html">
+        <source>List</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="projects.timelineMode" datatype="html">
+        <source>Timeline</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
     </body>

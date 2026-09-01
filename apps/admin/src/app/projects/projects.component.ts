@@ -33,7 +33,11 @@ export class Projects {
     params: () => (this.isBrowser ? true : undefined),
     stream: () => this.api.projectsControllerFindAll(),
   });
-  protected readonly projectList = computed(() => (this.projects.hasValue() ? this.projects.value() : undefined));
+  protected readonly projectList = computed(() =>
+    this.projects.hasValue()
+      ? [...this.projects.value()].sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
+      : undefined
+  );
   protected readonly formOpen = signal(false);
   protected readonly selectedProject = signal<ProjectDto | undefined>(undefined);
   protected readonly pendingDelete = signal<ProjectDto | undefined>(undefined);

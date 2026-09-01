@@ -42,6 +42,31 @@ describe('Projects', () => {
     expect(text).toContain('Angular');
   });
 
+  it('sorts projects from newest to oldest', async () => {
+    const olderProject = {
+      ...project,
+      id: 'project-older',
+      title: 'Older project',
+      createdAt: '2024-01-01T00:00:00.000Z',
+    };
+    const newerProject = {
+      ...project,
+      id: 'project-newer',
+      title: 'Newer project',
+      createdAt: '2025-01-01T00:00:00.000Z',
+    };
+    configure({ projectsControllerFindAll: vi.fn(() => of([olderProject, newerProject])) as never });
+
+    const fixture = TestBed.createComponent(Projects);
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const titles = Array.from(compiled.querySelectorAll<HTMLHeadingElement>('admin-project-list article h2')).map(
+      (title) => title.textContent?.trim()
+    );
+    expect(titles).toEqual(['Newer project', 'Older project']);
+  });
+
   it('renders an empty state when no projects exist', async () => {
     configure({ projectsControllerFindAll: vi.fn(() => of([])) as never });
 

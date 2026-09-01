@@ -9,9 +9,9 @@ import { LucideArrowLeft, LucideDynamicIcon, LucideExternalLink } from '@lucide/
 import { map } from 'rxjs';
 import { ProjectCard } from '../../shared/project-card/project-card.component';
 import { projectDuration, projectYear } from '../../shared/project-summary.util';
-import { PortfolioContentService } from '../../shared/portfolio-content.service';
 import { PortfolioTitleStrategy } from '../../portfolio-title.strategy';
 import { PROJECT_IMAGE_NG_SRCSET } from '../../shared/r2-image-loader';
+import { ProjectsContentService } from '../projects/projects-content.service';
 
 const RELATED_PROJECTS_LIMIT = 3;
 
@@ -22,7 +22,7 @@ const RELATED_PROJECTS_LIMIT = 3;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectDetailPage {
-  protected readonly content = inject(PortfolioContentService);
+  protected readonly content = inject(ProjectsContentService);
   private readonly projectsApi = inject(ProjectsService);
   private readonly route = inject(ActivatedRoute);
   private readonly titleStrategy = inject(PortfolioTitleStrategy);

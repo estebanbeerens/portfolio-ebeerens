@@ -1,7 +1,7 @@
 <section class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-8 p-6 lg:px-10" aria-labelledby="contact-title">
   <div class="max-w-3xl">
     <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase" i18n="@@contact.eyebrow">Contact</p>
-    <h1 id="contact-title" class="font-display text-text mt-3 text-4xl font-bold" i18n="@@contact.title">
+    <h1 id="contact-title" class="font-display text-text mt-2 text-4xl font-bold" i18n="@@contact.title">
       Get In Touch
     </h1>
     <p class="text-text-muted mt-4 max-w-2xl" i18n="@@contact.subtitle">
@@ -13,7 +13,7 @@
     <ui-card
       heading="Send a message"
       i18n-heading="@@contact.form.heading"
-      class="shadow-elevation"
+      class="shadow-elevation max-sm:p-5"
       density="comfortable"
     >
       @if (submissionState() === 'success') {

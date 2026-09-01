@@ -133,6 +133,26 @@ paths:
         '409':
           description: A project with this slug already exists
       tags: *ref_2
+  /api/projects/public:
+    get:
+      operationId: ProjectsController_findPublicAll
+      parameters:
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Public projects sorted latest to oldest
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicProjectDto'
+      tags: *ref_2
   /api/projects/{id}/related:
     get:
       operationId: ProjectsController_findRelated

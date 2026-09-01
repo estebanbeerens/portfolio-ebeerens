@@ -1,0 +1,97 @@
+<main class="mx-auto w-full max-w-7xl p-6 lg:px-10" aria-labelledby="projects-title">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+    <div class="flex flex-col gap-2">
+      <p class="text-accent font-mono text-xs uppercase" i18n="@@projects.eyebrow">All Projects</p>
+      <h1 id="projects-title" class="font-display text-text text-4xl font-bold" i18n="@@projects.title">
+        Project Directory
+      </h1>
+    </div>
+
+    <ui-segmented-control
+      class="w-full sm:w-auto"
+      [label]="displayModeLabel"
+      [options]="displayModeOptions"
+      [selected]="displayMode()"
+      (selectedChange)="setDisplayMode($event)"
+    />
+  </header>
+
+  @if (sortedProjects().length > 0) {
+    @if (displayMode() === 'list') {
+      <section
+        class="mt-10 flex flex-col gap-4 sm:mt-16 sm:gap-5"
+        role="tabpanel"
+        aria-label="Project list"
+        i18n-aria-label="@@projects.listPanelLabel"
+      >
+        @for (project of sortedProjects(); track project.id; let index = $index) {
+          <a class="project-row" [routerLink]="['/projects', project.slug]">
+            <div
+              class="project-thumbnail"
+              [class.project-thumbnail-violet]="index % 3 === 1"
+              [class.project-thumbnail-blue]="index % 3 === 2"
+              aria-hidden="true"
+            ></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-4">
+                <h2 class="font-display text-text text-xl font-bold sm:text-2xl">{{ project.title }}</h2>
+                <time
+                  class="text-text-subtle shrink-0 font-mono text-sm"
+                  [attr.datetime]="project.endDate ?? project.startDate"
+                >
+                  <span class="hidden lg:inline">{{ projectDateRange(project) }}</span>
+                  <span class="lg:hidden">{{ projectYearRange(project) }}</span>
+                </time>
+              </div>
+              <p class="text-text-muted mt-2 text-sm leading-6 sm:text-base">{{ project.shortDescription }}</p>
+              <p class="dark:text-accent mt-3 truncate font-mono text-sm text-cyan-900">
+                {{ projectSkillSummary(project) }}
+              </p>
+            </div>
+          </a>
+        }
+      </section>
+    } @else {
+      <section
+        class="timeline mt-10 sm:mt-16"
+        role="tabpanel"
+        aria-label="Project timeline"
+        i18n-aria-label="@@projects.timelinePanelLabel"
+      >
+        @for (project of sortedProjects(); track project.id) {
+          <article class="timeline-entry">
+            <a class="timeline-card" [routerLink]="['/projects', project.slug]">
+              <div class="flex items-baseline gap-2">
+                <time class="text-text-muted font-mono text-sm" [attr.datetime]="project.startDate">{{
+                  project.startDate | date: 'MMM yyyy'
+                }}</time>
+                @if (project.endDate) {
+                  <span class="text-text-subtle" aria-hidden="true">-</span>
+                  <time class="text-text-muted font-mono text-sm" [attr.datetime]="project.endDate">{{
+                    project.endDate | date: 'MMM yyyy'
+                  }}</time>
+                }
+              </div>
+              <h2 class="font-display text-text text-xl font-bold">{{ project.title }}</h2>
+              <p class="text-text-muted mt-3 text-sm leading-5">{{ project.shortDescription }}</p>
+              <p class="text-accent mt-2 font-mono text-sm">{{ projectSkillSummary(project) }}</p>
+            </a>
+            <div class="timeline-marker" aria-hidden="true">
+              <span></span>
+              <time class="timeline-year font-display text-text-muted text-sm font-bold">{{
+                projectYear(project)
+              }}</time>
+            </div>
+          </article>
+        }
+      </section>
+    }
+  } @else {
+    <p
+      class="border-border-subtle bg-glass text-text-muted mt-10 rounded-lg border p-6 sm:mt-16"
+      i18n="@@projects.empty"
+    >
+      Projects are being prepared.
+    </p>
+  }
+</main>

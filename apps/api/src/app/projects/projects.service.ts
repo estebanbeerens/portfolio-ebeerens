@@ -43,6 +43,17 @@ export class ProjectsService {
     });
   }
 
+  async findPublicAll(locale: Locale = 'en') {
+    const projects = await this.prisma.project.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { skills: true },
+    });
+
+    return [...projects]
+      .sort((a, b) => recencyValue(b) - recencyValue(a))
+      .map((project) => toPublicProject(project, locale, this.markdown));
+  }
+
   async findOne(id: string) {
     const project = await this.prisma.project.findUnique({
       where: { id },

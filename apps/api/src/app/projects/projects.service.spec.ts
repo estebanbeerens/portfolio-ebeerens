@@ -57,6 +57,36 @@ describe('ProjectsService', () => {
     return { service: moduleRef.get(ProjectsService), prisma, r2, derivatives };
   }
 
+  describe('findPublicAll', () => {
+    it('returns localized public projects sorted by latest project date', async () => {
+      const { service, prisma } = await build();
+      const olderEnded = project({
+        id: 'older-ended',
+        startDate: new Date('2023-01-01T00:00:00.000Z'),
+        endDate: new Date('2023-06-01T00:00:00.000Z'),
+      });
+      const newerActive = project({
+        id: 'newer-active',
+        shortDescriptionNl: 'Kort',
+        descriptionNl: 'Lang',
+        startDate: new Date('2025-01-01T00:00:00.000Z'),
+        endDate: null,
+      });
+
+      prisma.project.findMany.mockResolvedValue([olderEnded, newerActive]);
+
+      const result = await service.findPublicAll('nl');
+
+      expect(result.map((p) => p.id)).toEqual(['newer-active', 'older-ended']);
+      expect(result[0]).toMatchObject({ shortDescription: 'Kort', description: 'Lang' });
+      expect(result[0]).not.toHaveProperty('shortDescriptionEn');
+      expect(prisma.project.findMany).toHaveBeenCalledWith({
+        orderBy: { createdAt: 'desc' },
+        include: { skills: true },
+      });
+    });
+  });
+
   describe('findRelated', () => {
     it('throws NotFoundException when the target project does not exist', async () => {
       const { service, prisma } = await build();

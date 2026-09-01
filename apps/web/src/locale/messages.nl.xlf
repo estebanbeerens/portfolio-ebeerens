@@ -19,8 +19,8 @@
         <target>Woonplaats</target>
       </trans-unit>
       <trans-unit id="artifacts.eyebrow" datatype="html">
-        <source>Selected Work</source>
-        <target>Uitgelicht werk</target>
+        <source>Latest Projects</source>
+        <target>Laatste Projecten</target>
       </trans-unit>
       <trans-unit id="artifacts.title" datatype="html">
         <source> Engineered Artifacts </source>

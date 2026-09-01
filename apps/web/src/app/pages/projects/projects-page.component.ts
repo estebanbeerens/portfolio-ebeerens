@@ -1,20 +1,42 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Meta } from '@angular/platform-browser';
-import { EngineeredArtifactsSection } from '../../home/components/engineered-artifacts-section/engineered-artifacts-section.component';
-import { PortfolioContentService } from '../../shared/portfolio-content.service';
+import { RouterLink } from '@angular/router';
+import { SegmentedControl, SegmentedControlOption } from '@portfolio-ebeerens/ui';
+import {
+  projectDateRange,
+  projectSkillSummary,
+  projectYear,
+  projectYearRange,
+} from '../../shared/project-summary.util';
+import { ProjectsContentService } from './projects-content.service';
 
 @Component({
   selector: 'web-projects-page',
-  imports: [EngineeredArtifactsSection],
-  template: `
-    <div class="mx-auto w-full max-w-7xl p-6 lg:px-10">
-      <web-engineered-artifacts-section [projects]="content.sortedProjects()" />
-    </div>
-  `,
+  imports: [DatePipe, RouterLink, SegmentedControl],
+  templateUrl: './projects-page.component.html',
+  styleUrl: './projects-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProjectsPage {
-  protected readonly content = inject(PortfolioContentService);
+  private readonly projectsContent = inject(ProjectsContentService);
+  protected readonly sortedProjects = computed(() => this.projectsContent.sortedProjects());
+  protected readonly displayMode = signal<'list' | 'timeline'>('list');
+  protected readonly displayModeLabel = $localize`:@@projects.displayModeLabel:Project display mode`;
+  protected readonly displayModeOptions: readonly SegmentedControlOption[] = [
+    { value: 'list', label: $localize`:@@projects.listMode:List` },
+    { value: 'timeline', label: $localize`:@@projects.timelineMode:Timeline` },
+  ];
+  protected readonly projectDateRange = projectDateRange;
+  protected readonly projectYear = projectYear;
+  protected readonly projectYearRange = projectYearRange;
+  protected readonly projectSkillSummary = projectSkillSummary;
+
+  protected setDisplayMode(displayMode: string): void {
+    if (displayMode === 'list' || displayMode === 'timeline') {
+      this.displayMode.set(displayMode);
+    }
+  }
 
   constructor() {
     const meta = inject(Meta);
