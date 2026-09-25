@@ -7,11 +7,14 @@ export async function resetE2eDatabase() {
   const client = new Client({ connectionString: E2E_DATABASE_URL });
   await client.connect();
   await client.query('DELETE FROM "ActivityLog"');
+  await client.query('DELETE FROM "ContactMessage"');
   await client.query('DELETE FROM "Role"');
   await client.query('DELETE FROM "Organization"');
+  await client.query('DELETE FROM "Project"');
   await client.query('DELETE FROM "Skill"');
   await client.query('DELETE FROM "Profile"');
   await client.query('DELETE FROM "Session"');
+  await client.query('UPDATE "FeatureFlag" SET enabled = false');
   await client.end();
 }
 

@@ -76,7 +76,7 @@
   --color-surface-value: #f8fafc;
   --color-text-value: #08071a;
   /* Figma uses #64748b here; darkened to clear 4.5:1 against the glass Card background near the ambient glow blobs. */
-  --color-text-muted-value: #596980;
+  --color-text-muted-value: #4a5568;
   --color-border-value: rgb(8 7 26 / 0.15);
   /* Figma uses #0284c7 here; darkened so white filled-button text clears 4.5:1 (was 4.09:1). */
   --color-accent-value: #026fa8;
@@ -92,8 +92,8 @@
   --color-accent-tertiary-value: #1d4ed8;
   --color-border-subtle-value: rgb(8 7 26 / 0.1);
   --color-border-strong-value: rgb(8 7 26 / 0.3);
-  /* Figma uses #64748b here; darkened to clear 4.5:1 against --color-bg. */
-  --color-text-subtle-value: #5b6779;
+  /* Figma uses #64748b here; darkened to clear 4.5:1 against the glass Card background near the ambient glow blobs. */
+  --color-text-subtle-value: #55606e;
 }
 
 .dark {

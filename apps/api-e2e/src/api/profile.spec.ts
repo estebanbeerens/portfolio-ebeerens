@@ -16,7 +16,7 @@ describe('Profile API', () => {
       name: 'Jane Doe',
       headline: 'Frontend engineer',
       location: 'Amsterdam, Netherlands',
-      bio: '# About\n\nBuilding accessible interfaces.',
+      bioEn: '# About\n\nBuilding accessible interfaces.',
       avatarUrl: 'https://cdn.example.com/jane.png',
       linkedinUrl: 'https://www.linkedin.com/in/jane-doe',
       githubUrl: 'https://github.com/jane-doe',
@@ -39,7 +39,7 @@ describe('Profile API', () => {
 
     const update = await axios.put(
       '/api/profile',
-      { name: 'Jane Doe', bio: '## Biography\n\nMarkdown **source**.' },
+      { name: 'Jane Doe', bioEn: '## Biography\n\nMarkdown **source**.' },
       { headers }
     );
 
@@ -47,7 +47,7 @@ describe('Profile API', () => {
     expect(update.data).toEqual(
       expect.objectContaining({
         name: 'Jane Doe',
-        bio: '## Biography\n\nMarkdown **source**.',
+        bioEn: '## Biography\n\nMarkdown **source**.',
       })
     );
     expect(update.data).not.toHaveProperty('location');
