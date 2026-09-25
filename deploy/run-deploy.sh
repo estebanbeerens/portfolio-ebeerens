@@ -32,7 +32,9 @@ echo "Running database migrations..."
 "${compose[@]}" run --rm migrate
 
 echo "Restarting services..."
-"${compose[@]}" up -d --remove-orphans
+# `up -d` alone succeeds even when a container immediately crash-loops. Wait for services with a
+# healthcheck (notably the API) to become healthy before declaring the deployment successful.
+"${compose[@]}" up -d --remove-orphans --wait --wait-timeout 120
 
 echo "Pruning unused Docker images..."
 docker image prune -f
