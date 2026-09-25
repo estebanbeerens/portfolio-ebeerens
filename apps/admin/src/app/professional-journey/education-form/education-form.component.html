@@ -1,0 +1,99 @@
+<ui-card class="w-full xl:w-152 xl:shrink-0" [heading]="isEditing() ? 'Edit education' : 'New education'">
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="text-text-muted text-xs"><span aria-hidden="true" class="text-error">*</span> Required field</p>
+    <ui-input
+      controlId="education-degree"
+      label="Degree or qualification"
+      formControlName="degree"
+      [required]="true"
+      [error]="fieldInvalid('degree') ? 'Enter a degree or qualification.' : undefined"
+    />
+    <ui-input controlId="education-field" label="Field of study" formControlName="fieldOfStudy" />
+    <ui-select
+      controlId="education-institution"
+      label="Institution"
+      formControlName="institutionId"
+      [required]="true"
+      [options]="institutionOptions()"
+      placeholder="Select an institution"
+      [error]="fieldInvalid('institutionId') ? 'Select an institution.' : undefined"
+    />
+    @if (showNewInstitutionField()) {
+      <ui-input
+        controlId="education-new-institution"
+        label="New institution name"
+        formControlName="newInstitutionName"
+        [required]="true"
+        [error]="fieldInvalid('newInstitutionName') ? 'Enter the institution name.' : undefined"
+      />
+    }
+    <div>
+      <label class="text-sm font-medium" for="education-description">Description</label
+      ><ui-language-tabs
+        class="mt-1 block"
+        label="Description language"
+        panelId="education-description-panel"
+        [(language)]="descriptionLanguage"
+      />
+      <div class="border-border flex gap-1 border-b" role="tablist" aria-label="Education description editor">
+        <button
+          type="button"
+          role="tab"
+          class="hover:bg-glass-hover focus-visible:outline-accent rounded-t px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+          [class.text-accent]="descriptionView() === 'markdown'"
+          [attr.aria-selected]="descriptionView() === 'markdown'"
+          (click)="descriptionView.set('markdown')"
+        >
+          Markdown</button
+        ><button
+          type="button"
+          role="tab"
+          class="hover:bg-glass-hover focus-visible:outline-accent rounded-t px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
+          [class.text-accent]="descriptionView() === 'preview'"
+          [attr.aria-selected]="descriptionView() === 'preview'"
+          (click)="descriptionView.set('preview')"
+        >
+          Preview
+        </button>
+      </div>
+      <div id="education-description-panel" role="tabpanel">
+        @if (descriptionView() === 'markdown') {
+          <textarea
+            id="education-description"
+            class="border-border bg-surface min-h-32 w-full rounded-b border border-t-0 px-3 py-2 font-mono text-sm"
+            [formControl]="activeDescriptionControl()"
+          ></textarea>
+        } @else {
+          <div class="border-border bg-surface-raised min-h-32 rounded-b border border-t-0 p-3">
+            <ui-markdown [source]="activeDescriptionControl().value" />
+          </div>
+        }
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 sm:flex-row">
+      <ui-input
+        class="flex-1"
+        controlId="education-start"
+        label="Start date"
+        type="date"
+        formControlName="startDate"
+        [required]="true"
+        [error]="fieldInvalid('startDate') ? 'Enter a start date.' : undefined"
+      /><ui-input
+        class="flex-1"
+        controlId="education-end"
+        label="End date"
+        type="date"
+        formControlName="endDate"
+        hint="Leave blank if ongoing."
+      />
+    </div>
+    @if (formError(); as error) {
+      <p class="text-error text-xs" role="alert">{{ error }}</p>
+    }
+    <div class="flex justify-end gap-2">
+      <button uiButton variant="outlined" type="button" (click)="cancelled.emit()">Cancel</button
+      ><button uiButton type="submit" [disabled]="saving()">{{ saving() ? 'Saving...' : 'Save education' }}</button>
+    </div>
+  </form>
+</ui-card>

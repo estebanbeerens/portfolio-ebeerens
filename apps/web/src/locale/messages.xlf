@@ -107,6 +107,15 @@
           <context context-type="linenumber">119,122</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="journey.educationTitle" datatype="html">
+        <source> Education </source>
+      </trans-unit>
+      <trans-unit id="journey.educationAriaLabel" datatype="html">
+        <source>Education</source>
+      </trans-unit>
+      <trans-unit id="journey.educationComingSoon" datatype="html">
+        <source>Education details are coming soon.</source>
+      </trans-unit>
       <trans-unit id="journey.showLess" datatype="html">
         <source>Show less experience</source>
         <context-group purpose="location">

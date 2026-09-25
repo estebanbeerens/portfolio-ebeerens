@@ -120,3 +120,63 @@
     </ui-card>
   }
 </section>
+
+<section class="mt-12" aria-labelledby="education-title">
+  <h3 id="education-title" class="font-display text-text mb-6 text-3xl font-bold" i18n="@@journey.educationTitle">
+    Education
+  </h3>
+  @if (education().length > 0) {
+    <ol class="grid gap-0" aria-label="Education" i18n-aria-label="@@journey.educationAriaLabel">
+      @for (entry of education(); track entry.id; let last = $last) {
+        <li class="grid gap-5 sm:grid-cols-[7.5rem_2rem_minmax(0,1fr)] sm:gap-8">
+          <p class="dark:text-accent pt-6 font-mono text-sm font-semibold text-cyan-900 sm:text-right">
+            {{ educationDateRange(entry) }}
+          </p>
+          <div class="hidden flex-col items-center self-stretch pt-6 sm:flex" aria-hidden="true">
+            <span
+              class="border-accent bg-bg size-5 shrink-0 rounded-full border-2 shadow-[0_0_20px_rgb(56_189_248/0.45)]"
+            ></span>
+            @if (!last) {
+              <span class="bg-border-subtle w-px flex-1"></span>
+            }
+          </div>
+          <div class="pb-8">
+            <ui-card density="compact" class="shadow-elevation">
+              <div class="flex gap-3">
+                @if (entry.institution.logoUrl) {
+                  <img
+                    class="border-border-subtle size-10 shrink-0 rounded-full border object-cover"
+                    [src]="entry.institution.logoUrl"
+                    [alt]="entry.institution.name + ' logo'"
+                    width="40"
+                    height="40"
+                  />
+                } @else {
+                  <div
+                    class="bg-glass-active text-text flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                    aria-hidden="true"
+                  >
+                    {{ institutionInitials(entry.institution.name) }}
+                  </div>
+                }
+                <div>
+                  <h4 class="font-display text-text text-xl font-bold">{{ entry.degree }}</h4>
+                  <p class="text-text-subtle font-mono text-xs">
+                    {{ entry.institution.name }}{{ entry.fieldOfStudy ? ' · ' + entry.fieldOfStudy : '' }}
+                  </p>
+                  @if (entry.descriptionHtml) {
+                    <div class="text-text-muted mt-3 text-sm" [innerHTML]="entry.descriptionHtml"></div>
+                  }
+                </div>
+              </div>
+            </ui-card>
+          </div>
+        </li>
+      }
+    </ol>
+  } @else {
+    <ui-card density="compact"
+      ><p class="text-text-muted" i18n="@@journey.educationComingSoon">Education details are coming soon.</p></ui-card
+    >
+  }
+</section>

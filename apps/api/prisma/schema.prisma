@@ -62,6 +62,31 @@ model Organization {
   updatedAt     DateTime @updatedAt
 }
 
+model Institution {
+  id            String      @id @default(cuid())
+  name          String      @unique
+  logoUrl       String?
+  logoObjectKey String?
+  website       String?
+  educations    Education[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Education {
+  id            String      @id @default(cuid())
+  degree        String
+  fieldOfStudy  String?
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  descriptionEn String?     @db.Text
+  descriptionNl String?     @db.Text
+  startDate     DateTime
+  endDate       DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
 enum EmploymentType {
   FULL_TIME
   PART_TIME
@@ -134,6 +159,8 @@ enum ActivityEntity {
   PROJECT
   ROLE
   ORGANIZATION
+  INSTITUTION
+  EDUCATION
   RESUME
 }
 

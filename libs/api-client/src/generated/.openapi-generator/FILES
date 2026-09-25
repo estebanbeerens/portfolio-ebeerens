@@ -6,7 +6,9 @@ api/api.ts
 api/auth.service.ts
 api/contact.service.ts
 api/dashboard.service.ts
+api/education.service.ts
 api/featureFlags.service.ts
+api/institutions.service.ts
 api/organizations.service.ts
 api/profile.service.ts
 api/projects.service.ts
@@ -23,6 +25,9 @@ model/activityEntryDto.ts
 model/confirmResumeUploadDto.ts
 model/contactMessageDto.ts
 model/createContactMessageDto.ts
+model/createEducationDto.ts
+model/createInstitutionDto.ts
+model/createInstitutionLogoUploadUrlDto.ts
 model/createOrganizationDto.ts
 model/createOrganizationLogoUploadUrlDto.ts
 model/createProjectDto.ts
@@ -30,7 +35,10 @@ model/createProjectImageUploadUrlDto.ts
 model/createResumeUploadUrlDto.ts
 model/createRoleDto.ts
 model/dashboardSummaryDto.ts
+model/educationDto.ts
 model/featureFlagDto.ts
+model/institutionDto.ts
+model/institutionLogoUploadUrlDto.ts
 model/meResponseDto.ts
 model/models.ts
 model/organizationDto.ts
@@ -38,6 +46,7 @@ model/organizationLogoUploadUrlDto.ts
 model/profileDto.ts
 model/projectDto.ts
 model/projectImageUploadUrlDto.ts
+model/publicEducationDto.ts
 model/publicPortfolioDto.ts
 model/publicProfileDto.ts
 model/publicProjectDto.ts
@@ -47,7 +56,9 @@ model/resumeUploadUrlDto.ts
 model/roleDto.ts
 model/skillDto.ts
 model/updateContactMessageDto.ts
+model/updateEducationDto.ts
 model/updateFeatureFlagDto.ts
+model/updateInstitutionDto.ts
 model/updateOrganizationDto.ts
 model/updateProfileDto.ts
 model/updateProjectDto.ts

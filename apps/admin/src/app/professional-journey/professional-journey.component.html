@@ -26,9 +26,39 @@
   }
 </div>
 
+<div class="flex flex-col gap-6 transition-all duration-300 xl:flex-row">
+  <admin-education-list
+    [entries]="education.hasValue() ? education.value() : []"
+    [loading]="education.isLoading()"
+    [error]="education.error() ? 'Education could not be loaded. Try again.' : undefined"
+    (create)="beginEducationCreate()"
+    (edit)="beginEducationEdit($event)"
+    (delete)="askToDeleteEducation($event)"
+    (retry)="retry()"
+    (updateInstitution)="updateInstitution($event)"
+  />
+  @if (educationFormOpen()) {
+    <admin-education-form
+      [education]="selectedEducation()"
+      [institutions]="institutions.hasValue() ? institutions.value() : []"
+      [saving]="isSaving()"
+      [formError]="educationFormError()"
+      [resetToken]="educationFormResetToken()"
+      (saved)="saveEducation($event)"
+      (cancelled)="cancelEducationEdit()"
+    />
+  }
+</div>
+
 <admin-role-delete-dialog
   [role]="pendingDelete()"
   [deleting]="isDeleting()"
   (confirm)="deleteRole()"
   (dismiss)="cancelDelete()"
+/>
+<admin-education-delete-dialog
+  [education]="pendingEducationDelete()"
+  [deleting]="isEducationDeleting()"
+  (confirm)="deleteEducation()"
+  (dismiss)="cancelEducationDelete()"
 />

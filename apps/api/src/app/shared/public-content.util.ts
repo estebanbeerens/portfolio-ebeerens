@@ -57,3 +57,22 @@ export function toPublicRole<T extends RoleLike>(
     descriptionHtml: description ? markdown.render(description) : undefined,
   } as PublicRole<T>;
 }
+
+interface EducationLike {
+  descriptionEn: string | null;
+  descriptionNl: string | null;
+}
+
+export function toPublicEducation<T extends EducationLike>(
+  education: T,
+  locale: Locale,
+  markdown: MarkdownRenderService
+) {
+  const { descriptionEn, descriptionNl, ...rest } = education;
+  const description = pickLocalizedOptional(descriptionEn, descriptionNl, locale);
+  return {
+    ...rest,
+    description,
+    descriptionHtml: description ? markdown.render(description) : undefined,
+  };
+}

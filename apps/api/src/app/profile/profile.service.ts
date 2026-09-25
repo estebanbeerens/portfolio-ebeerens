@@ -4,7 +4,7 @@ import { ActivityService } from '../activity/activity.service';
 import { PrismaService } from '../prisma.service';
 import { Locale } from '../shared/locale.util';
 import { MarkdownRenderService } from '../shared/markdown-render.service';
-import { toPublicProject, toPublicRole } from '../shared/public-content.util';
+import { toPublicEducation, toPublicProject, toPublicRole } from '../shared/public-content.util';
 import { ProfileDto } from './dto/profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PublicPortfolioDto } from './dto/public-portfolio.dto';
@@ -28,7 +28,7 @@ export class ProfileService {
   }
 
   async findPublicPortfolio(locale: Locale = 'en'): Promise<PublicPortfolioDto> {
-    const [profile, roles, projects, featureFlags] = await Promise.all([
+    const [profile, roles, projects, education, featureFlags] = await Promise.all([
       this.prisma.profile.findFirst(),
       this.prisma.role.findMany({
         orderBy: { startDate: 'desc' },
@@ -39,12 +39,17 @@ export class ProfileService {
         orderBy: { createdAt: 'desc' },
         include: { skills: true },
       }),
+      this.prisma.education.findMany({
+        orderBy: { startDate: 'desc' },
+        include: { institution: true },
+      }),
       this.prisma.featureFlag.findMany({ orderBy: { key: 'asc' } }),
     ]);
 
     return {
       profile: profile ? this.toPublicProfileDto(profile, locale) : undefined,
       roles: roles.map((role) => toPublicRole(role, locale, this.markdown)),
+      education: education.map((entry) => toPublicEducation(entry, locale, this.markdown)),
       projects: projects.map((project) => toPublicProject(project, locale, this.markdown)),
       featureFlags,
     };

@@ -17,6 +17,7 @@ describe('App', () => {
               of({
                 profile: { id: 'profile-1', name: 'Alex Mercer', updatedAt: '2026-01-01' },
                 roles: [],
+                education: [],
                 projects: [],
                 featureFlags: [
                   { key: FeatureFlagDto.KeyEnum.Contact, enabled: false, updatedAt: '2026-01-01' },

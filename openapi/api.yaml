@@ -692,6 +692,186 @@ paths:
           description: No valid session
       tags:
         - dashboard
+  /api/education:
+    get:
+      operationId: EducationController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EducationDto'
+      tags: &ref_8
+        - education
+    post:
+      operationId: EducationController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEducationDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EducationDto'
+        '401':
+          description: ''
+      tags: *ref_8
+  /api/education/{id}:
+    get:
+      operationId: EducationController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EducationDto'
+        '404':
+          description: ''
+      tags: *ref_8
+    put:
+      operationId: EducationController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEducationDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EducationDto'
+        '404':
+          description: ''
+      tags: *ref_8
+    delete:
+      operationId: EducationController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ''
+      tags: *ref_8
+  /api/institutions/upload-url:
+    post:
+      operationId: InstitutionsController_createLogoUploadUrl
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstitutionLogoUploadUrlDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionLogoUploadUrlDto'
+        '401':
+          description: No valid session
+      tags: &ref_9
+        - institutions
+  /api/institutions:
+    get:
+      operationId: InstitutionsController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionDto'
+      tags: *ref_9
+    post:
+      operationId: InstitutionsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstitutionDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionDto'
+        '409':
+          description: An institution with this name already exists
+      tags: *ref_9
+  /api/institutions/{id}:
+    put:
+      operationId: InstitutionsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstitutionDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionDto'
+        '404':
+          description: No institution with this id exists
+      tags: *ref_9
+    delete:
+      operationId: InstitutionsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ''
+      tags: *ref_9
 info:
   title: Portfolio API
   description: API documentation for the portfolio backend
@@ -892,7 +1072,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_9
+          enum: &ref_11
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -939,6 +1119,65 @@ components:
         - organization
         - startDate
         - skills
+        - createdAt
+        - updatedAt
+    InstitutionDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: University of Amsterdam
+        logoUrl:
+          type: string
+        website:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+    PublicEducationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        degree:
+          type: string
+          example: Bachelor of Science
+        fieldOfStudy:
+          type: string
+          example: Computer Science
+        institution:
+          $ref: '#/components/schemas/InstitutionDto'
+        startDate:
+          format: date-time
+          type: string
+        endDate:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        description:
+          type: string
+        descriptionHtml:
+          type: string
+      required:
+        - id
+        - degree
+        - institution
+        - startDate
         - createdAt
         - updatedAt
     PublicProjectDto:
@@ -1051,6 +1290,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PublicRoleDto'
+        education:
+          description: Public education entries
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicEducationDto'
         projects:
           description: Public portfolio projects
           type: array
@@ -1063,6 +1307,7 @@ components:
             $ref: '#/components/schemas/FeatureFlagDto'
       required:
         - roles
+        - education
         - projects
         - featureFlags
     UpdateProfileDto:
@@ -1301,7 +1546,7 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: &ref_8
+          example: &ref_10
             - Angular
             - NestJS
             - Figma
@@ -1382,7 +1627,7 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: *ref_8
+          example: *ref_10
           type: array
           items:
             type: string
@@ -1493,7 +1738,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_9
+          enum: *ref_11
           example: FULL_TIME
         startDate:
           format: date-time
@@ -1557,7 +1802,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_10
+          enum: &ref_12
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -1579,7 +1824,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: &ref_11
+          example: &ref_13
             - Angular
             - NestJS
             - Figma
@@ -1621,7 +1866,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_10
+          enum: *ref_12
           example: FULL_TIME
         startDate:
           type: string
@@ -1635,7 +1880,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: *ref_11
+          example: *ref_13
           type: array
           items:
             type: string
@@ -1792,6 +2037,8 @@ components:
         - PROJECT
         - ROLE
         - ORGANIZATION
+        - INSTITUTION
+        - EDUCATION
         - RESUME
     ActivityAction:
       type: string
@@ -1850,3 +2097,154 @@ components:
         - totalSkills
         - resumeDownloadsLast30Days
         - recentActivity
+    EducationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        degree:
+          type: string
+          example: Bachelor of Science
+        fieldOfStudy:
+          type: string
+          example: Computer Science
+        institution:
+          $ref: '#/components/schemas/InstitutionDto'
+        descriptionEn:
+          type: string
+        descriptionNl:
+          type: string
+        startDate:
+          format: date-time
+          type: string
+        endDate:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - degree
+        - institution
+        - startDate
+        - createdAt
+        - updatedAt
+    CreateEducationDto:
+      type: object
+      properties:
+        degree:
+          type: string
+          example: Bachelor of Science
+        fieldOfStudy:
+          type: string
+          example: Computer Science
+        institutionId:
+          type: string
+          description: Id of the institution attended
+        descriptionEn:
+          type: string
+          description: Markdown description in English
+        descriptionNl:
+          type: string
+          description: Markdown description in Dutch
+        startDate:
+          type: string
+          example: '2018-09-01'
+        endDate:
+          type: string
+          example: '2022-06-30'
+      required:
+        - degree
+        - institutionId
+        - startDate
+    UpdateEducationDto:
+      type: object
+      properties:
+        degree:
+          type: string
+          example: Bachelor of Science
+        fieldOfStudy:
+          type: string
+          example: Computer Science
+        institutionId:
+          type: string
+          description: Id of the institution attended
+        descriptionEn:
+          type: string
+          description: Markdown description in English
+        descriptionNl:
+          type: string
+          description: Markdown description in Dutch
+        startDate:
+          type: string
+          example: '2018-09-01'
+        endDate:
+          type: string
+          example: '2022-06-30'
+    CreateInstitutionLogoUploadUrlDto:
+      type: object
+      properties:
+        fileName:
+          type: string
+        mimeType:
+          type: string
+          enum:
+            - image/png
+            - image/jpeg
+            - image/webp
+        fileSize:
+          type: number
+          maximum: 5242880
+      required:
+        - fileName
+        - mimeType
+        - fileSize
+    InstitutionLogoUploadUrlDto:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        objectKey:
+          type: string
+        publicUrl:
+          type: string
+      required:
+        - uploadUrl
+        - objectKey
+        - publicUrl
+    CreateInstitutionDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: University of Amsterdam
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/uva.png
+        logoObjectKey:
+          type: string
+          example: institutions/uuid.png
+        website:
+          type: string
+          example: https://www.uva.nl
+      required:
+        - name
+    UpdateInstitutionDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: University of Amsterdam
+        logoUrl:
+          type: string
+          example: https://cdn.example.com/logos/uva.png
+        logoObjectKey:
+          type: string
+          example: institutions/uuid.png
+        website:
+          type: string
+          example: https://www.uva.nl

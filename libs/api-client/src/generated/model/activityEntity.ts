@@ -13,6 +13,8 @@ export const ActivityEntity = {
   Project: 'PROJECT',
   Role: 'ROLE',
   Organization: 'ORGANIZATION',
+  Institution: 'INSTITUTION',
+  Education: 'EDUCATION',
   Resume: 'RESUME',
 } as const;
 export type ActivityEntity = (typeof ActivityEntity)[keyof typeof ActivityEntity];

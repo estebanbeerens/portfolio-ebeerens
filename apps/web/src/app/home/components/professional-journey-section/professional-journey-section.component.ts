@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { PublicRoleDto } from '@portfolio-ebeerens/api-client';
+import { PublicEducationDto, PublicRoleDto } from '@portfolio-ebeerens/api-client';
 import { Button, Card } from '@portfolio-ebeerens/ui';
 import { RoleCompanyGroup } from '../../../shared/portfolio-content.service';
 import { RoleDescription } from './role-description/role-description.component';
@@ -14,6 +14,7 @@ const COLLAPSED_COMPANY_COUNT = 3;
 })
 export class ProfessionalJourneySection {
   readonly groups = input<readonly RoleCompanyGroup[]>([]);
+  readonly education = input<readonly PublicEducationDto[]>([]);
 
   protected readonly expanded = signal(false);
   protected readonly hasMore = computed(() => this.groups().length > COLLAPSED_COMPANY_COUNT);
@@ -68,6 +69,22 @@ export class ProfessionalJourneySection {
   protected organizationInitials(name: string): string {
     const words = name.trim().split(/\s+/).filter(Boolean);
     return words
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  protected educationDateRange(entry: PublicEducationDto): string {
+    const start = new Date(entry.startDate).getFullYear();
+    const end = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present';
+    return `${start}-${end}`;
+  }
+
+  protected institutionInitials(name: string): string {
+    return name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
       .slice(0, 2)
       .map((word) => word.charAt(0).toUpperCase())
       .join('');

@@ -31,6 +31,7 @@ describe('ProfileService', () => {
       },
       role: { findMany: jest.fn() },
       project: { findMany: jest.fn() },
+      education: { findMany: jest.fn() },
       featureFlag: { findMany: jest.fn() },
     };
     const activity = { record: jest.fn() };
@@ -131,6 +132,7 @@ describe('ProfileService', () => {
         skills: [],
       },
     ]);
+    prisma.education.findMany.mockResolvedValue([]);
     prisma.featureFlag.findMany.mockResolvedValue([]);
 
     const result = await service.findPublicPortfolio();
@@ -145,6 +147,7 @@ describe('ProfileService', () => {
     prisma.profile.findFirst.mockResolvedValue(null);
     prisma.role.findMany.mockResolvedValue([]);
     prisma.project.findMany.mockResolvedValue([]);
+    prisma.education.findMany.mockResolvedValue([]);
     prisma.featureFlag.findMany.mockResolvedValue([]);
 
     await service.findPublicPortfolio();
