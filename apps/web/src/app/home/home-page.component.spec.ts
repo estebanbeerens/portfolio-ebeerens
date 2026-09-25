@@ -62,6 +62,7 @@ describe('HomePage', () => {
               of({
                 profile,
                 roles,
+                education: [],
                 projects,
                 featureFlags: [
                   { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },
@@ -97,6 +98,7 @@ describe('HomePage', () => {
               of({
                 profile,
                 roles,
+                education: [],
                 projects,
                 featureFlags: [
                   { key: FeatureFlagDto.KeyEnum.Roles, enabled: true, updatedAt: '2026-01-01' },

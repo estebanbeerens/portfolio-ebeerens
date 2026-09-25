@@ -1,0 +1,26 @@
+@if (education(); as education) {
+  <div
+    class="bg-overlay/60 fixed inset-0 z-50 flex items-center justify-center p-4"
+    role="presentation"
+    (click)="dismiss.emit()"
+  >
+    <div
+      class="bg-surface border-border w-full max-w-md rounded border p-6 shadow-xl"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-education-title"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keydown.escape)="dismiss.emit()"
+    >
+      <h2 id="delete-education-title" class="text-lg font-semibold">Delete {{ education.degree }}?</h2>
+      <p class="text-text-muted mt-2">This action cannot be undone.</p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button uiButton variant="outlined" type="button" (click)="dismiss.emit()">Cancel</button
+        ><button uiButton variant="filled" tone="danger" type="button" [disabled]="deleting()" (click)="confirm.emit()">
+          {{ deleting() ? 'Deleting...' : 'Delete education' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

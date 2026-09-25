@@ -66,6 +66,18 @@
         <source>Professional journey details are coming soon.</source>
         <target>Details over de professionele reis volgen binnenkort.</target>
       </trans-unit>
+      <trans-unit id="journey.educationTitle" datatype="html">
+        <source> Education </source>
+        <target> Opleiding </target>
+      </trans-unit>
+      <trans-unit id="journey.educationAriaLabel" datatype="html">
+        <source>Education</source>
+        <target>Opleiding</target>
+      </trans-unit>
+      <trans-unit id="journey.educationComingSoon" datatype="html">
+        <source>Education details are coming soon.</source>
+        <target>Opleidingsdetails volgen binnenkort.</target>
+      </trans-unit>
       <trans-unit id="journey.showLess" datatype="html">
         <source>Show less experience</source>
         <target>Toon minder ervaring</target>

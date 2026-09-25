@@ -9,6 +9,7 @@
  */
 import { PublicProjectDto } from './publicProjectDto';
 import { FeatureFlagDto } from './featureFlagDto';
+import { PublicEducationDto } from './publicEducationDto';
 import { PublicRoleDto } from './publicRoleDto';
 import { PublicProfileDto } from './publicProfileDto';
 
@@ -18,6 +19,10 @@ export interface PublicPortfolioDto {
    * Public professional roles
    */
   roles: Array<PublicRoleDto>;
+  /**
+   * Public education entries
+   */
+  education: Array<PublicEducationDto>;
   /**
    * Public portfolio projects
    */

@@ -9,7 +9,10 @@
     <web-hero-section [profile]="content.profileValue()" />
 
     @if (content.rolesEnabled()) {
-      <web-professional-journey-section [groups]="content.roleCompanyGroups()" />
+      <web-professional-journey-section
+        [groups]="content.roleCompanyGroups()"
+        [education]="content.sortedEducation()"
+      />
     }
 
     @if (content.projectsEnabled()) {

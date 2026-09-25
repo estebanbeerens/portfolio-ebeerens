@@ -22,7 +22,7 @@ function configure(flags: Partial<FeatureFlagDto>[] = allFlagsEnabled) {
         provide: ProfileService,
         useValue: {
           profileControllerGetPublicPortfolio: () =>
-            of({ profile: undefined, roles: [], projects: [], featureFlags: flags }),
+            of({ profile: undefined, roles: [], education: [], projects: [], featureFlags: flags }),
         },
       },
     ],

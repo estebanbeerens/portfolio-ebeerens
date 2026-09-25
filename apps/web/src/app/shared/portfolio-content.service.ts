@@ -7,6 +7,7 @@ import {
   PublicProfileDto,
   PublicProjectDto,
   PublicRoleDto,
+  PublicEducationDto,
 } from '@portfolio-ebeerens/api-client';
 
 export interface RoleCompanyGroup {
@@ -34,6 +35,11 @@ export class PortfolioContentService {
   });
 
   readonly roleCompanyGroups = computed<RoleCompanyGroup[]>(() => groupRolesByCompany(this.sortedRoles()));
+
+  readonly sortedEducation = computed<PublicEducationDto[]>(() => {
+    if (!this.portfolio.hasValue()) return [];
+    return [...this.portfolio.value().education].sort((a, b) => dateValue(b.startDate) - dateValue(a.startDate));
+  });
 
   readonly sortedProjects = computed<PublicProjectDto[]>(() => {
     if (!this.portfolio.hasValue()) {

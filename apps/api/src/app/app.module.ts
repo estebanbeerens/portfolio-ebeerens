@@ -4,8 +4,10 @@ import { ActivityModule } from './activity/activity.module';
 import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { EducationModule } from './education/education.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { HealthModule } from './health/health.module';
+import { InstitutionsModule } from './institutions/institutions.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma.module';
 import { ProfileModule } from './profile/profile.module';
@@ -32,6 +34,8 @@ import { StorageModule } from './storage/storage.module';
     ContactModule,
     ResumeModule,
     DashboardModule,
+    EducationModule,
+    InstitutionsModule,
   ],
 })
 export class AppModule {}

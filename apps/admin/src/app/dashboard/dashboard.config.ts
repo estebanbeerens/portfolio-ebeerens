@@ -1,6 +1,7 @@
 import {
   LucideBriefcase,
   LucideFolder,
+  LucideGraduationCap,
   LucidePlus,
   LucideRefreshCw,
   LucideSquarePen,
@@ -35,6 +36,8 @@ const ENTITY_ICONS: Record<ActivityEntity, LucideIconInput> = {
   [ActivityEntity.Project]: LucideFolder,
   [ActivityEntity.Role]: LucideBriefcase,
   [ActivityEntity.Organization]: LucideBriefcase,
+  [ActivityEntity.Institution]: LucideGraduationCap,
+  [ActivityEntity.Education]: LucideGraduationCap,
   [ActivityEntity.Resume]: LucideUpload,
 };
 

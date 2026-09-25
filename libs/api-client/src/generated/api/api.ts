@@ -4,8 +4,12 @@ export * from './contact.service';
 import { ContactService } from './contact.service';
 export * from './dashboard.service';
 import { DashboardService } from './dashboard.service';
+export * from './education.service';
+import { EducationService } from './education.service';
 export * from './featureFlags.service';
 import { FeatureFlagsService } from './featureFlags.service';
+export * from './institutions.service';
+import { InstitutionsService } from './institutions.service';
 export * from './organizations.service';
 import { OrganizationsService } from './organizations.service';
 export * from './profile.service';
@@ -22,7 +26,9 @@ export const APIS = [
   AuthService,
   ContactService,
   DashboardService,
+  EducationService,
   FeatureFlagsService,
+  InstitutionsService,
   OrganizationsService,
   ProfileService,
   ProjectsService,
