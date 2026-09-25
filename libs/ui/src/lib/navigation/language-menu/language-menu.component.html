@@ -1,6 +1,6 @@
 <button
   type="button"
-  class="border-border bg-glass text-text hover:border-border-strong hover:bg-glass-hover focus-visible:outline-accent inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  class="border-border bg-surface text-text hover:border-border-strong hover:bg-glass-hover focus-visible:outline-accent inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
   aria-label="Choose language"
   [attr.aria-expanded]="open()"
   aria-haspopup="menu"
@@ -28,7 +28,24 @@
         [href]="languageHref(language.code)"
         (click)="close()"
       >
-        <span class="text-base leading-none" aria-hidden="true">{{ language.flag }}</span>
+        @switch (language.code) {
+          @case ('en') {
+            <svg class="size-4 shrink-0 rounded-xs" viewBox="0 0 20 20" aria-hidden="true">
+              <rect width="20" height="20" fill="#00247d" />
+              <path d="M0 0L20 20M20 0L0 20" stroke="#fff" stroke-width="4" />
+              <path d="M0 0L20 20M20 0L0 20" stroke="#cf142b" stroke-width="1.6" />
+              <path d="M10 0V20M0 10H20" stroke="#fff" stroke-width="6" />
+              <path d="M10 0V20M0 10H20" stroke="#cf142b" stroke-width="3.6" />
+            </svg>
+          }
+          @case ('nl') {
+            <svg class="size-4 shrink-0 rounded-xs" viewBox="0 0 20 20" aria-hidden="true">
+              <rect width="20" height="6.67" y="0" fill="#ae1c28" />
+              <rect width="20" height="6.67" y="6.67" fill="#fff" />
+              <rect width="20" height="6.67" y="13.33" fill="#21468b" />
+            </svg>
+          }
+        }
         <span class="flex-1">{{ language.label }}</span>
         @if (language.code === currentLanguage()) {
           <svg class="text-accent size-4" [lucideIcon]="checkIcon" aria-label="Current language"></svg>

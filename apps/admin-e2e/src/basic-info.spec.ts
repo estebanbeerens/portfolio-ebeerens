@@ -1,8 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { authenticate } from './support/authenticate';
+import { resetAdminE2eDatabase } from './support/e2e-database';
 
 test.beforeEach(async ({ page }) => {
+  await resetAdminE2eDatabase();
   await authenticate(page);
 });
 

@@ -29,15 +29,20 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
+  // All specs share one Postgres instance and reset shared tables in beforeEach; running two tests
+  // at once (even across different browser projects) would race resets against each other.
+  fullyParallel: false,
+  workers: 1,
   globalTeardown: './src/support/global-teardown.ts',
   /* Run your local dev server before starting the tests */
+  // Only the admin app is started here — the @nx/playwright plugin already infers a task
+  // `dependsOn` on `api:serve-e2e` from this config (see `nx show project admin-e2e`), so nx
+  // guarantees the API is prepared and listening before Playwright ever runs. Also declaring it
+  // as a webServer here caused Playwright to invoke `npx nx run api:serve-e2e` a second time
+  // (its own health-check race against nx's own startup), which re-ran `prepare-e2e-db`
+  // (`docker compose up --force-recreate`) *after* the already-running server had seeded its
+  // feature flags at boot, wiping them out from under it for the rest of the run.
   webServer: [
-    {
-      command: 'npx nx run api:serve-e2e',
-      url: 'http://localhost:3000/api/docs',
-      reuseExistingServer: true,
-      cwd: workspaceRoot,
-    },
     {
       command: 'npx nx run admin:serve:e2e --host=localhost',
       url: 'http://localhost:4300',
