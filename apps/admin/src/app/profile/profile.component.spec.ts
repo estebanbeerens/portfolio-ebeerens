@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ProfileDto, ProfileService } from '@portfolio-ebeerens/api-client';
+import { ProfileDto, ProfileService, ResumeService } from '@portfolio-ebeerens/api-client';
 import { ToastService } from '@portfolio-ebeerens/ui';
 import { provideMarkdown } from 'ngx-markdown';
 import { of, throwError } from 'rxjs';
@@ -19,6 +19,7 @@ describe('Profile', () => {
       providers: [
         provideMarkdown(),
         { provide: ProfileService, useValue: api },
+        { provide: ResumeService, useValue: { resumeControllerPreview: vi.fn() } },
         { provide: ToastService, useValue: toast },
       ],
     });

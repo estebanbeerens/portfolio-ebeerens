@@ -1,0 +1,25 @@
+<ui-page-header title="CV requests" />
+<admin-cv-request-list
+  [page]="page()"
+  [loading]="resource.isLoading()"
+  [error]="error()"
+  [busy]="deleting()"
+  (remove)="pendingDelete.set($event)"
+  (retry)="resource.reload()"
+  (paginate)="offset.set($event)"
+/>
+<dialog
+  #confirmation
+  class="bg-surface text-text border-border backdrop:bg-overlay/60 fixed inset-0 m-auto w-full max-w-md space-y-4 rounded-md border p-6 shadow-xl"
+  aria-labelledby="delete-cv-request-title"
+  (cancel)="$event.preventDefault(); cancelDelete()"
+>
+  <h2 id="delete-cv-request-title" class="font-display text-xl font-semibold">Delete CV request?</h2>
+  <p class="text-text-muted text-sm">This action cannot be undone.</p>
+  <div class="flex justify-end gap-3">
+    <button uiButton type="button" variant="outlined" [disabled]="deleting()" (click)="cancelDelete()">Cancel</button>
+    <button uiButton type="button" tone="danger" [disabled]="deleting()" (click)="remove()">
+      {{ deleting() ? 'Deleting...' : 'Delete request' }}
+    </button>
+  </div>
+</dialog>

@@ -32,6 +32,7 @@ model Project {
   shortDescriptionNl String?   @db.VarChar(255)
   descriptionEn      String    @db.Text
   descriptionNl      String?   @db.Text
+  isCvFeatured       Boolean   @default(false)
   imageUrl           String?
   imageObjectKey     String?
   client             String?
@@ -45,10 +46,22 @@ model Project {
 }
 
 model Skill {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  projects Project[]
-  roles    Role[]
+  id              String         @id @default(cuid())
+  name            String         @unique
+  skillCategoryId String?
+  category        SkillCategory? @relation(fields: [skillCategoryId], references: [id], onDelete: SetNull)
+  projects        Project[]
+  roles           Role[]
+
+  @@index([skillCategoryId])
+}
+
+model SkillCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  skills    Skill[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Organization {
@@ -133,6 +146,20 @@ model ContactMessage {
   message      String
   isRead       Boolean  @default(false)
   createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model CvRequest {
+  id                 String   @id @default(cuid())
+  fullName           String?
+  email              String?
+  reason             String?
+  consentedAt        DateTime
+  consentTextVersion String
+  createdAt          DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 enum FeatureFlagKey {
@@ -189,8 +216,8 @@ model Resume {
 
 model ResumeDownload {
   id        String   @id @default(cuid())
-  resumeId  String
-  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId  String?
+  resume    Resume?  @relation(fields: [resumeId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 
   @@index([createdAt])

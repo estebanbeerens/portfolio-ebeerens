@@ -37,6 +37,24 @@
             </div>
           </div>
           <div class="flex shrink-0 gap-2">
+            <button
+              uiButton
+              type="button"
+              variant="outlined"
+              [disabled]="busy()"
+              [attr.aria-pressed]="project.isCvFeatured"
+              [attr.aria-label]="'Include ' + project.title + ' in CV'"
+              [title]="project.isCvFeatured ? 'Remove from CV' : 'Include in CV'"
+              (click)="toggleCv.emit(project)"
+            >
+              <svg
+                [lucideIcon]="starIcon"
+                [class]="
+                  project.isCvFeatured ? 'text-accent size-4 [&_path]:fill-current' : 'size-4 [&_path]:fill-none'
+                "
+                aria-hidden="true"
+              ></svg>
+            </button>
             <button uiButton variant="outlined" type="button" (click)="edit.emit(project)">Edit</button>
             <button uiButton variant="outlined" tone="danger" type="button" (click)="delete.emit(project)">
               Delete

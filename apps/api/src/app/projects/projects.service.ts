@@ -156,6 +156,23 @@ export class ProjectsService {
     }
   }
 
+  async setCvFeatured(id: string, isCvFeatured: boolean, actor?: string) {
+    await this.findOne(id);
+    const project = await this.prisma.project.update({
+      where: { id },
+      data: { isCvFeatured },
+      include: { skills: true },
+    });
+    await this.activity.record({
+      entityType: 'PROJECT',
+      entityId: id,
+      action: 'UPDATED',
+      summary: isCvFeatured ? 'Selected a project for the CV' : 'Removed a project from the CV',
+      actor,
+    });
+    return project;
+  }
+
   async remove(id: string, actor?: string) {
     const project = await this.findOne(id);
     await this.prisma.project.delete({ where: { id } });

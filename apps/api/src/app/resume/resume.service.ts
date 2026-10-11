@@ -1,75 +1,92 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
-import { ActivityAction, ActivityEntity } from '../../generated/prisma/enums';
-import { ActivityService } from '../activity/activity.service';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { Locale } from '../shared/locale.util';
 import { R2Service } from '../storage/r2.service';
-import { ConfirmResumeUploadDto } from './dto/confirm-resume-upload.dto';
-import { CreateResumeUploadUrlDto } from './dto/create-resume-upload-url.dto';
+import { CvRequestsService } from './cv-requests.service';
+import { CvDownloadDto } from './dto/cv-download.dto';
+import { RequestCvDto } from './dto/request-cv.dto';
+import { CvContent, fingerprint, ResumeContentService } from './resume-content.service';
+import { ResumePdfService } from './resume-pdf.service';
 
 @Injectable()
 export class ResumeService {
+  private readonly logger = new Logger(ResumeService.name);
+  private readonly inFlight = new Map<string, Promise<void>>();
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly r2: R2Service,
-    private readonly activity: ActivityService
+    private readonly source: ResumeContentService,
+    private readonly pdf: ResumePdfService,
+    private readonly requests: CvRequestsService
   ) {}
 
-  private get bucket(): string {
-    return process.env.R2_DOCUMENTS_BUCKET as string;
-  }
-
-  async createUploadUrl(dto: CreateResumeUploadUrlDto) {
-    const objectKey = `resume/${randomUUID()}.pdf`;
-    const uploadUrl = await this.r2.presignPut(this.bucket, objectKey, dto.mimeType, dto.fileSize);
-    return { uploadUrl, objectKey };
-  }
-
-  // There is only ever one resume, so confirming an upload replaces the existing row.
-  async confirmUpload(dto: ConfirmResumeUploadDto, actor?: string) {
-    const existing = await this.prisma.resume.findFirst();
-    const resume = existing
-      ? await this.prisma.resume.update({ where: { id: existing.id }, data: dto })
-      : await this.prisma.resume.create({ data: dto });
-
-    await this.activity.record({
-      entityType: ActivityEntity.RESUME,
-      entityId: resume.id,
-      action: existing ? ActivityAction.UPDATED : ActivityAction.CREATED,
-      summary: existing ? `Replaced the resume with "${dto.fileName}"` : `Uploaded resume "${dto.fileName}"`,
-      actor,
-    });
-
-    return resume;
-  }
-
-  async findResume() {
-    const resume = await this.prisma.resume.findFirst();
-    if (!resume) {
-      throw new NotFoundException('No resume has been uploaded yet');
+  async download(locale: Locale, dto: RequestCvDto = {}): Promise<CvDownloadDto> {
+    const identifying = await this.requests.validate(dto);
+    const downloadUrl = await this.generate(locale);
+    const results = await Promise.allSettled([
+      this.countDownload(),
+      ...(identifying ? [this.requests.record(dto)] : []),
+    ]);
+    const loggingStatus = !identifying ? 'not-requested' : results[1].status === 'fulfilled' ? 'recorded' : 'failed';
+    if (results.some((result) => result.status === 'rejected')) {
+      this.logger.warn('CV issued, but optional download logging failed');
     }
-    return resume;
+    return { downloadUrl, loggingStatus };
   }
 
-  /** Records the download before handing back a short-lived signed URL. */
-  async registerDownload() {
-    const resume = await this.findResume();
-    await this.prisma.resumeDownload.create({ data: { resumeId: resume.id } });
-    return this.r2.presignGet(this.bucket, resume.objectKey, resume.fileName);
+  async preview(locale: Locale): Promise<CvDownloadDto> {
+    return { downloadUrl: await this.generate(locale, true), loggingStatus: 'not-requested' };
   }
 
-  async deleteResume(actor?: string) {
-    const resume = await this.findResume();
-    await this.prisma.resume.delete({ where: { id: resume.id } });
-    if (this.r2.isConfigured) {
-      await this.r2.deleteObject(this.bucket, resume.objectKey);
+  private async countDownload(): Promise<void> {
+    await this.prisma.$transaction(
+      async (transaction) => {
+        await transaction.$executeRaw`SET LOCAL statement_timeout = '2000ms'`;
+        await transaction.resumeDownload.create({ data: {} });
+      },
+      { maxWait: 1000, timeout: 3000 }
+    );
+  }
+
+  private async generate(locale: Locale, preview = false): Promise<string> {
+    const bucket = process.env.R2_DOCUMENTS_BUCKET;
+    if (!bucket) throw new ServiceUnavailableException('CV storage is unavailable');
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const content = await this.source.snapshot(locale, preview);
+      const hash = fingerprint(content);
+      const key = `cv/${locale}/${hash}.pdf`;
+      try {
+        await this.ensureObject(bucket, key, content);
+      } catch {
+        this.logger.error('CV rendering or storage failed');
+        throw new ServiceUnavailableException('CV generation unavailable');
+      }
+      const latest = await this.source.snapshot(locale, preview);
+      if (fingerprint(latest) === hash) {
+        try {
+          return await this.r2.presignGet(bucket, key, `cv-${locale}.pdf`);
+        } catch {
+          throw new ServiceUnavailableException('CV delivery unavailable');
+        }
+      }
     }
-    await this.activity.record({
-      entityType: ActivityEntity.RESUME,
-      entityId: resume.id,
-      action: ActivityAction.DELETED,
-      summary: `Deleted the resume "${resume.fileName}"`,
-      actor,
-    });
+    throw new ServiceUnavailableException('CV content changed; please retry');
+  }
+
+  private async ensureObject(bucket: string, key: string, content: CvContent): Promise<void> {
+    const existing = this.inFlight.get(key);
+    if (existing) return existing;
+    const pending = (async () => {
+      if (await this.r2.objectExists(bucket, key)) return;
+      const document = await this.pdf.render(content);
+      await this.r2.putObject(bucket, key, document, 'application/pdf', 'private, max-age=300');
+    })();
+    this.inFlight.set(key, pending);
+    try {
+      await pending;
+    } finally {
+      this.inFlight.delete(key);
+    }
   }
 }

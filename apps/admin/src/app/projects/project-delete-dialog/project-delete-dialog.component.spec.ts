@@ -4,6 +4,7 @@ import { ProjectDto } from '@portfolio-ebeerens/api-client';
 import { ProjectDeleteDialog } from './project-delete-dialog.component';
 
 const project: ProjectDto = {
+  isCvFeatured: false,
   id: 'project-1',
   title: 'Portfolio site',
   slug: 'portfolio-site',

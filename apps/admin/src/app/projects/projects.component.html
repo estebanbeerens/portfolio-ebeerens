@@ -5,6 +5,8 @@
     [projects]="projectList()"
     [loading]="projects.isLoading()"
     [error]="requestError()"
+    [busy]="mutation() !== 'idle'"
+    (toggleCv)="toggleCv($event)"
     (create)="beginCreate()"
     (edit)="beginEdit($event)"
     (delete)="askToDelete($event)"

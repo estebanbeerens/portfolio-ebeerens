@@ -3,6 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { ContactMessageDto, ContactService, CreateContactMessageDto } from '@portfolio-ebeerens/api-client';
 import { NgxTurnstileComponent } from 'ngx-turnstile';
 import { of, throwError } from 'rxjs';
@@ -42,6 +43,7 @@ describe('ContactPage', () => {
     await TestBed.configureTestingModule({
       imports: [ContactPage, HttpClientTestingModule],
       providers: [
+        provideRouter([]),
         { provide: ContactService, useValue: contactService },
         {
           provide: PortfolioContentService,
@@ -246,6 +248,7 @@ describe('ContactPage', () => {
       providers: [
         { provide: ContactService, useValue: contactService },
         { provide: PortfolioContentService, useValue: { profileValue: () => undefined } },
+        provideRouter([]),
       ],
     })
       .overrideComponent(ContactPage, {

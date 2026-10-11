@@ -29,12 +29,17 @@ jobs:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BACKUPS_BUCKET: ${{ secrets.R2_BACKUPS_BUCKET }}
           R2_JURISDICTION: ${{ secrets.R2_JURISDICTION }}
+          BACKUP_KEY_INPUT: ${{ inputs.backup_key }}
         shell: bash
         run: |
           set -euo pipefail
 
-          if [[ -n "${{ inputs.backup_key }}" ]]; then
-            echo "backup_file=${{ inputs.backup_key }}" >> "$GITHUB_OUTPUT"
+          if [[ -n "${BACKUP_KEY_INPUT}" ]]; then
+            if [[ ! "${BACKUP_KEY_INPUT}" =~ ^backup-[0-9]{8}T[0-9]{6}Z\.sql\.gz$ ]]; then
+              echo "Use a timestamped backup filename, not an erasure marker." >&2
+              exit 1
+            fi
+            echo "backup_file=${BACKUP_KEY_INPUT}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -44,7 +49,7 @@ jobs:
             r2_endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
           fi
 
-          backup_file="$(aws --endpoint-url "${r2_endpoint}" s3 ls "s3://${R2_BACKUPS_BUCKET}/" --recursive | sort | tail -n 1 | awk '{print $4}')"
+          backup_file="$(aws --endpoint-url "${r2_endpoint}" s3api list-objects-v2 --bucket "${R2_BACKUPS_BUCKET}" --prefix backup- --output json | jq -r '[.Contents[]? | select(.Key | test("^backup-[0-9]{8}T[0-9]{6}Z\\.sql\\.gz$"))] | sort_by(.LastModified) | last.Key // empty')"
 
           if [[ -z "$backup_file" ]]; then
             echo "No backups found in s3://${R2_BACKUPS_BUCKET}/" >&2
@@ -131,7 +136,10 @@ jobs:
 
             echo "Restoring backup"
             export DATABASE_URL="postgresql://${db_user}:${db_password}@localhost:5434/${db_name}"
-            /opt/portfolio/deploy/restore-backup.sh "$backup_path"
+            export RESTORE_OFFLINE_CONFIRMED=true
+            export RESTORE_MIGRATION_IMAGE="$(docker inspect --format '{{.Config.Image}}' portfolio-api)-migrate"
+            cd /opt/portfolio
+            bash deploy/restore-backup.sh "$backup_path"
 
             echo "Verifying restored database"
             psql "$DATABASE_URL" -c '\dt'

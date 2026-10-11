@@ -9,6 +9,10 @@
  */
 
 export interface UpdateProjectDto {
+  /**
+   * Include this project in the generated CV
+   */
+  isCvFeatured?: boolean;
   title?: string;
   /**
    * URL-safe unique identifier

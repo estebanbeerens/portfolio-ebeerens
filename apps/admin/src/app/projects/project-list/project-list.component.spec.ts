@@ -4,6 +4,7 @@ import { ProjectDto } from '@portfolio-ebeerens/api-client';
 import { ProjectList } from './project-list.component';
 
 const project: ProjectDto = {
+  isCvFeatured: false,
   id: 'project-1',
   title: 'Portfolio site',
   slug: 'portfolio-site',
@@ -26,6 +27,7 @@ const project: ProjectDto = {
       (edit)="edited = $event"
       (delete)="deleted = $event"
       (retry)="retryCount = retryCount + 1"
+      (toggleCv)="starred = $event"
     />
   `,
 })
@@ -37,6 +39,7 @@ class HostComponent {
   retryCount = 0;
   edited: ProjectDto | undefined;
   deleted: ProjectDto | undefined;
+  starred: ProjectDto | undefined;
 }
 
 describe('ProjectList', () => {
@@ -52,6 +55,29 @@ describe('ProjectList', () => {
     expect(text).toContain('Portfolio site');
     expect(text).toContain('/portfolio-site');
     expect(text).toContain('Angular');
+  });
+
+  it('exposes the star as a named toggle and emits the selected project', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    await fixture.whenStable();
+    const star = fixture.nativeElement.querySelector('button[aria-pressed]') as HTMLButtonElement;
+    expect(star.getAttribute('aria-pressed')).toBe('false');
+    expect(star.getAttribute('aria-label')).toContain('Portfolio site');
+    star.click();
+    expect(fixture.componentInstance.starred).toEqual(project);
+  });
+
+  it('fills highlighted stars and leaves other stars outlined', async () => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.componentInstance.projects = [project, { ...project, id: 'featured', isCvFeatured: true }];
+    await fixture.whenStable();
+
+    const buttons = fixture.nativeElement.querySelectorAll('button[aria-pressed]') as NodeListOf<HTMLButtonElement>;
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('false');
+    expect(buttons[0].querySelector('svg')?.classList.contains('[&_path]:fill-none')).toBe(true);
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true');
+    expect(buttons[1].querySelector('svg')?.classList.contains('[&_path]:fill-current')).toBe(true);
+    expect(buttons[1].querySelector('path')).not.toBeNull();
   });
 
   it('renders a loading state', async () => {

@@ -1,21 +1,26 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { isPlatformBrowser } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { ProfileService, UpdateProfileDto } from '@portfolio-ebeerens/api-client';
-import { PageHeader, ToastService } from '@portfolio-ebeerens/ui';
+import { ProfileService, ResumeService, UpdateProfileDto } from '@portfolio-ebeerens/api-client';
+import { Button, FormLanguage, LanguageTabs, PageHeader, ToastService } from '@portfolio-ebeerens/ui';
+import { LucideDownload, LucideDynamicIcon } from '@lucide/angular';
 import { ProfileForm, ProfileFormValue } from './profile-form/profile-form.component';
-import { ResumeUpload } from './resume-upload/resume-upload.component';
 
 @Component({
   selector: 'admin-profile',
-  imports: [PageHeader, ProfileForm, ResumeUpload],
+  imports: [PageHeader, ProfileForm, Button, LanguageTabs, LucideDynamicIcon],
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-w-0 flex-1 flex-col gap-8' },
 })
 export class Profile {
   private readonly api = inject(ProfileService);
+  private readonly resume = inject(ResumeService);
+  private readonly document = inject(DOCUMENT);
+  protected readonly downloadIcon = LucideDownload;
+  protected readonly previewLocale = signal<FormLanguage>('en');
+  protected readonly previewing = signal(false);
   private readonly toast = inject(ToastService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
@@ -56,6 +61,26 @@ export class Profile {
             : 'Basic Info could not be saved. Check the form and try again.';
         this.formError.set(message);
         this.toast.error(message);
+      },
+    });
+  }
+
+  protected preview(): void {
+    if (!this.isBrowser || this.previewing()) return;
+    this.previewing.set(true);
+    this.resume.resumeControllerPreview(this.previewLocale(), 'body', false, { transferCache: false }).subscribe({
+      next: (result) => {
+        this.previewing.set(false);
+        const link = this.document.createElement('a');
+        link.href = result.downloadUrl;
+        link.download = `cv-${this.previewLocale()}.pdf`;
+        this.document.body.appendChild(link);
+        link.click();
+        link.remove();
+      },
+      error: () => {
+        this.previewing.set(false);
+        this.toast.error('The CV preview could not be generated. Try again.');
       },
     });
   }

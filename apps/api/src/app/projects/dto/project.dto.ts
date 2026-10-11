@@ -2,6 +2,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SkillDto } from '../../skills/dto/skill.dto';
 
 export class ProjectDto {
+  @ApiProperty({ description: 'Include this project in the generated CV' })
+  isCvFeatured: boolean;
+
   @ApiProperty({
     description: 'Unique identifier of the project',
     example: 'cly1x8f9z0000abcd1234efgh',

@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button, Card, TextInput, Textarea } from '@portfolio-ebeerens/ui';
@@ -29,7 +30,7 @@ type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
 
 @Component({
   selector: 'web-contact-page',
-  imports: [ReactiveFormsModule, TextInput, Textarea, Button, Card, BasicInfoCard, NgxTurnstileComponent],
+  imports: [ReactiveFormsModule, TextInput, Textarea, Button, Card, BasicInfoCard, NgxTurnstileComponent, RouterLink],
   templateUrl: './contact-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

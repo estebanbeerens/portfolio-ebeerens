@@ -31,6 +31,11 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('./pages/contact/contact-page.component').then((component) => component.ContactPage),
   },
   {
+    path: 'privacy',
+    title: 'Privacy',
+    loadComponent: () => import('./pages/privacy/privacy-page.component').then((component) => component.PrivacyPage),
+  },
+  {
     path: '**',
     title: 'Page not found',
     loadComponent: () =>

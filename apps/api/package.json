@@ -2,6 +2,7 @@
   "name": "api",
   "version": "0.0.1",
   "dependencies": {
-    "@prisma/client": "7.10.0"
+    "@prisma/client": "7.10.0",
+    "pdfmake": "0.2.20"
   }
 }

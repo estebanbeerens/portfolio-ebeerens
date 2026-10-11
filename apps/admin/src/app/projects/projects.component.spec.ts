@@ -6,6 +6,7 @@ import { provideMarkdown } from 'ngx-markdown';
 import { Projects } from './projects.component';
 
 const project: ProjectDto = {
+  isCvFeatured: false,
   id: 'project-1',
   title: 'Portfolio site',
   slug: 'portfolio-site',
@@ -42,17 +43,34 @@ describe('Projects', () => {
     expect(text).toContain('Angular');
   });
 
-  it('sorts projects from newest to oldest', async () => {
+  it('saves a star using the targeted endpoint rather than a partial project update', async () => {
+    const toggle = vi.fn(() => of({ ...project, isCvFeatured: true }));
+    const update = vi.fn();
+    configure({
+      projectsControllerFindAll: vi.fn(() => of([project])) as never,
+      projectsControllerSetCvFeatured: toggle as never,
+      projectsControllerUpdate: update as never,
+    });
+    const fixture = TestBed.createComponent(Projects);
+    await fixture.whenStable();
+    (fixture.nativeElement.querySelector('button[aria-pressed]') as HTMLButtonElement).click();
+    expect(toggle).toHaveBeenCalledWith(project.id, { isCvFeatured: true });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('sorts projects by start date newest to oldest, regardless of creation date', async () => {
     const olderProject = {
       ...project,
       id: 'project-older',
       title: 'Older project',
-      createdAt: '2024-01-01T00:00:00.000Z',
+      startDate: '2023-06-01',
+      createdAt: '2026-01-01T00:00:00.000Z',
     };
     const newerProject = {
       ...project,
       id: 'project-newer',
       title: 'Newer project',
+      startDate: '2025-01-01',
       createdAt: '2025-01-01T00:00:00.000Z',
     };
     configure({ projectsControllerFindAll: vi.fn(() => of([olderProject, newerProject])) as never });

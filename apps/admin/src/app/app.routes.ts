@@ -36,6 +36,11 @@ export const appRoutes: Route[] = [
         loadComponent: () => import('./projects/projects.component').then((m) => m.Projects),
       },
       {
+        path: 'skills',
+        title: 'Skills',
+        loadComponent: () => import('./skills/skills.component').then((m) => m.Skills),
+      },
+      {
         path: 'messages',
         title: 'Messages',
         loadComponent: () => import('./messages/messages.component').then((m) => m.Messages),
@@ -44,6 +49,11 @@ export const appRoutes: Route[] = [
         path: 'feature-flags',
         title: 'Feature Flags',
         loadComponent: () => import('./feature-flags/feature-flags.component').then((m) => m.FeatureFlags),
+      },
+      {
+        path: 'cv-requests',
+        title: 'CV Requests',
+        loadComponent: () => import('./cv-requests/cv-requests.component').then((module) => module.CvRequests),
       },
     ],
   },

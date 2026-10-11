@@ -2,8 +2,10 @@ import {
   LucideBriefcase,
   LucideFlag,
   LucideFolder,
+  LucideFileText,
   LucideLayoutGrid,
   LucideMail,
+  LucideTags,
   LucideUser,
   type LucideIconInput,
 } from '@lucide/angular';
@@ -20,6 +22,8 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   { label: 'Basic Info', route: '/basic-info', icon: LucideUser },
   { label: 'Professional Journey', route: '/professional-journey', icon: LucideBriefcase },
   { label: 'Projects', route: '/projects', icon: LucideFolder },
+  { label: 'Skills', route: '/skills', icon: LucideTags },
   { label: 'Messages', route: '/messages', icon: LucideMail },
+  { label: 'CV requests', route: '/cv-requests', icon: LucideFileText },
   { label: 'Feature Flags', route: '/feature-flags', icon: LucideFlag },
 ];

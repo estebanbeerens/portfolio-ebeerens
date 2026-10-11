@@ -55,4 +55,19 @@ describe('R2Service', () => {
       CacheControl: 'public, max-age=1',
     });
   });
+
+  it('treats only missing objects as cache misses', async () => {
+    const service = new R2Service();
+    const send = jest
+      .fn()
+      .mockRejectedValueOnce({ $metadata: { httpStatusCode: 404 } })
+      .mockRejectedValueOnce({ $metadata: { httpStatusCode: 403 } })
+      .mockResolvedValueOnce({});
+    (service as unknown as { getClient: () => { send: typeof send } }).getClient = () => ({ send });
+    await expect(service.objectExists('documents', 'cv/en/hash.pdf')).resolves.toBe(false);
+    await expect(service.objectExists('documents', 'cv/en/hash.pdf')).rejects.toMatchObject({
+      $metadata: { httpStatusCode: 403 },
+    });
+    await expect(service.objectExists('documents', 'cv/en/hash.pdf')).resolves.toBe(true);
+  });
 });

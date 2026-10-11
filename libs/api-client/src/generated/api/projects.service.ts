@@ -25,6 +25,8 @@ import { ProjectImageUploadUrlDto } from '../model/projectImageUploadUrlDto';
 // @ts-ignore
 import { PublicProjectDto } from '../model/publicProjectDto';
 // @ts-ignore
+import { SetCvFeaturedDto } from '../model/setCvFeaturedDto';
+// @ts-ignore
 import { UpdateProjectDto } from '../model/updateProjectDto';
 
 // @ts-ignore
@@ -566,6 +568,95 @@ export class ProjectsService extends BaseService {
     const { basePath, withCredentials } = this.configuration;
     return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * @endpoint put /api/projects/{id}/cv-featured
+   * @param id
+   * @param setCvFeaturedDto
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public projectsControllerSetCvFeatured(
+    id: string,
+    setCvFeaturedDto: SetCvFeaturedDto,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<ProjectDto>;
+  public projectsControllerSetCvFeatured(
+    id: string,
+    setCvFeaturedDto: SetCvFeaturedDto,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpResponse<ProjectDto>>;
+  public projectsControllerSetCvFeatured(
+    id: string,
+    setCvFeaturedDto: SetCvFeaturedDto,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpEvent<ProjectDto>>;
+  public projectsControllerSetCvFeatured(
+    id: string,
+    setCvFeaturedDto: SetCvFeaturedDto,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<any> {
+    if (id === null || id === undefined) {
+      throw new Error('Required parameter id was null or undefined when calling projectsControllerSetCvFeatured.');
+    }
+    if (setCvFeaturedDto === null || setCvFeaturedDto === undefined) {
+      throw new Error(
+        'Required parameter setCvFeaturedDto was null or undefined when calling projectsControllerSetCvFeatured.'
+      );
+    }
+
+    let localVarHeaders = this.defaultHeaders;
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    // to determine the Content-Type header
+    const consumes: string[] = ['application/json'];
+    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+    if (httpContentTypeSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+    }
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/projects/${this.configuration.encodeParam({ name: 'id', value: id, in: 'path', style: 'simple', explode: false, dataType: 'string', dataFormat: undefined })}/cv-featured`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<ProjectDto>('put', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      body: setCvFeaturedDto,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),
       headers: localVarHeaders,

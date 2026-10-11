@@ -32,6 +32,7 @@ import { CreateProjectImageUploadUrlDto } from './dto/create-project-image-uploa
 import { ProjectDto } from './dto/project.dto';
 import { ProjectImageUploadUrlDto } from './dto/project-image-upload-url.dto';
 import { PublicProjectDto } from './dto/public-project.dto';
+import { SetCvFeaturedDto } from './dto/set-cv-featured.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
 
@@ -112,6 +113,15 @@ export class ProjectsController {
   @ApiUnauthorizedResponse({ description: 'No valid session' })
   update(@Param('id') id: string, @Body() dto: UpdateProjectDto, @Req() req: RequestWithGithubUser) {
     return this.projectsService.update(id, dto, actorOf(req));
+  }
+
+  @Put(':id/cv-featured')
+  @UseGuards(SessionAuthGuard)
+  @ApiOkResponse({ description: 'The updated project', type: ProjectDto })
+  @ApiNotFoundResponse({ description: 'No project with this id exists' })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  setCvFeatured(@Param('id') id: string, @Body() dto: SetCvFeaturedDto, @Req() req: RequestWithGithubUser) {
+    return this.projectsService.setCvFeatured(id, dto.isCvFeatured, actorOf(req));
   }
 
   @Delete(':id')

@@ -2,6 +2,8 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma.service';
+import { TurnstileVerifier } from '../privacy/turnstile-verifier.service';
+import { PrivacyErasureService } from '../privacy/privacy-erasure.service';
 import { ContactService } from './contact.service';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
 
@@ -28,7 +30,12 @@ describe('ContactService', () => {
       },
     };
     const moduleRef = await Test.createTestingModule({
-      providers: [ContactService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        ContactService,
+        TurnstileVerifier,
+        { provide: PrismaService, useValue: prisma },
+        { provide: PrivacyErasureService, useValue: { record: jest.fn() } },
+      ],
     }).compile();
 
     return { service: moduleRef.get(ContactService), prisma };
@@ -63,6 +70,7 @@ describe('ContactService', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ secret: 'secret', response: 'turnstile-token' }),
+      signal: expect.any(AbortSignal),
     });
     expect(prisma.contactMessage.create).toHaveBeenCalledWith({
       data: {

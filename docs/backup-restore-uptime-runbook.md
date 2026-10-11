@@ -2,6 +2,33 @@
 
 This runbook covers the remaining production checks for Stage 13 and Stage 14.
 
+## Privacy deployment gate
+
+Before publishing the notice or enabling consented CV logging:
+
+1. Configure `PUBLIC_SITE_URL`, Turnstile secrets/site key/expected hostname, and private
+   `R2_DOCUMENTS_BUCKET` and `R2_BACKUPS_BUCKET`. API credentials need permission to write
+   erasure markers into the private backup bucket. Verify the privacy mailbox and actual
+   hosting/processing regions, provider roles and applicable transfer safeguards.
+2. Run `bash deploy/configure-r2-retention.sh` on the VPS with AWS CLI and jq installed.
+   It preserves unrelated rules: `cv/` expires after thirty days, `backup-` after thirty,
+   and `erasures/` after thirty-one. Inspect returned rules, existing objects and actual expiry;
+   lifecycle processing is not proven merely because the API accepted the configuration.
+3. Install the log policy: `sudo install -m 0644 deploy/portfolio-logs.logrotate /etc/logrotate.d/portfolio`.
+   Verify daily logrotate runs and nginx reopens files. API/proxy logs must not record submitted
+   names, emails, message bodies, tokens or signed URLs. Nginx's access format omits query strings.
+4. Complete the isolated restore drill below, including one expired and one recently erased
+   submission. The restored result must contain neither before any application can access it.
+
+Admin deletion writes a marker containing only table, record ID and erasure time **before**
+deleting live data. In production, unavailable erasure storage blocks deletion rather than
+silently losing the ability to honor it after restore. Automatic age-based expiry needs no marker
+because the same cutoff is reapplied during restore. No requester details are copied into markers.
+
+Retired manual-upload routes and UI are removed. Preserve legacy Resume object keys until an
+operator has inventoried and deleted the old private `resume/` objects, verified generated CVs,
+and can safely retire the unused metadata. Historical download counts are not cascade-deleted.
+
 ## 1. Restore test: verify a real backup works
 
 Use a real backup object from the private R2 bucket, then restore it into a throwaway local Postgres database.
@@ -43,11 +70,12 @@ aws --endpoint-url "https://<account-id>.r2.cloudflarestorage.com" \
 
 # 3) Restore it into the throwaway DB
 export DATABASE_URL="postgresql://testuser:testpass@localhost:5434/portfolio_restore"
-gunzip -c "/tmp/portfolio-backups/${BACKUP_KEY}" | psql "${DATABASE_URL}"
+RESTORE_OFFLINE_CONFIRMED=true bash deploy/restore-backup.sh "/tmp/portfolio-backups/${BACKUP_KEY}"
 
 # 4) Verify a table exists and some data is present
 psql "${DATABASE_URL}" -c '\dt'
-psql "${DATABASE_URL}" -c 'SELECT COUNT(*) FROM profiles;'
+psql "${DATABASE_URL}" -c 'SELECT COUNT(*) FROM "Profile";'
+psql "${DATABASE_URL}" -c 'SELECT COUNT(*) FROM "CvRequest";'
 
 # 5) Tear down the throwaway instance when done
  docker rm -f portfolio-restore-test
@@ -59,6 +87,15 @@ psql "${DATABASE_URL}" -c 'SELECT COUNT(*) FROM profiles;'
 - the expected tables exist
 - core rows are present (for example, `profiles` or `projects`)
 - the restored DB is functional enough to query it
+- current migrations, age-based deletion and independent early-erasure reconciliation all ran
+
+Only original timestamped backups no older than thirty days may be restored through this script.
+Use a recently downloaded object, not the dated example filename above. The database must be
+isolated or all application traffic stopped; `RESTORE_OFFLINE_CONFIRMED=true` is an explicit
+operator acknowledgement, not an automatic traffic shutdown. Run from the repository root with
+Postgres client, AWS CLI, jq and local Prisma dependencies available. On the VPS, alternatively
+set `RESTORE_MIGRATION_IMAGE` to the deployed `-migrate` image; its host-network connection is
+intended for the Linux restore-test container on port 5434.
 
 A backup that has never been restored is not considered proven.
 

@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { ProjectForm, ProjectFormValue } from './project-form.component';
 
 const project: ProjectDto = {
+  isCvFeatured: true,
   id: 'project-1',
   title: 'Portfolio site',
   slug: 'portfolio-site',
@@ -79,6 +80,7 @@ describe('ProjectForm', () => {
     expect(text).toContain('Edit project');
     const titleInput = fixture.nativeElement.querySelector('#project-title') as HTMLInputElement;
     expect(titleInput.value).toBe('Portfolio site');
+    expect((fixture.nativeElement.querySelector('#project-cv-featured') as HTMLInputElement).checked).toBe(true);
   });
 
   it('does not emit saved and shows a validation error for an invalid form', async () => {

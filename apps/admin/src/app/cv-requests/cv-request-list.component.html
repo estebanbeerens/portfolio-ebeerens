@@ -1,0 +1,84 @@
+@if (loading()) {
+  <p class="text-text-muted" role="status">Loading CV requests...</p>
+} @else if (error(); as message) {
+  <div class="space-y-3" role="alert">
+    <p class="text-error">{{ message }}</p>
+    <button uiButton variant="outlined" type="button" (click)="retry.emit()">Retry</button>
+  </div>
+} @else if (page(); as result) {
+  @if (!result.items.length) {
+    <p class="text-text-muted">No CV requests.</p>
+  } @else {
+    <ul class="border-border-subtle divide-border-subtle divide-y border-y" aria-label="CV requests">
+      @for (request of result.items; track request.id) {
+        <li class="space-y-3 py-5">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0 space-y-1">
+              <h2 class="text-text font-semibold wrap-break-word">{{ request.fullName || 'Name not provided' }}</h2>
+              @if (request.email) {
+                <p class="text-text-muted text-sm break-all">{{ request.email }}</p>
+              }
+              <p class="text-text-muted text-sm">{{ request.createdAt | date: 'medium' }}</p>
+            </div>
+            <button
+              uiButton
+              type="button"
+              variant="outlined"
+              tone="danger"
+              [disabled]="busy()"
+              [attr.aria-label]="'Delete CV request from ' + (request.fullName || request.email || 'visitor')"
+              title="Delete CV request"
+              (click)="remove.emit(request)"
+            >
+              <svg [lucideIcon]="trashIcon" class="size-4" aria-hidden="true"></svg>
+            </button>
+          </div>
+          <details class="text-text text-sm">
+            <summary
+              class="text-accent hover:text-accent-hover cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80"
+            >
+              Request and consent details
+            </summary>
+            <div class="mt-3 space-y-2">
+              @if (request.reason) {
+                <p class="wrap-break-word whitespace-pre-wrap">{{ request.reason }}</p>
+              }
+              <p class="text-text-muted">
+                Consent: {{ request.consentedAt | date: 'medium' }}; wording version {{ request.consentTextVersion }}.
+              </p>
+              <p class="text-text-muted break-all">Record: {{ request.id }}</p>
+            </div>
+          </details>
+        </li>
+      }
+    </ul>
+  }
+  <nav class="mt-5 flex flex-wrap items-center gap-3" aria-label="CV request pages">
+    <button
+      uiButton
+      type="button"
+      variant="outlined"
+      aria-label="Previous page"
+      title="Previous page"
+      [disabled]="result.offset === 0 || busy()"
+      (click)="paginate.emit(result.offset - 25)"
+    >
+      <svg [lucideIcon]="previousIcon" class="size-4" aria-hidden="true"></svg>
+    </button>
+    <p class="text-text-muted text-sm">
+      {{ result.items.length ? result.offset + 1 : 0 }} - {{ result.offset + result.items.length }} of
+      {{ result.total }}
+    </p>
+    <button
+      uiButton
+      type="button"
+      variant="outlined"
+      aria-label="Next page"
+      title="Next page"
+      [disabled]="result.offset + result.items.length >= result.total || busy()"
+      (click)="paginate.emit(result.offset + 25)"
+    >
+      <svg [lucideIcon]="nextIcon" class="size-4" aria-hidden="true"></svg>
+    </button>
+  </nav>
+}

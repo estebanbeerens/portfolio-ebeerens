@@ -26,5 +26,14 @@
     (saved)="save($event)"
   />
 
-  <admin-resume-upload class="w-full flex-1" />
+  <section class="w-full space-y-4 xl:max-w-sm" aria-labelledby="cv-preview-title">
+    <h2 id="cv-preview-title" class="font-display text-text text-xl font-semibold">CV preview</h2>
+    <ui-language-tabs label="CV language" panelId="cv-preview-panel" [(language)]="previewLocale" />
+    <div id="cv-preview-panel" role="tabpanel" class="my-3">
+      <button uiButton type="button" [disabled]="previewing()" (click)="preview()">
+        <svg [lucideIcon]="downloadIcon" class="size-4" aria-hidden="true"></svg>
+        {{ previewing() ? 'Generating...' : 'Download preview' }}
+      </button>
+    </div>
+  </section>
 </div>

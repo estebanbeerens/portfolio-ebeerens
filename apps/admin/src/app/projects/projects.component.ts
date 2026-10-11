@@ -9,7 +9,7 @@ import { ProjectDeleteDialog } from './project-delete-dialog/project-delete-dial
 import { ProjectForm, ProjectFormValue } from './project-form/project-form.component';
 import { ProjectList } from './project-list/project-list.component';
 
-type Mutation = 'idle' | 'saving' | 'deleting';
+type Mutation = 'idle' | 'saving' | 'deleting' | 'starring';
 
 @Component({
   selector: 'admin-projects',
@@ -35,7 +35,7 @@ export class Projects {
   });
   protected readonly projectList = computed(() =>
     this.projects.hasValue()
-      ? [...this.projects.value()].sort((first, second) => Date.parse(second.createdAt) - Date.parse(first.createdAt))
+      ? [...this.projects.value()].sort((first, second) => Date.parse(second.startDate) - Date.parse(first.startDate))
       : undefined
   );
   protected readonly formOpen = signal(false);
@@ -84,6 +84,7 @@ export class Projects {
     }
 
     const payload: CreateProjectDto = {
+      isCvFeatured: value.isCvFeatured,
       title: value.title,
       slug: value.slug,
       shortDescriptionEn: value.shortDescriptionEn,
@@ -118,6 +119,22 @@ export class Projects {
         const message = this.mutationError(error);
         this.formError.set(message);
         this.toast.error(message);
+      },
+    });
+  }
+
+  protected toggleCv(project: ProjectDto): void {
+    if (this.mutation() !== 'idle') return;
+    this.mutation.set('starring');
+    this.api.projectsControllerSetCvFeatured(project.id, { isCvFeatured: !project.isCvFeatured }).subscribe({
+      next: () => {
+        this.mutation.set('idle');
+        this.projects.reload();
+        this.toast.success(project.isCvFeatured ? 'Project removed from CV.' : 'Project included in CV.');
+      },
+      error: () => {
+        this.mutation.set('idle');
+        this.toast.error('The CV selection could not be saved. Try again.');
       },
     });
   }

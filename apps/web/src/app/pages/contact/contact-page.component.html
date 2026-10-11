@@ -115,6 +115,15 @@
             </p>
           }
 
+          <p class="text-text-muted text-sm" i18n="@@contact.privacyNote">
+            I use your details to respond to your message and delete it after twelve months. Read the
+            <a
+              routerLink="/privacy"
+              class="text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80"
+              >privacy notice</a
+            >.
+          </p>
+
           <div class="flex flex-wrap items-center gap-3">
             <button uiButton type="submit" [disabled]="submissionState() === 'submitting'">
               {{ submitLabel() }}
