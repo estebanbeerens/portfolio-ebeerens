@@ -15,13 +15,11 @@ import { Observable } from 'rxjs';
 import { OpenApiHttpParams, QueryParamStyle } from '../query.params';
 
 // @ts-ignore
-import { ConfirmResumeUploadDto } from '../model/confirmResumeUploadDto';
+import { CvDownloadDto } from '../model/cvDownloadDto';
 // @ts-ignore
-import { CreateResumeUploadUrlDto } from '../model/createResumeUploadUrlDto';
+import { CvRequestPageDto } from '../model/cvRequestPageDto';
 // @ts-ignore
-import { ResumeDto } from '../model/resumeDto';
-// @ts-ignore
-import { ResumeUploadUrlDto } from '../model/resumeUploadUrlDto';
+import { RequestCvDto } from '../model/requestCvDto';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS } from '../variables';
@@ -41,194 +39,40 @@ export class ResumeService extends BaseService {
   }
 
   /**
-   * @endpoint put /api/resume
-   * @param confirmResumeUploadDto
-   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-   * @param reportProgress flag to report request and response progress.
-   * @param options additional options
-   */
-  public resumeControllerConfirmUpload(
-    confirmResumeUploadDto: ConfirmResumeUploadDto,
-    observe?: 'body',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<ResumeDto>;
-  public resumeControllerConfirmUpload(
-    confirmResumeUploadDto: ConfirmResumeUploadDto,
-    observe?: 'response',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpResponse<ResumeDto>>;
-  public resumeControllerConfirmUpload(
-    confirmResumeUploadDto: ConfirmResumeUploadDto,
-    observe?: 'events',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpEvent<ResumeDto>>;
-  public resumeControllerConfirmUpload(
-    confirmResumeUploadDto: ConfirmResumeUploadDto,
-    observe: any = 'body',
-    reportProgress: boolean = false,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<any> {
-    if (confirmResumeUploadDto === null || confirmResumeUploadDto === undefined) {
-      throw new Error(
-        'Required parameter confirmResumeUploadDto was null or undefined when calling resumeControllerConfirmUpload.'
-      );
-    }
-
-    let localVarHeaders = this.defaultHeaders;
-
-    const localVarHttpHeaderAcceptSelected: string | undefined =
-      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
-    if (localVarHttpHeaderAcceptSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-    }
-
-    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-    const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-    // to determine the Content-Type header
-    const consumes: string[] = ['application/json'];
-    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-    if (httpContentTypeSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-    }
-
-    let responseType_: 'text' | 'json' | 'blob' = 'json';
-    if (localVarHttpHeaderAcceptSelected) {
-      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-        responseType_ = 'text';
-      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-        responseType_ = 'json';
-      } else {
-        responseType_ = 'blob';
-      }
-    }
-
-    let localVarPath = `/api/resume`;
-    const { basePath, withCredentials } = this.configuration;
-    return this.httpClient.request<ResumeDto>('put', `${basePath}${localVarPath}`, {
-      context: localVarHttpContext,
-      body: confirmResumeUploadDto,
-      responseType: <any>responseType_,
-      ...(withCredentials ? { withCredentials } : {}),
-      headers: localVarHeaders,
-      observe: observe,
-      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-      reportProgress: reportProgress,
-    });
-  }
-
-  /**
-   * @endpoint post /api/resume/upload-url
-   * @param createResumeUploadUrlDto
-   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-   * @param reportProgress flag to report request and response progress.
-   * @param options additional options
-   */
-  public resumeControllerCreateUploadUrl(
-    createResumeUploadUrlDto: CreateResumeUploadUrlDto,
-    observe?: 'body',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<ResumeUploadUrlDto>;
-  public resumeControllerCreateUploadUrl(
-    createResumeUploadUrlDto: CreateResumeUploadUrlDto,
-    observe?: 'response',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpResponse<ResumeUploadUrlDto>>;
-  public resumeControllerCreateUploadUrl(
-    createResumeUploadUrlDto: CreateResumeUploadUrlDto,
-    observe?: 'events',
-    reportProgress?: boolean,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpEvent<ResumeUploadUrlDto>>;
-  public resumeControllerCreateUploadUrl(
-    createResumeUploadUrlDto: CreateResumeUploadUrlDto,
-    observe: any = 'body',
-    reportProgress: boolean = false,
-    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<any> {
-    if (createResumeUploadUrlDto === null || createResumeUploadUrlDto === undefined) {
-      throw new Error(
-        'Required parameter createResumeUploadUrlDto was null or undefined when calling resumeControllerCreateUploadUrl.'
-      );
-    }
-
-    let localVarHeaders = this.defaultHeaders;
-
-    const localVarHttpHeaderAcceptSelected: string | undefined =
-      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
-    if (localVarHttpHeaderAcceptSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-    }
-
-    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
-
-    const localVarTransferCache: boolean = options?.transferCache ?? true;
-
-    // to determine the Content-Type header
-    const consumes: string[] = ['application/json'];
-    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-    if (httpContentTypeSelected !== undefined) {
-      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-    }
-
-    let responseType_: 'text' | 'json' | 'blob' = 'json';
-    if (localVarHttpHeaderAcceptSelected) {
-      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-        responseType_ = 'text';
-      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-        responseType_ = 'json';
-      } else {
-        responseType_ = 'blob';
-      }
-    }
-
-    let localVarPath = `/api/resume/upload-url`;
-    const { basePath, withCredentials } = this.configuration;
-    return this.httpClient.request<ResumeUploadUrlDto>('post', `${basePath}${localVarPath}`, {
-      context: localVarHttpContext,
-      body: createResumeUploadUrlDto,
-      responseType: <any>responseType_,
-      ...(withCredentials ? { withCredentials } : {}),
-      headers: localVarHeaders,
-      observe: observe,
-      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
-      reportProgress: reportProgress,
-    });
-  }
-
-  /**
    * @endpoint get /api/resume/download
+   * @param xAcceptLanguage Requested content language (en/nl); defaults to en
    * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
    * @param reportProgress flag to report request and response progress.
    * @param options additional options
    */
   public resumeControllerDownload(
+    xAcceptLanguage?: string,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<any>;
   public resumeControllerDownload(
+    xAcceptLanguage?: string,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpResponse<any>>;
   public resumeControllerDownload(
+    xAcceptLanguage?: string,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpEvent<any>>;
   public resumeControllerDownload(
+    xAcceptLanguage?: string,
     observe: any = 'body',
     reportProgress: boolean = false,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<any> {
     let localVarHeaders = this.defaultHeaders;
+    if (xAcceptLanguage !== undefined && xAcceptLanguage !== null) {
+      localVarHeaders = localVarHeaders.set('x-accept-language', String(xAcceptLanguage));
+    }
 
     const localVarHttpHeaderAcceptSelected: string | undefined =
       options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([]);
@@ -265,31 +109,46 @@ export class ResumeService extends BaseService {
   }
 
   /**
-   * @endpoint get /api/resume
+   * @endpoint get /api/resume/requests
+   * @param offset
    * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
    * @param reportProgress flag to report request and response progress.
    * @param options additional options
    */
-  public resumeControllerFindResume(
+  public resumeControllerFindRequests(
+    offset?: number,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<ResumeDto>;
-  public resumeControllerFindResume(
+  ): Observable<CvRequestPageDto>;
+  public resumeControllerFindRequests(
+    offset?: number,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpResponse<ResumeDto>>;
-  public resumeControllerFindResume(
+  ): Observable<HttpResponse<CvRequestPageDto>>;
+  public resumeControllerFindRequests(
+    offset?: number,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
-  ): Observable<HttpEvent<ResumeDto>>;
-  public resumeControllerFindResume(
+  ): Observable<HttpEvent<CvRequestPageDto>>;
+  public resumeControllerFindRequests(
+    offset?: number,
     observe: any = 'body',
     reportProgress: boolean = false,
     options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
   ): Observable<any> {
+    let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
+
+    localVarQueryParameters = this.addToHttpParams(
+      localVarQueryParameters,
+      'offset',
+      <any>offset,
+      QueryParamStyle.Form,
+      true
+    );
+
     let localVarHeaders = this.defaultHeaders;
 
     const localVarHttpHeaderAcceptSelected: string | undefined =
@@ -313,9 +172,80 @@ export class ResumeService extends BaseService {
       }
     }
 
-    let localVarPath = `/api/resume`;
+    let localVarPath = `/api/resume/requests`;
     const { basePath, withCredentials } = this.configuration;
-    return this.httpClient.request<ResumeDto>('get', `${basePath}${localVarPath}`, {
+    return this.httpClient.request<CvRequestPageDto>('get', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      params: localVarQueryParameters.toHttpParams(),
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * @endpoint post /api/resume/preview
+   * @param xAcceptLanguage Requested content language (en/nl); defaults to en
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public resumeControllerPreview(
+    xAcceptLanguage?: string,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<CvDownloadDto>;
+  public resumeControllerPreview(
+    xAcceptLanguage?: string,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpResponse<CvDownloadDto>>;
+  public resumeControllerPreview(
+    xAcceptLanguage?: string,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpEvent<CvDownloadDto>>;
+  public resumeControllerPreview(
+    xAcceptLanguage?: string,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<any> {
+    let localVarHeaders = this.defaultHeaders;
+    if (xAcceptLanguage !== undefined && xAcceptLanguage !== null) {
+      localVarHeaders = localVarHeaders.set('x-accept-language', String(xAcceptLanguage));
+    }
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/resume/preview`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<CvDownloadDto>('post', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),
@@ -327,31 +257,40 @@ export class ResumeService extends BaseService {
   }
 
   /**
-   * @endpoint delete /api/resume
+   * @endpoint delete /api/resume/requests/{id}
+   * @param id
    * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
    * @param reportProgress flag to report request and response progress.
    * @param options additional options
    */
-  public resumeControllerRemove(
+  public resumeControllerRemoveRequest(
+    id: string,
     observe?: 'body',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<any>;
-  public resumeControllerRemove(
+  public resumeControllerRemoveRequest(
+    id: string,
     observe?: 'response',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpResponse<any>>;
-  public resumeControllerRemove(
+  public resumeControllerRemoveRequest(
+    id: string,
     observe?: 'events',
     reportProgress?: boolean,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<HttpEvent<any>>;
-  public resumeControllerRemove(
+  public resumeControllerRemoveRequest(
+    id: string,
     observe: any = 'body',
     reportProgress: boolean = false,
     options?: { httpHeaderAccept?: undefined; context?: HttpContext; transferCache?: boolean }
   ): Observable<any> {
+    if (id === null || id === undefined) {
+      throw new Error('Required parameter id was null or undefined when calling resumeControllerRemoveRequest.');
+    }
+
     let localVarHeaders = this.defaultHeaders;
 
     const localVarHttpHeaderAcceptSelected: string | undefined =
@@ -375,10 +314,99 @@ export class ResumeService extends BaseService {
       }
     }
 
-    let localVarPath = `/api/resume`;
+    let localVarPath = `/api/resume/requests/${this.configuration.encodeParam({ name: 'id', value: id, in: 'path', style: 'simple', explode: false, dataType: 'string', dataFormat: undefined })}`;
     const { basePath, withCredentials } = this.configuration;
     return this.httpClient.request<any>('delete', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * @endpoint post /api/resume/download
+   * @param requestCvDto
+   * @param xAcceptLanguage Requested content language (en/nl); defaults to en
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public resumeControllerRequestDownload(
+    requestCvDto: RequestCvDto,
+    xAcceptLanguage?: string,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<CvDownloadDto>;
+  public resumeControllerRequestDownload(
+    requestCvDto: RequestCvDto,
+    xAcceptLanguage?: string,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpResponse<CvDownloadDto>>;
+  public resumeControllerRequestDownload(
+    requestCvDto: RequestCvDto,
+    xAcceptLanguage?: string,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<HttpEvent<CvDownloadDto>>;
+  public resumeControllerRequestDownload(
+    requestCvDto: RequestCvDto,
+    xAcceptLanguage?: string,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: { httpHeaderAccept?: 'application/json'; context?: HttpContext; transferCache?: boolean }
+  ): Observable<any> {
+    if (requestCvDto === null || requestCvDto === undefined) {
+      throw new Error(
+        'Required parameter requestCvDto was null or undefined when calling resumeControllerRequestDownload.'
+      );
+    }
+
+    let localVarHeaders = this.defaultHeaders;
+    if (xAcceptLanguage !== undefined && xAcceptLanguage !== null) {
+      localVarHeaders = localVarHeaders.set('x-accept-language', String(xAcceptLanguage));
+    }
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    // to determine the Content-Type header
+    const consumes: string[] = ['application/json'];
+    const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+    if (httpContentTypeSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+    }
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/resume/download`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<CvDownloadDto>('post', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      body: requestCvDto,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),
       headers: localVarHeaders,

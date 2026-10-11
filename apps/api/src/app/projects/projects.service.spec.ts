@@ -241,4 +241,29 @@ describe('ProjectsService', () => {
       expect(derivatives.generate).not.toHaveBeenCalled();
     });
   });
+
+  describe('setCvFeatured', () => {
+    it('updates only the CV flag, preserving all other project fields', async () => {
+      const { service, prisma, derivatives } = await build();
+      prisma.project.findUnique.mockResolvedValue(project());
+      prisma.project.update.mockResolvedValue(project({ isCvFeatured: true }));
+
+      await service.setCvFeatured('project-1', true, 'Administrator');
+
+      expect(prisma.project.update).toHaveBeenCalledWith({
+        where: { id: 'project-1' },
+        data: { isCvFeatured: true },
+        include: { skills: true },
+      });
+      expect(derivatives.generate).not.toHaveBeenCalled();
+    });
+
+    it('rejects a missing project', async () => {
+      const { service, prisma } = await build();
+      prisma.project.findUnique.mockResolvedValue(null);
+
+      await expect(service.setCvFeatured('missing', true)).rejects.toBeInstanceOf(NotFoundException);
+      expect(prisma.project.update).not.toHaveBeenCalled();
+    });
+  });
 });

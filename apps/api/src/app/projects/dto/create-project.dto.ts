@@ -1,8 +1,23 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsDateString, IsOptional, IsString, IsUrl, Matches, MaxLength } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateProjectDto {
+  @ApiPropertyOptional({ description: 'Include this project in the generated CV' })
+  @IsOptional()
+  @IsBoolean()
+  isCvFeatured?: boolean;
+
   @ApiProperty({ example: 'Personal Portfolio' })
   @IsString()
   @MaxLength(200)

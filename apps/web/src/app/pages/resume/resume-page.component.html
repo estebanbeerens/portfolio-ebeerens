@@ -1,6 +1,33 @@
 <section
-  class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-10 p-6 lg:px-10"
-  aria-labelledby="journey-title"
+  class="mx-auto flex min-h-[60vh] w-full max-w-7xl flex-col gap-8 p-6 lg:px-10"
+  aria-labelledby="cv-download-title"
 >
-  <web-professional-journey-section [groups]="content.roleCompanyGroups()" [education]="content.sortedEducation()" />
+  <div class="max-w-3xl">
+    <p class="dark:text-accent font-mono text-xs text-cyan-900 uppercase" i18n="@@resume.eyebrow">Curriculum Vitae</p>
+    <h1 id="cv-download-title" class="font-display text-text mt-2 text-4xl font-bold" i18n="@@cv.downloadTitle">
+      Download CV
+    </h1>
+  </div>
+
+  <div class="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-12">
+    <ui-card
+      heading="Request CV"
+      i18n-heading="@@cv.form.heading"
+      class="shadow-elevation max-sm:p-5"
+      density="comfortable"
+    >
+      <web-cv-request-form
+        [saving]="saving()"
+        [siteKey]="siteKey()"
+        [resetToken]="resetToken()"
+        (submitted)="download($event)"
+      />
+      @if (status(); as message) {
+        <p class="text-text-muted mt-3 text-sm" role="status">{{ message }}</p>
+      }
+      @if (error(); as message) {
+        <p #downloadError class="text-error mt-3 text-sm" role="alert" tabindex="-1">{{ message }}</p>
+      }
+    </ui-card>
+  </div>
 </section>

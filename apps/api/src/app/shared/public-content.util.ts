@@ -2,6 +2,7 @@ import { Locale, pickLocalized, pickLocalizedOptional } from './locale.util';
 import { MarkdownRenderService } from './markdown-render.service';
 
 interface ProjectLike {
+  isCvFeatured?: boolean;
   shortDescriptionEn: string;
   shortDescriptionNl: string | null;
   descriptionEn: string;
@@ -10,7 +11,7 @@ interface ProjectLike {
 
 type PublicProject<T extends ProjectLike> = Omit<
   T,
-  'shortDescriptionEn' | 'shortDescriptionNl' | 'descriptionEn' | 'descriptionNl'
+  'shortDescriptionEn' | 'shortDescriptionNl' | 'descriptionEn' | 'descriptionNl' | 'isCvFeatured'
 > & {
   shortDescription: string;
   description: string;
@@ -23,7 +24,14 @@ export function toPublicProject<T extends ProjectLike>(
   locale: Locale,
   markdown: MarkdownRenderService
 ): PublicProject<T> {
-  const { shortDescriptionEn, shortDescriptionNl, descriptionEn, descriptionNl, ...rest } = project;
+  const {
+    shortDescriptionEn,
+    shortDescriptionNl,
+    descriptionEn,
+    descriptionNl,
+    isCvFeatured: _isCvFeatured,
+    ...rest
+  } = project;
   const shortDescription = pickLocalized(shortDescriptionEn, shortDescriptionNl, locale);
   const description = pickLocalized(descriptionEn, descriptionNl, locale);
   return {

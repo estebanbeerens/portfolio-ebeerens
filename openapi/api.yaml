@@ -249,6 +249,33 @@ paths:
         '404':
           description: No project with this id exists
       tags: *ref_2
+  /api/projects/{id}/cv-featured:
+    put:
+      operationId: ProjectsController_setCvFeatured
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetCvFeaturedDto'
+      responses:
+        '200':
+          description: The updated project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No project with this id exists
+      tags: *ref_2
   /api/skills:
     get:
       operationId: SkillsController_findAll
@@ -262,8 +289,116 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SkillDto'
-      tags:
+      tags: &ref_3
         - skills
+  /api/skills/admin:
+    get:
+      operationId: SkillsController_findManagement
+      parameters: []
+      responses:
+        '200':
+          description: Skills grouped by category for admin management
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillManagementDto'
+        '401':
+          description: No valid session
+      tags: *ref_3
+  /api/skills/categories:
+    post:
+      operationId: SkillsController_createCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillCategoryDto'
+      responses:
+        '201':
+          description: The created skill category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCategoryDto'
+        '401':
+          description: No valid session
+        '409':
+          description: A skill category with this name already exists
+      tags: *ref_3
+  /api/skills/categories/{id}:
+    put:
+      operationId: SkillsController_updateCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkillCategoryDto'
+      responses:
+        '200':
+          description: The updated skill category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillCategoryDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No skill category with this id exists
+        '409':
+          description: A skill category with this name already exists
+      tags: *ref_3
+    delete:
+      operationId: SkillsController_removeCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The skill category was deleted and its skills are now unassigned
+        '401':
+          description: No valid session
+        '404':
+          description: No skill category with this id exists
+      tags: *ref_3
+  /api/skills/{id}/category:
+    put:
+      operationId: SkillsController_setCategory
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignSkillCategoryDto'
+      responses:
+        '200':
+          description: The updated skill
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillDto'
+        '401':
+          description: No valid session
+        '404':
+          description: No skill or category with this id exists
+      tags: *ref_3
   /api/organizations/upload-url:
     post:
       operationId: OrganizationsController_createLogoUploadUrl
@@ -283,7 +418,7 @@ paths:
                 $ref: '#/components/schemas/OrganizationLogoUploadUrlDto'
         '401':
           description: No valid session
-      tags: &ref_3
+      tags: &ref_4
         - organizations
   /api/organizations:
     get:
@@ -298,7 +433,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OrganizationDto'
-      tags: *ref_3
+      tags: *ref_4
     post:
       operationId: OrganizationsController_create
       parameters: []
@@ -319,7 +454,7 @@ paths:
           description: No valid session
         '409':
           description: An organization with this name already exists
-      tags: *ref_3
+      tags: *ref_4
   /api/organizations/{id}:
     get:
       operationId: OrganizationsController_findOne
@@ -338,7 +473,7 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         '404':
           description: No organization with this id exists
-      tags: *ref_3
+      tags: *ref_4
     put:
       operationId: OrganizationsController_update
       parameters:
@@ -366,7 +501,7 @@ paths:
           description: No organization with this id exists
         '409':
           description: An organization with this name already exists
-      tags: *ref_3
+      tags: *ref_4
     delete:
       operationId: OrganizationsController_remove
       parameters:
@@ -384,7 +519,7 @@ paths:
           description: No organization with this id exists
         '409':
           description: The organization still has roles referencing it
-      tags: *ref_3
+      tags: *ref_4
   /api/roles:
     get:
       operationId: RolesController_findAll
@@ -398,7 +533,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RoleDto'
-      tags: &ref_4
+      tags: &ref_5
         - roles
     post:
       operationId: RolesController_create
@@ -420,7 +555,7 @@ paths:
           description: No valid session
         '404':
           description: No organization with this id exists
-      tags: *ref_4
+      tags: *ref_5
   /api/roles/{id}:
     get:
       operationId: RolesController_findOne
@@ -439,7 +574,7 @@ paths:
                 $ref: '#/components/schemas/RoleDto'
         '404':
           description: No role with this id exists
-      tags: *ref_4
+      tags: *ref_5
     put:
       operationId: RolesController_update
       parameters:
@@ -465,7 +600,7 @@ paths:
           description: No valid session
         '404':
           description: No role, or no organization, with this id exists
-      tags: *ref_4
+      tags: *ref_5
     delete:
       operationId: RolesController_remove
       parameters:
@@ -481,7 +616,7 @@ paths:
           description: No valid session
         '404':
           description: No role with this id exists
-      tags: *ref_4
+      tags: *ref_5
   /api/feature-flags:
     get:
       operationId: FeatureFlagsController_findAll
@@ -495,7 +630,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FeatureFlagDto'
-      tags: &ref_5
+      tags: &ref_6
         - feature-flags
   /api/feature-flags/{key}:
     put:
@@ -526,7 +661,7 @@ paths:
                 $ref: '#/components/schemas/FeatureFlagDto'
         '401':
           description: No valid session
-      tags: *ref_5
+      tags: *ref_6
   /api/contact:
     post:
       operationId: ContactController_create
@@ -546,7 +681,7 @@ paths:
                 $ref: '#/components/schemas/ContactMessageDto'
         '400':
           description: Turnstile verification failed
-      tags: &ref_6
+      tags: &ref_7
         - contact
     get:
       operationId: ContactController_findAll
@@ -562,7 +697,7 @@ paths:
                   $ref: '#/components/schemas/ContactMessageDto'
         '401':
           description: No valid session
-      tags: *ref_6
+      tags: *ref_7
   /api/contact/{id}:
     delete:
       operationId: ContactController_remove
@@ -577,7 +712,7 @@ paths:
           description: The message was deleted
         '401':
           description: No valid session
-      tags: *ref_6
+      tags: *ref_7
     patch:
       operationId: ContactController_update
       parameters:
@@ -603,80 +738,117 @@ paths:
           description: No valid session
         '404':
           description: The message was not found
-      tags: *ref_6
-  /api/resume/upload-url:
-    post:
-      operationId: ResumeController_createUploadUrl
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateResumeUploadUrlDto'
-      responses:
-        '200':
-          description: A short-lived presigned PUT url
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResumeUploadUrlDto'
-        '401':
-          description: No valid session
-      tags: &ref_7
-        - resume
-  /api/resume:
-    put:
-      operationId: ResumeController_confirmUpload
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmResumeUploadDto'
-      responses:
-        '200':
-          description: The stored resume
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResumeDto'
-        '401':
-          description: No valid session
-      tags: *ref_7
-    get:
-      operationId: ResumeController_findResume
-      parameters: []
-      responses:
-        '200':
-          description: The current resume metadata
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResumeDto'
-        '404':
-          description: No resume uploaded yet
-      tags: *ref_7
-    delete:
-      operationId: ResumeController_remove
-      parameters: []
-      responses:
-        '204':
-          description: The resume was deleted
-        '401':
-          description: No valid session
-        '404':
-          description: No resume uploaded yet
       tags: *ref_7
   /api/resume/download:
     get:
       operationId: ResumeController_download
-      parameters: []
+      parameters:
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
       responses:
+        '302':
+          description: Redirect to the generated CV
         '404':
-          description: No resume uploaded yet
-      tags: *ref_7
+          description: CV unavailable
+        '503':
+          description: CV generation unavailable
+      tags: &ref_8
+        - resume
+    post:
+      operationId: ResumeController_requestDownload
+      parameters:
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestCvDto'
+      responses:
+        '200':
+          description: A generated CV download URL and optional logging status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDownloadDto'
+        '400':
+          description: Invalid details, consent or verification
+        '404':
+          description: CV unavailable
+        '503':
+          description: CV generation unavailable
+      tags: *ref_8
+  /api/resume/preview:
+    post:
+      operationId: ResumeController_preview
+      parameters:
+        - name: x-accept-language
+          required: false
+          in: header
+          description: Requested content language (en/nl); defaults to en
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A generated CV preview without download logging
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvDownloadDto'
+        '401':
+          description: No valid session
+        '404':
+          description: CV unavailable
+        '503':
+          description: CV generation unavailable
+      tags: *ref_8
+  /api/resume/requests:
+    get:
+      operationId: ResumeController_findRequests
+      parameters:
+        - name: offset
+          required: false
+          in: query
+          schema:
+            minimum: 0
+            default: 0
+            type: integer
+      responses:
+        '200':
+          description: A page of unexpired CV requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CvRequestPageDto'
+        '401':
+          description: No valid session
+      tags: *ref_8
+  /api/resume/requests/{id}:
+    delete:
+      operationId: ResumeController_removeRequest
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The CV request was deleted
+        '401':
+          description: No valid session
+        '404':
+          description: The CV request was not found
+      tags: *ref_8
   /api/dashboard/summary:
     get:
       operationId: DashboardController_getSummary
@@ -705,7 +877,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EducationDto'
-      tags: &ref_8
+      tags: &ref_9
         - education
     post:
       operationId: EducationController_create
@@ -725,7 +897,7 @@ paths:
                 $ref: '#/components/schemas/EducationDto'
         '401':
           description: ''
-      tags: *ref_8
+      tags: *ref_9
   /api/education/{id}:
     get:
       operationId: EducationController_findOne
@@ -744,7 +916,7 @@ paths:
                 $ref: '#/components/schemas/EducationDto'
         '404':
           description: ''
-      tags: *ref_8
+      tags: *ref_9
     put:
       operationId: EducationController_update
       parameters:
@@ -768,7 +940,7 @@ paths:
                 $ref: '#/components/schemas/EducationDto'
         '404':
           description: ''
-      tags: *ref_8
+      tags: *ref_9
     delete:
       operationId: EducationController_remove
       parameters:
@@ -780,7 +952,7 @@ paths:
       responses:
         '204':
           description: ''
-      tags: *ref_8
+      tags: *ref_9
   /api/institutions/upload-url:
     post:
       operationId: InstitutionsController_createLogoUploadUrl
@@ -800,7 +972,7 @@ paths:
                 $ref: '#/components/schemas/InstitutionLogoUploadUrlDto'
         '401':
           description: No valid session
-      tags: &ref_9
+      tags: &ref_10
         - institutions
   /api/institutions:
     get:
@@ -815,7 +987,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionDto'
-      tags: *ref_9
+      tags: *ref_10
     post:
       operationId: InstitutionsController_create
       parameters: []
@@ -834,7 +1006,7 @@ paths:
                 $ref: '#/components/schemas/InstitutionDto'
         '409':
           description: An institution with this name already exists
-      tags: *ref_9
+      tags: *ref_10
   /api/institutions/{id}:
     put:
       operationId: InstitutionsController_update
@@ -859,7 +1031,7 @@ paths:
                 $ref: '#/components/schemas/InstitutionDto'
         '404':
           description: No institution with this id exists
-      tags: *ref_9
+      tags: *ref_10
     delete:
       operationId: InstitutionsController_remove
       parameters:
@@ -871,7 +1043,7 @@ paths:
       responses:
         '204':
           description: ''
-      tags: *ref_9
+      tags: *ref_10
 info:
   title: Portfolio API
   description: API documentation for the portfolio backend
@@ -1072,7 +1244,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_11
+          enum: &ref_12
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -1394,6 +1566,9 @@ components:
     ProjectDto:
       type: object
       properties:
+        isCvFeatured:
+          type: boolean
+          description: Include this project in the generated CV
         id:
           type: string
           description: Unique identifier of the project
@@ -1469,6 +1644,7 @@ components:
           type: string
           example: '2026-08-14T12:00:00.000Z'
       required:
+        - isCvFeatured
         - id
         - title
         - slug
@@ -1481,6 +1657,9 @@ components:
     CreateProjectDto:
       type: object
       properties:
+        isCvFeatured:
+          type: boolean
+          description: Include this project in the generated CV
         title:
           type: string
           example: Personal Portfolio
@@ -1546,7 +1725,7 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: &ref_10
+          example: &ref_11
             - Angular
             - NestJS
             - Figma
@@ -1562,6 +1741,9 @@ components:
     UpdateProjectDto:
       type: object
       properties:
+        isCvFeatured:
+          type: boolean
+          description: Include this project in the generated CV
         title:
           type: string
           example: Personal Portfolio
@@ -1627,10 +1809,88 @@ components:
           description: >-
             Skill names used on this project (e.g. React, Angular, .NET, Figma)
             — created if they do not already exist
-          example: *ref_10
+          example: *ref_11
           type: array
           items:
             type: string
+    SetCvFeaturedDto:
+      type: object
+      properties:
+        isCvFeatured:
+          type: boolean
+      required:
+        - isCvFeatured
+    SkillCategoryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: cly1x8f9z0000abcd1234efgh
+        name:
+          type: string
+          example: Frontend
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+        createdAt:
+          format: date-time
+          type: string
+          example: '2026-10-12T00:00:00.000Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2026-10-12T00:00:00.000Z'
+      required:
+        - id
+        - name
+        - skills
+        - createdAt
+        - updatedAt
+    SkillManagementDto:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillCategoryDto'
+        unassignedSkills:
+          type: array
+          items:
+            $ref: '#/components/schemas/SkillDto'
+      required:
+        - categories
+        - unassignedSkills
+    CreateSkillCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Frontend
+          minLength: 1
+          maxLength: 80
+      required:
+        - name
+    UpdateSkillCategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Frontend
+          minLength: 1
+          maxLength: 80
+      required:
+        - name
+    AssignSkillCategoryDto:
+      type: object
+      properties:
+        categoryId:
+          type: string
+          description: The target category id, or null to make the skill unassigned
+          example: cly1x8f9z0000abcd1234efgh
+          nullable: true
+      required:
+        - categoryId
     CreateOrganizationLogoUploadUrlDto:
       type: object
       properties:
@@ -1738,7 +1998,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_11
+          enum: *ref_12
           example: FULL_TIME
         startDate:
           format: date-time
@@ -1802,7 +2062,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: &ref_12
+          enum: &ref_13
             - FULL_TIME
             - PART_TIME
             - SELF_EMPLOYED
@@ -1824,7 +2084,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: &ref_13
+          example: &ref_14
             - Angular
             - NestJS
             - Figma
@@ -1866,7 +2126,7 @@ components:
           example: Amsterdam, Netherlands
         employmentType:
           type: string
-          enum: *ref_12
+          enum: *ref_13
           example: FULL_TIME
         startDate:
           type: string
@@ -1880,7 +2140,7 @@ components:
           description: >-
             Skill names used in this role (e.g. React, Angular, .NET, Figma) —
             created if they do not already exist
-          example: *ref_13
+          example: *ref_14
           type: array
           items:
             type: string
@@ -1968,68 +2228,77 @@ components:
           description: Whether the message has been read
       required:
         - isRead
-    CreateResumeUploadUrlDto:
+    RequestCvDto:
       type: object
       properties:
-        fileName:
+        fullName:
           type: string
-        mimeType:
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        reason:
+          type: string
+          maxLength: 500
+        consent:
+          type: boolean
+        turnstileToken:
+          type: string
+          maxLength: 2048
+    CvDownloadDto:
+      type: object
+      properties:
+        downloadUrl:
+          type: string
+        loggingStatus:
           type: string
           enum:
-            - application/pdf
-        fileSize:
-          type: number
-          maximum: 5242880
+            - not-requested
+            - recorded
+            - failed
       required:
-        - fileName
-        - mimeType
-        - fileSize
-    ResumeUploadUrlDto:
+        - downloadUrl
+        - loggingStatus
+    CvRequestDto:
       type: object
       properties:
-        uploadUrl:
+        id:
           type: string
-        objectKey:
+        fullName:
           type: string
-      required:
-        - uploadUrl
-        - objectKey
-    ConfirmResumeUploadDto:
-      type: object
-      properties:
-        objectKey:
+        email:
           type: string
-        fileName:
+        reason:
           type: string
-        mimeType:
-          type: string
-          enum:
-            - application/pdf
-        fileSize:
-          type: number
-          maximum: 5242880
-      required:
-        - objectKey
-        - fileName
-        - mimeType
-        - fileSize
-    ResumeDto:
-      type: object
-      properties:
-        fileName:
-          type: string
-        mimeType:
-          type: string
-        fileSize:
-          type: number
-        uploadedAt:
+        createdAt:
           format: date-time
           type: string
+        consentedAt:
+          format: date-time
+          type: string
+        consentTextVersion:
+          type: string
       required:
-        - fileName
-        - mimeType
-        - fileSize
-        - uploadedAt
+        - id
+        - createdAt
+        - consentedAt
+        - consentTextVersion
+    CvRequestPageDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CvRequestDto'
+        total:
+          type: number
+        offset:
+          type: number
+      required:
+        - items
+        - total
+        - offset
     ActivityEntity:
       type: string
       enum:

@@ -45,7 +45,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="hero.title" datatype="html">
-        <source> Crafting fluid <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>interactive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> architectures </source>
+        <source> Engineering <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digital experiences<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> that work for <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>everyone<x id="CLOSE_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;/span&gt;"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/home/components/hero-section/hero-section.component.html</context>
           <context context-type="linenumber">8,10</context>
@@ -109,25 +109,37 @@
       </trans-unit>
       <trans-unit id="journey.educationTitle" datatype="html">
         <source> Education </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/home/components/professional-journey-section/professional-journey-section.component.html</context>
+          <context context-type="linenumber">126,128</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="journey.educationAriaLabel" datatype="html">
         <source>Education</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/home/components/professional-journey-section/professional-journey-section.component.html</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="journey.educationComingSoon" datatype="html">
         <source>Education details are coming soon.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/home/components/professional-journey-section/professional-journey-section.component.html</context>
+          <context context-type="linenumber">179,183</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="journey.showLess" datatype="html">
         <source>Show less experience</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/home/components/professional-journey-section/professional-journey-section.component.ts</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="journey.showAll" datatype="html">
         <source>Show all experience</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/home/components/professional-journey-section/professional-journey-section.component.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="roleDescription.readMore" datatype="html">
@@ -141,21 +153,28 @@
         <source>View All Projects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/home/home-page.component.html</context>
-          <context context-type="linenumber">20,24</context>
+          <context context-type="linenumber">23,27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.resumeLink" datatype="html">
         <source>Resume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/footer/footer.component.html</context>
-          <context context-type="linenumber">23,26</context>
+          <context context-type="linenumber">23,25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.privacyLink" datatype="html">
+        <source>Privacy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/footer/footer.component.html</context>
+          <context context-type="linenumber">25,27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="footer.copyright" datatype="html">
         <source> © <x id="INTERPOLATION" equiv-text="{{ currentYear }}"/> <x id="START_BLOCK_IF" equiv-text="@if (profile()?.name; as name) {"/> <x id="INTERPOLATION_1" equiv-text="{{ &apos; &apos; + name }}"/> <x id="CLOSE_BLOCK_IF" equiv-text="}"/> . Designed with Apple Liquid Glass aesthetic. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/footer/footer.component.html</context>
-          <context context-type="linenumber">27,33</context>
+          <context context-type="linenumber">28,34</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.ariaLabel" datatype="html">
@@ -165,69 +184,69 @@
           <context context-type="linenumber">4,5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="header.nav.openMenu" datatype="html">
-        <source>Open navigation</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">21,22</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="header.nav.home" datatype="html">
         <source>Home</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">86,87</context>
+          <context context-type="linenumber">88,89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.projects" datatype="html">
         <source>Projects</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">39,42</context>
+          <context context-type="linenumber">29,32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">97,100</context>
+          <context context-type="linenumber">99,102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.resume" datatype="html">
         <source>Resume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">44,47</context>
+          <context context-type="linenumber">34,37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">110,113</context>
+          <context context-type="linenumber">112,115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.contact" datatype="html">
         <source>Contact</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">49,52</context>
+          <context context-type="linenumber">39,42</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">123,127</context>
+          <context context-type="linenumber">125,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="header.nav.openMenu" datatype="html">
+        <source>Open navigation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
+          <context context-type="linenumber">47,48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.closeMenu" datatype="html">
         <source>Close navigation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">61,62</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="header.nav.mobileLabel" datatype="html">
         <source>Main navigation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/layout/header/header.component.html</context>
-          <context context-type="linenumber">70,71</context>
+          <context context-type="linenumber">72,73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.eyebrow" datatype="html">
@@ -314,95 +333,106 @@
           <context context-type="linenumber">101,103</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="contact.privacyNote" datatype="html">
+        <source> I use your details to respond to your message and delete it after twelve months. Read the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+              routerLink=&quot;/privacy&quot;
+              class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+              &gt;"/>privacy notice<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+            &gt;"/>. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.html</context>
+          <context context-type="linenumber">119,125</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="contact.form.submitting" datatype="html">
         <source>Sending...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.form.submit" datatype="html">
         <source>Send message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.verificationUnavailable" datatype="html">
         <source>Verification is unavailable right now.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">87</context>
+          <context context-type="linenumber">88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.sending" datatype="html">
         <source>Sending your message...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.invalid" datatype="html">
         <source>Complete the required fields before sending.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">93</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.needsVerification" datatype="html">
         <source>Complete the verification before sending.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">97</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.verified" datatype="html">
         <source>Verification complete.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">99</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.fullName.error" datatype="html">
         <source>Enter your name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">103</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.email.error" datatype="html">
         <source>Enter a valid email address</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.organization.error" datatype="html">
         <source>Keep organization under 200 characters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.subject.error" datatype="html">
         <source>Enter a subject under 200 characters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.field.message.error" datatype="html">
         <source>Enter a message under 5000 characters</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.status.error" datatype="html">
         <source>Something went wrong. Please try again.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/contact/contact-page.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="notFound.code" datatype="html">
@@ -431,6 +461,148 @@
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/not-found/not-found-page.component.html</context>
           <context context-type="linenumber">5,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.title" datatype="html">
+        <source>Privacy notice</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">3,4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.updated" datatype="html">
+        <source>Last updated: 9 October 2026</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">4,5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.intro" datatype="html">
+        <source> This is my personal portfolio. I use submitted details to reply to messages and, if you choose, to know who is interested in my CV. I do not sell these details or use them for marketing or unrelated commercial purposes. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">6,9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.controller" datatype="html">
+        <source> Who is responsible? </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">12,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.controllerBody" datatype="html">
+        <source> Esteban Beerens is the data controller. For privacy questions or requests, email <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+        class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+        href=&quot;mailto:privacy@ebeerens.com&quot;
+        &gt;"/>privacy@ebeerens.com<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+      &gt;"/>. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">15,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.contact" datatype="html">
+        <source> Contact messages </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">25,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.contactBody" datatype="html">
+        <source> The contact form collects your name, email, optional organization, subject and message. I use these to read and respond to your inquiry. The legal basis is my legitimate interest in handling correspondence initiated by you. Required fields are needed to send a message through this form. Messages are automatically deleted from the live database after twelve calendar months, or sooner following an applicable deletion request. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">28,33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.cv" datatype="html">
+        <source>CV downloads</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.cvBody" datatype="html">
+        <source> You can download my CV without giving your name or email. If you choose to share your name, email or reason, I store those optional details only with your consent, together with the submission time and a record of that consent. The purpose is to know who is interested in my CV, not to send marketing. These details are automatically deleted from the live database after six calendar months. You can withdraw consent at any time by emailing me, without affecting your ability to download the CV or the lawfulness of earlier processing. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">37,41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.downloadCounts" datatype="html">
+        <source> I also count issued download links using timestamps, without linking those counts to your submitted details, IP address or browser. These events are removed after twelve calendar months. Your details are not included in the PDF, and the CV is downloaded directly rather than emailed. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">44,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.security" datatype="html">
+        <source> Security and service providers </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">51,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.securityBody" datatype="html">
+        <source> The site uses Oracle Cloud hosting and Cloudflare for network security, bot verification and storage. These providers can process technical information such as your IP address and request metadata. Cloudflare Turnstile checks form submissions for abuse; verification tokens are not saved with your message or CV request. My legal basis for necessary security processing is the legitimate interest in keeping the site safe and available. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">54,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.providers" datatype="html">
+        <source> Provider processing can involve locations outside the European Economic Area. Contact me for details of the applicable locations and transfer safeguards. Further information is available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+        href=&quot;https://www.cloudflare.com/privacypolicy/&quot;
+        class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+        &gt;"/>Cloudflare privacy policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+      &gt;"/> and <x id="START_LINK_1" equiv-text="&lt;a
+        href=&quot;https://www.oracle.com/legal/privacy/&quot;
+        class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+        &gt;"/>Oracle privacy policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+      &gt;"/>. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">60,74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.storage" datatype="html">
+        <source> Storage and backups </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">77,79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.storageBody" datatype="html">
+        <source> Submissions are stored in a restricted database accessible to me and the infrastructure providers needed to operate the site. Deleted data may remain in restricted disaster-recovery backups for up to thirty additional days. It is not used for other purposes, and expiry and earlier deletions must be reapplied before a restored database is brought online. Minimal record identifiers used to reconcile deletions are kept separately for up to thirty-one days. Site-controlled security logs are retained for up to thirty days; infrastructure providers apply their own security-log policies. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">80,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.rights" datatype="html">
+        <source> Your rights </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">90,92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.rightsBody" datatype="html">
+        <source> Depending on the circumstances, you may request access, correction, deletion or restriction of your personal data, object to processing based on legitimate interests, and request portability for data processed on consent where applicable. You can also withdraw CV logging consent. Email privacy@ebeerens.com; I may ask for proportionate information to verify your identity. I normally respond within one month, subject to legally permitted extensions. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">93,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="privacy.complaint" datatype="html">
+        <source> You have the right to complain to a data protection supervisory authority, particularly in the country where you live or work, or where you believe an infringement occurred. The <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+        href=&quot;https://www.edpb.europa.eu/about-edpb/about-edpb/members_en&quot;
+        class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+        &gt;"/>European Data Protection Board directory<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+      &gt;"/> lists the authorities. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/privacy/privacy-page.component.html</context>
+          <context context-type="linenumber">99,107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="projectDetail.backToDirectory" datatype="html">
@@ -546,35 +718,158 @@
         <source> Projects are being prepared. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.html</context>
-          <context context-type="linenumber">116,120</context>
+          <context context-type="linenumber">94,98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="projects.displayModeLabel" datatype="html">
         <source>Project display mode</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
-          <context context-type="linenumber">44</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="projects.timelinePresent" datatype="html">
-        <source>Present</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="projects.listMode" datatype="html">
         <source>List</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="projects.timelineMode" datatype="html">
         <source>Timeline</source>
         <context-group purpose="location">
           <context context-type="sourcefile">apps/web/src/app/pages/projects/projects-page.component.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.name" datatype="html">
+        <source>Full name (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">11,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.email" datatype="html">
+        <source>Email (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">19,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.reason" datatype="html">
+        <source>Reason (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.consent" datatype="html">
+        <source>I agree that Esteban Beerens may store these optional details for six months to know who is interested in his CV. I can withdraw this consent at any time.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">45,49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.privacy" datatype="html">
+        <source> Sharing details is optional and does not affect your download. Read the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+      routerLink=&quot;/privacy&quot;
+      class=&quot;text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80&quot;
+      &gt;"/>privacy notice<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+    &gt;"/>. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">50,57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.verificationUnavailable" datatype="html">
+        <source> Sharing details is unavailable right now. You can still download anonymously. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">74,78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.download" datatype="html">
+        <source>Download CV</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.html</context>
+          <context context-type="linenumber">84,87</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.fieldError" datatype="html">
+        <source>Check this field&apos;s format and length.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.ts</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.invalid" datatype="html">
+        <source>Check the highlighted fields, or download anonymously.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.consentRequired" datatype="html">
+        <source>Agree to storing your optional details, or leave the fields empty to download anonymously.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.ts</context>
+          <context context-type="linenumber">88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.verificationRequired" datatype="html">
+        <source>Complete verification to share details, or leave the fields empty to download anonymously.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/cv-request-form/cv-request-form.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="resume.eyebrow" datatype="html">
+        <source>Curriculum Vitae</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.html</context>
+          <context context-type="linenumber">6,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.downloadTitle" datatype="html">
+        <source> Download CV </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.html</context>
+          <context context-type="linenumber">8,12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.form.heading" datatype="html">
+        <source>Request CV</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.html</context>
+          <context context-type="linenumber">14,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.status.preparing" datatype="html">
+        <source>Preparing your CV...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.status.loggingFailed" datatype="html">
+        <source>Your CV is ready, but your optional details could not be saved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.status.ready" datatype="html">
+        <source>Your CV is ready.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.ts</context>
+          <context context-type="linenumber">81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cv.status.error" datatype="html">
+        <source>The CV could not be downloaded. Please try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">apps/web/src/app/pages/resume/resume-page.component.ts</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
     </body>

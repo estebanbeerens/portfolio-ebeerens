@@ -332,15 +332,13 @@ storage instead of through your API.
    switch per row that calls `PUT /api/feature-flags/{key}`. This is admin-only config, not
    content the public site fetches at build time — every page load re-checks it (see Stage 6's
    note on the still-unbuilt frontend consumption piece).
-6. Create the Cloudflare R2 buckets you'll need for this stage — one for project images, one for
-   the resume/CV document — following the **R2 setup walkthrough** below. Add a presign endpoint
-   per resource (`POST /api/projects/upload-url`, `POST /api/resume/upload-url`) that validates the
-   requested content-type/size against an explicit allowlist and returns a short-lived presigned PUT
-   URL using the S3-compatible R2 API.
-7. In the admin UI, upload the selected file directly to the presigned URL (not through your API).
-   For project images, include the returned object key alongside the resulting public URL in the
-   project's create/update payload. For the resume, call the `PUT /api/resume` confirm endpoint with
-   the object key/filename/size once the direct upload finishes.
+6. Create R2 buckets for public project images and private generated CVs using the walkthrough
+   below. Keep the project-image presign endpoint and direct uploads; generate CV PDFs in the
+   backend using pdfmake with local fonts, rather than uploading documents from admin.
+7. Include project image metadata in create/update payloads. Add CV project stars with a targeted
+   update, English/Dutch admin previews, and content-hashed private R2 caching. Return five-minute
+   signed download links and keep old uploaded-object metadata only until safe cleanup. Follow
+   `docs/cv-pdf-generation.md`; never include requester details in rendered content.
 8. When rendering the project description anywhere (admin preview or later, the public site), parse
    the stored Markdown to HTML with `ngx-markdown`/`marked` and rely on its built-in sanitizer
    (Angular's `DomSanitizer`) — never bypass sanitization to render stored markdown as trusted HTML.
@@ -414,8 +412,9 @@ storage instead of through your API.
 
 **Verify it worked:** creating a project with a rich-text description and an image in the admin UI
 results in a new row in `projects` with a Markdown `description` and a real `R2_PUBLIC_BASE_URL`-backed
-image URL; the image loads directly from that URL in a browser. Uploading a resume in the admin UI's
-Basic Info page shows it as the active file and downloads correctly from the public site.
+image URL; the image loads directly from that URL in a browser. Basic Info downloads generated
+EN/NL CV previews; starring a project changes the next CV, while an unchanged download reuses its
+cached object. Preview does not add requester records or download counts.
 
 **Reference:** architecture doc §10 (Image Storage, including the WYSIWYG/sanitization design).
 
@@ -442,9 +441,11 @@ prerendering (SSG) is the wrong choice when the content is admin-editable after 
 2. Build the home/projects/project-detail pages in `web`, fetching data from the read-only API
    endpoints (no auth needed for these). Show a project's skills, client, job role, live URL, and
    start/end date where present.
-3. Build a real `/resume` page (`apps/web/src/app/pages/resume/resume-page.component.ts`) reusing
-   `ProfessionalJourneySection` fed from `PortfolioContentService.roleCompanyGroups()` — roles are
-   grouped by organization (LinkedIn-style) and render "Present" when a role's `endDate` is absent.
+3. Build `/resume` as a dedicated CV download page with the contact page's heading and form-card
+   styling, without the professional journey. Use one download button and an optional form with
+   an unchecked storage-consent checkbox; empty fields allow an anonymous download.
+   Implement an unguarded bilingual `/privacy` route, link it from
+   the footer and both forms, and use `privacy@ebeerens.com` for rights/withdrawal requests.
 4. Build a contact page with a Cloudflare Turnstile widget. Serve the public site key through
    `apps/web/public/runtime-config.json` as `turnstileSiteKey`, keep `TURNSTILE_SECRET_KEY`
    server-side only, submit the resulting `turnstileToken` to `POST /api/contact`, show a clear
@@ -827,10 +828,15 @@ gates).
    the R2 S3-compatible API (e.g. via the `aws` CLI configured against R2, or `rclone`). This bucket
    stays private; there's no need for public access or CORS on it.
 2. Schedule it with a cron job on the VPS (e.g. daily at a quiet hour).
-3. Add a retention policy in the script or via R2 lifecycle rules (e.g. keep the last 7 daily + 4
-   weekly dumps) so storage stays inside the free tier.
+3. Run `bash deploy/configure-r2-retention.sh` to expire backups after thirty days, generated CV
+   objects after thirty days, and separate erasure markers after thirty-one days. Give the API
+   write access to private erasure storage and verify effective expiry, including existing objects.
+   Install `deploy/portfolio-logs.logrotate` for daily security-log rotation with a thirty-day bound.
 4. Actually test a restore: spin up a throwaway local Postgres container, download a backup, and run
-   `pg_restore`/`psql` against it to confirm the dump is valid and complete.
+   `deploy/restore-backup.sh` from the repository root with `RESTORE_OFFLINE_CONFIRMED=true`.
+   It fetches independent erasure markers, applies current migrations, purges six-month CV requests
+   and twelve-month contact/download records, then reconciles early erasures. For a VPS without
+   Node/dependencies, set `RESTORE_MIGRATION_IMAGE` to the deployed API's `-migrate` image.
 
 > 💡 **B1 explainer — why isn't the server's disk a backup?**
 > A backup's whole purpose is to survive the _original_ being lost, damaged, or deleted. If your
@@ -840,7 +846,9 @@ gates).
 > different storage service (R2) entirely, not just a different folder on the same machine.
 
 **Verify it worked:** a fresh dump appears in the backup R2 bucket after the cron job runs; the
-manual restore test in step 4 produces a working database with your real data in it.
+manual restore test in step 4 produces a working database without expired or previously erased
+submissions. Verify the privacy mailbox and actual provider/transfer arrangements before publishing
+the notice; code alone cannot establish production GDPR compliance.
 
 **Reference:** architecture doc §16 (Backups).
 

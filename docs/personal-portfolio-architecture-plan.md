@@ -592,6 +592,21 @@ strips disallowed tags/attributes as the primary XSS defense before the HTML rea
 
 ---
 
+### Generated CV and privacy
+
+Generate English/Dutch CVs from public portfolio data with pdfmake and packaged local fonts,
+including only projects explicitly starred for the CV. Replace manual document uploads with
+lazy generation and private R2 keys derived from locale, rendered content and template version.
+Recheck content before issuing five-minute signed links; expire generated objects after thirty
+days. No scheduled renderer, Chromium, queue or extra server is required.
+
+Anonymous download remains available. Optional requester details require separate consent and
+expire after six calendar months; contact messages use legitimate interests and expire after
+twelve months. Publish an always-accessible bilingual privacy route, linked from the footer and
+both forms. Protected admin request listing/deletion and daily/startup retention cleanup reuse
+the existing session and scheduler patterns. See `docs/cv-pdf-generation.md` and
+`docs/gdpr-privacy-notice.md` for the full flows and publication gates.
+
 ## 11. Nginx
 
 Use Nginx as a reverse proxy, not initially as a load balancer.
@@ -846,8 +861,10 @@ pg_dump (scheduled cron job)
 Upload to a separate Cloudflare R2 bucket (free tier, same account as image storage)
 ```
 
-Apply a retention/rotation policy (e.g. keep the last 7 daily + 4 weekly dumps) so storage doesn't
-grow unbounded.
+Expire database backups after thirty days. Keep minimal early-erasure markers separately in
+private R2 for thirty-one days; restore only recent backups while traffic is offline, apply
+current migrations, purge expired submissions and reconcile earlier erasures before reopening
+the application. Lifecycle rules must not replace unrelated bucket rules.
 
 Do not rely exclusively on the VPS disk.
 

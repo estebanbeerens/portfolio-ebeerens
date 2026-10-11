@@ -1,32 +1,31 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma } from '../../generated/prisma/client';
+import { calendarMonthsAgo } from '../privacy/retention.util';
+import { TurnstileVerifier } from '../privacy/turnstile-verifier.service';
+import { PrivacyErasureService } from '../privacy/privacy-erasure.service';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
 import { UpdateContactMessageDto } from './dto/update-contact-message.dto';
 
-const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-const CONTACT_TURNSTILE_ACTION = 'contact';
-
-type TurnstileSiteverifyResponse = {
-  success: boolean;
-  action?: string;
-  hostname?: string;
-  'error-codes'?: string[];
-};
-
 @Injectable()
 export class ContactService {
-  private readonly logger = new Logger(ContactService.name);
-
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly turnstile: TurnstileVerifier,
+    private readonly erasures: PrivacyErasureService
+  ) {}
 
   findAll() {
     return this.prisma.contactMessage.findMany({
+      where: { createdAt: { gt: calendarMonthsAgo(12) } },
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async remove(id: string) {
+    const existing = await this.prisma.contactMessage.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Contact message not found');
+    await this.erasures.record('ContactMessage', id);
     await this.prisma.contactMessage.delete({ where: { id } });
   }
 
@@ -45,42 +44,11 @@ export class ContactService {
   }
 
   async create(dto: CreateContactMessageDto) {
-    await this.verifyTurnstile(dto.turnstileToken);
+    await this.turnstile.verify(dto.turnstileToken, 'contact');
 
     const { fullName, email, organization, subject, message } = dto;
     return this.prisma.contactMessage.create({
       data: { fullName, email, organization: organization ?? null, subject, message },
     });
-  }
-
-  private async verifyTurnstile(token: string) {
-    const secret = process.env.TURNSTILE_SECRET_KEY;
-    if (!secret) {
-      this.logger.error('TURNSTILE_SECRET_KEY is not configured');
-      throw new BadRequestException('Turnstile verification is unavailable');
-    }
-
-    let result: TurnstileSiteverifyResponse;
-    try {
-      const response = await fetch(TURNSTILE_VERIFY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ secret, response: token }),
-      });
-      result = (await response.json()) as TurnstileSiteverifyResponse;
-    } catch (error) {
-      this.logger.error('Turnstile verification request failed', error);
-      throw new BadRequestException('Turnstile verification failed');
-    }
-
-    if (!result.success) {
-      this.logger.warn(`Turnstile verification failed: ${result['error-codes']?.join(', ') ?? 'unknown error'}`);
-      throw new BadRequestException('Turnstile verification failed');
-    }
-
-    if (result.action !== CONTACT_TURNSTILE_ACTION) {
-      this.logger.warn(`Turnstile action mismatch: ${result.action ?? 'missing'}`);
-      throw new BadRequestException('Turnstile verification failed');
-    }
   }
 }

@@ -31,8 +31,8 @@
         <target>Ontwikkelde projecten worden voorbereid.</target>
       </trans-unit>
       <trans-unit id="hero.title" datatype="html">
-        <source> Crafting fluid <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>interactive<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> architectures </source>
-        <target> Vloeiende <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>interactieve<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> architecturen bouwen </target>
+        <source> Engineering <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digital experiences<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> that work for <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>everyone<x id="CLOSE_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;/span&gt;"/> </source>
+        <target> Technische <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digitale ervaringen<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> die werken voor <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>iedereen<x id="CLOSE_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;/span&gt;"/> </target>
       </trans-unit>
       <trans-unit id="hero.seeProjects" datatype="html">
         <source>See My Projects</source>
@@ -310,6 +310,82 @@
         <source>Back to home</source>
         <target>Terug naar home</target>
       </trans-unit>
+      <trans-unit id="footer.privacyLink" datatype="html"><source>Privacy</source><target>Privacy</target></trans-unit>
+      <trans-unit id="contact.privacyNote" datatype="html">
+        <source>I use your details to respond to your message and delete it after twelve months. Read the <x id="START_LINK"/>privacy notice<x id="CLOSE_LINK"/>.</source>
+        <target>Ik gebruik je gegevens om op je bericht te reageren en verwijder het na twaalf maanden. Lees de <x id="START_LINK"/>privacyverklaring<x id="CLOSE_LINK"/>.</target>
+      </trans-unit>
+      <trans-unit id="privacy.title" datatype="html"><source>Privacy notice</source><target>Privacyverklaring</target></trans-unit>
+      <trans-unit id="privacy.updated" datatype="html"><source>Last updated: 9 October 2026</source><target>Laatst bijgewerkt: 9 oktober 2026</target></trans-unit>
+      <trans-unit id="privacy.intro" datatype="html">
+        <source>This is my personal portfolio. I use submitted details to reply to messages and, if you choose, to know who is interested in my CV. I do not sell these details or use them for marketing or unrelated commercial purposes.</source>
+        <target>Dit is mijn persoonlijke portfolio. Ik gebruik verstrekte gegevens om op berichten te reageren en, als je daarvoor kiest, te weten wie interesse heeft in mijn cv. Ik verkoop deze gegevens niet en gebruik ze niet voor marketing of andere commerciële doeleinden.</target>
+      </trans-unit>
+      <trans-unit id="privacy.controller" datatype="html"><source>Who is responsible?</source><target>Wie is verantwoordelijk?</target></trans-unit>
+      <trans-unit id="privacy.controllerBody" datatype="html">
+        <source>Esteban Beerens is the data controller. For privacy questions or requests, email <x id="START_LINK"/>privacy@ebeerens.com<x id="CLOSE_LINK"/>.</source>
+        <target>Esteban Beerens is de verwerkingsverantwoordelijke. Mail voor privacyvragen of verzoeken naar <x id="START_LINK"/>privacy@ebeerens.com<x id="CLOSE_LINK"/>.</target>
+      </trans-unit>
+      <trans-unit id="privacy.contact" datatype="html"><source>Contact messages</source><target>Contactberichten</target></trans-unit>
+      <trans-unit id="privacy.contactBody" datatype="html">
+        <source>The contact form collects your name, email, optional organization, subject and message. I use these to read and respond to your inquiry. The legal basis is my legitimate interest in handling correspondence initiated by you. Required fields are needed to send a message through this form. Messages are automatically deleted from the live database after twelve calendar months, or sooner following an applicable deletion request.</source>
+        <target>Het contactformulier verzamelt je naam, e-mailadres, eventuele organisatie, onderwerp en bericht. Ik gebruik deze om je vraag te lezen en erop te reageren. De rechtsgrond is mijn gerechtvaardigde belang om door jou geïnitieerde correspondentie te behandelen. Verplichte velden zijn nodig om via dit formulier een bericht te versturen. Berichten worden na twaalf kalendermaanden automatisch uit de actieve database verwijderd, of eerder naar aanleiding van een toepasselijk verwijderingsverzoek.</target>
+      </trans-unit>
+      <trans-unit id="privacy.cv" datatype="html"><source>CV downloads</source><target>Cv-downloads</target></trans-unit>
+      <trans-unit id="privacy.cvBody" datatype="html">
+        <source>You can download my CV without giving your name or email. If you choose to share your name, email or reason, I store those optional details only with your consent, together with the submission time and a record of that consent. The purpose is to know who is interested in my CV, not to send marketing. These details are automatically deleted from the live database after six calendar months. You can withdraw consent at any time by emailing me, without affecting your ability to download the CV or the lawfulness of earlier processing.</source>
+        <target>Je kunt mijn cv downloaden zonder je naam of e-mailadres op te geven. Als je je naam, e-mailadres of reden wilt delen, bewaar ik deze optionele gegevens alleen met je toestemming, samen met het tijdstip van inzending en een registratie van die toestemming. Het doel is te weten wie interesse heeft in mijn cv, niet om marketing te versturen. Deze gegevens worden na zes kalendermaanden automatisch uit de actieve database verwijderd. Je kunt je toestemming op elk moment per e-mail intrekken. Dat heeft geen invloed op je mogelijkheid om het cv te downloaden of op de rechtmatigheid van eerdere verwerking.</target>
+      </trans-unit>
+      <trans-unit id="privacy.downloadCounts" datatype="html">
+        <source>I also count issued download links using timestamps, without linking those counts to your submitted details, IP address or browser. These events are removed after twelve calendar months. Your details are not included in the PDF, and the CV is downloaded directly rather than emailed.</source>
+        <target>Ik tel ook verstrekte downloadlinks aan de hand van tijdstippen, zonder deze tellingen te koppelen aan je verstrekte gegevens, IP-adres of browser. Deze gebeurtenissen worden na twaalf kalendermaanden verwijderd. Je gegevens komen niet in de pdf terecht en het cv wordt rechtstreeks gedownload, niet per e-mail verzonden.</target>
+      </trans-unit>
+      <trans-unit id="privacy.security" datatype="html"><source>Security and service providers</source><target>Beveiliging en dienstverleners</target></trans-unit>
+      <trans-unit id="privacy.securityBody" datatype="html">
+        <source>The site uses Oracle Cloud hosting and Cloudflare for network security, bot verification and storage. These providers can process technical information such as your IP address and request metadata. Cloudflare Turnstile checks form submissions for abuse; verification tokens are not saved with your message or CV request. My legal basis for necessary security processing is the legitimate interest in keeping the site safe and available.</source>
+        <target>De website gebruikt Oracle Cloud voor hosting en Cloudflare voor netwerkbeveiliging, botverificatie en opslag. Deze dienstverleners kunnen technische informatie verwerken, zoals je IP-adres en metadata van verzoeken. Cloudflare Turnstile controleert formulierinzendingen op misbruik; verificatietokens worden niet bij je bericht of cv-aanvraag opgeslagen. Mijn rechtsgrond voor noodzakelijke beveiligingsverwerking is het gerechtvaardigde belang om de website veilig en beschikbaar te houden.</target>
+      </trans-unit>
+      <trans-unit id="privacy.providers" datatype="html">
+        <source>Provider processing can involve locations outside the European Economic Area. Contact me for details of the applicable locations and transfer safeguards. Further information is available in the <x id="START_LINK"/>Cloudflare privacy policy<x id="CLOSE_LINK"/> and <x id="START_LINK_1"/>Oracle privacy policy<x id="CLOSE_LINK"/>.</source>
+        <target>Verwerking door dienstverleners kan plaatsvinden buiten de Europese Economische Ruimte. Neem contact met mij op voor informatie over de betreffende locaties en waarborgen bij doorgifte. Meer informatie staat in het <x id="START_LINK"/>privacybeleid van Cloudflare<x id="CLOSE_LINK"/> en het <x id="START_LINK_1"/>privacybeleid van Oracle<x id="CLOSE_LINK"/>.</target>
+      </trans-unit>
+      <trans-unit id="privacy.storage" datatype="html"><source>Storage and backups</source><target>Opslag en back-ups</target></trans-unit>
+      <trans-unit id="privacy.storageBody" datatype="html">
+        <source>Submissions are stored in a restricted database accessible to me and the infrastructure providers needed to operate the site. Deleted data may remain in restricted disaster-recovery backups for up to thirty additional days. It is not used for other purposes, and expiry and earlier deletions must be reapplied before a restored database is brought online. Minimal record identifiers used to reconcile deletions are kept separately for up to thirty-one days. Site-controlled security logs are retained for up to thirty days; infrastructure providers apply their own security-log policies.</source>
+        <target>Inzendingen worden opgeslagen in een afgeschermde database die toegankelijk is voor mij en de infrastructuurleveranciers die nodig zijn om de website te beheren. Verwijderde gegevens kunnen nog maximaal dertig extra dagen in afgeschermde herstelback-ups staan. Ze worden niet voor andere doeleinden gebruikt. Verlopen gegevens en eerdere verwijderingen moeten opnieuw worden verwijderd voordat een herstelde database online komt. Minimale recordidentificaties voor het opnieuw toepassen van verwijderingen worden maximaal eenendertig dagen apart bewaard. Beveiligingslogs onder mijn beheer worden maximaal dertig dagen bewaard; infrastructuurleveranciers hanteren hun eigen beleid voor beveiligingslogs.</target>
+      </trans-unit>
+      <trans-unit id="privacy.rights" datatype="html"><source>Your rights</source><target>Je rechten</target></trans-unit>
+      <trans-unit id="privacy.rightsBody" datatype="html">
+        <source>Depending on the circumstances, you may request access, correction, deletion or restriction of your personal data, object to processing based on legitimate interests, and request portability for data processed on consent where applicable. You can also withdraw CV logging consent. Email privacy@ebeerens.com; I may ask for proportionate information to verify your identity. I normally respond within one month, subject to legally permitted extensions.</source>
+        <target>Afhankelijk van de omstandigheden kun je vragen om inzage, correctie, verwijdering of beperking van je persoonsgegevens, bezwaar maken tegen verwerking op basis van gerechtvaardigde belangen en waar toepasselijk overdraagbaarheid vragen voor gegevens die op basis van toestemming worden verwerkt. Je kunt ook je toestemming voor het registreren van cv-aanvragen intrekken. Mail naar privacy@ebeerens.com; ik kan om passende informatie vragen om je identiteit te controleren. Ik reageer normaal binnen één maand, behoudens wettelijk toegestane verlengingen.</target>
+      </trans-unit>
+      <trans-unit id="privacy.complaint" datatype="html">
+        <source>You have the right to complain to a data protection supervisory authority, particularly in the country where you live or work, or where you believe an infringement occurred. The <x id="START_LINK"/>European Data Protection Board directory<x id="CLOSE_LINK"/> lists the authorities.</source>
+        <target>Je hebt het recht een klacht in te dienen bij een toezichthouder voor gegevensbescherming, met name in het land waar je woont of werkt, of waar je denkt dat een overtreding heeft plaatsgevonden. De <x id="START_LINK"/>lijst van het Europees Comité voor gegevensbescherming<x id="CLOSE_LINK"/> vermeldt de toezichthouders.</target>
+      </trans-unit>
+      <trans-unit id="cv.form.name" datatype="html"><source>Full name (optional)</source><target>Volledige naam (optioneel)</target></trans-unit>
+      <trans-unit id="cv.form.email" datatype="html"><source>Email (optional)</source><target>E-mailadres (optioneel)</target></trans-unit>
+      <trans-unit id="cv.form.reason" datatype="html"><source>Reason (optional)</source><target>Reden (optioneel)</target></trans-unit>
+      <trans-unit id="cv.form.consent" datatype="html">
+        <source>I agree that Esteban Beerens may store these optional details for six months to know who is interested in his CV. I can withdraw this consent at any time.</source>
+        <target>Ik geef Esteban Beerens toestemming om deze optionele gegevens zes maanden te bewaren om te weten wie interesse heeft in zijn cv. Ik kan deze toestemming op elk moment intrekken.</target>
+      </trans-unit>
+      <trans-unit id="cv.form.privacy" datatype="html">
+        <source>Sharing details is optional and does not affect your download. Read the <x id="START_LINK"/>privacy notice<x id="CLOSE_LINK"/>.</source>
+        <target>Gegevens delen is optioneel en heeft geen invloed op je download. Lees de <x id="START_LINK"/>privacyverklaring<x id="CLOSE_LINK"/>.</target>
+      </trans-unit>
+      <trans-unit id="cv.form.verificationUnavailable" datatype="html"><source>Sharing details is unavailable right now. You can still download anonymously.</source><target>Gegevens delen is momenteel niet beschikbaar. Je kunt nog steeds anoniem downloaden.</target></trans-unit>
+      <trans-unit id="cv.form.download" datatype="html"><source>Download CV</source><target>Cv downloaden</target></trans-unit>
+      <trans-unit id="cv.form.fieldError" datatype="html"><source>Check this field's format and length.</source><target>Controleer de opmaak en lengte van dit veld.</target></trans-unit>
+      <trans-unit id="cv.form.invalid" datatype="html"><source>Check the highlighted fields, or download anonymously.</source><target>Controleer de gemarkeerde velden of download anoniem.</target></trans-unit>
+      <trans-unit id="cv.form.consentRequired" datatype="html"><source>Agree to storing your optional details, or leave the fields empty to download anonymously.</source><target>Geef toestemming om je optionele gegevens te bewaren of laat de velden leeg om anoniem te downloaden.</target></trans-unit>
+      <trans-unit id="cv.form.verificationRequired" datatype="html"><source>Complete verification to share details, or leave the fields empty to download anonymously.</source><target>Voltooi de verificatie om gegevens te delen of laat de velden leeg om anoniem te downloaden.</target></trans-unit>
+      <trans-unit id="cv.form.heading" datatype="html"><source>Request CV</source><target>Cv aanvragen</target></trans-unit>
+      <trans-unit id="cv.downloadTitle" datatype="html"><source>Download CV</source><target>Cv downloaden</target></trans-unit>
+      <trans-unit id="cv.status.preparing" datatype="html"><source>Preparing your CV...</source><target>Je cv wordt voorbereid...</target></trans-unit>
+      <trans-unit id="cv.status.loggingFailed" datatype="html"><source>Your CV is ready, but your optional details could not be saved.</source><target>Je cv is klaar, maar je optionele gegevens konden niet worden opgeslagen.</target></trans-unit>
+      <trans-unit id="cv.status.ready" datatype="html"><source>Your CV is ready.</source><target>Je cv is klaar.</target></trans-unit>
+      <trans-unit id="cv.status.error" datatype="html"><source>The CV could not be downloaded. Please try again.</source><target>Het cv kon niet worden gedownload. Probeer het opnieuw.</target></trans-unit>
     </body>
   </file>
 </xliff>

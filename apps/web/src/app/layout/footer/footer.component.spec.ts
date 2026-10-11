@@ -42,6 +42,7 @@ describe('Footer', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).not.toContain('Instagram');
     expect(text).not.toContain('YouTube');
+    expect((fixture.nativeElement as HTMLElement).querySelector('a[href="/privacy"]')).not.toBeNull();
   });
 
   it('has no accessibility violations', async () => {

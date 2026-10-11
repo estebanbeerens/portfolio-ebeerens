@@ -1,5 +1,11 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const PRESIGN_TTL_SECONDS = 300;
@@ -35,6 +41,23 @@ export class R2Service {
 
   async deleteObject(bucket: string, objectKey: string) {
     await this.getClient().send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
+  }
+
+  async objectExists(bucket: string, objectKey: string): Promise<boolean> {
+    try {
+      await this.getClient().send(new HeadObjectCommand({ Bucket: bucket, Key: objectKey }));
+      return true;
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        '$metadata' in error &&
+        (error.$metadata as { httpStatusCode?: number }).httpStatusCode === 404
+      ) {
+        return false;
+      }
+      throw error;
+    }
   }
 
   async getObjectBuffer(bucket: string, objectKey: string): Promise<Buffer> {

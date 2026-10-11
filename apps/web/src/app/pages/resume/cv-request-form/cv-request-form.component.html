@@ -1,0 +1,87 @@
+<form
+  class="grid gap-5"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  aria-labelledby="cv-download-title"
+  [attr.aria-describedby]="error() ? 'cv-form-error' : null"
+>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <ui-input
+      controlId="cv-full-name"
+      label="Full name (optional)"
+      i18n-label="@@cv.form.name"
+      autocomplete="name"
+      formControlName="fullName"
+      [error]="fieldError('fullName')"
+    />
+    <ui-input
+      controlId="cv-email"
+      label="Email (optional)"
+      i18n-label="@@cv.form.email"
+      type="email"
+      autocomplete="email"
+      formControlName="email"
+      [error]="fieldError('email')"
+    />
+  </div>
+  <ui-textarea
+    controlId="cv-reason"
+    label="Reason (optional)"
+    i18n-label="@@cv.form.reason"
+    [rows]="3"
+    [maxlength]="500"
+    formControlName="reason"
+    [error]="fieldError('reason')"
+  />
+  <label class="text-text flex cursor-pointer items-start gap-3 text-sm" for="cv-consent">
+    <input
+      id="cv-consent"
+      type="checkbox"
+      formControlName="consent"
+      aria-describedby="cv-privacy-note"
+      class="accent-accent focus-visible:outline-accent mt-0.5 size-5 shrink-0 cursor-pointer hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-70"
+    />
+    <span i18n="@@cv.form.consent"
+      >I agree that Esteban Beerens may store these optional details for six months to know who is interested in his CV.
+      I can withdraw this consent at any time.</span
+    >
+  </label>
+  <p id="cv-privacy-note" class="text-text-muted text-sm" i18n="@@cv.form.privacy">
+    Sharing details is optional and does not affect your download. Read the
+    <a
+      routerLink="/privacy"
+      class="text-accent hover:text-accent-hover underline focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-80"
+      >privacy notice</a
+    >.
+  </p>
+  @if (hasDetails() && consented()) {
+    @if (siteKey(); as key) {
+      <ngx-turnstile
+        #turnstile
+        [siteKey]="key"
+        action="cv-request"
+        theme="auto"
+        size="flexible"
+        [tabIndex]="0"
+        [responseField]="false"
+        (resolved)="token.set($event || undefined)"
+        (errored)="token.set(undefined)"
+        (timeout)="token.set(undefined)"
+        (unsupported)="token.set(undefined)"
+      />
+    } @else {
+      <p class="text-text-muted text-sm" role="status" i18n="@@cv.form.verificationUnavailable">
+        Sharing details is unavailable right now. You can still download anonymously.
+      </p>
+    }
+  }
+  @if (error(); as message) {
+    <p id="cv-form-error" class="text-error text-sm" role="alert">{{ message }}</p>
+  }
+  <div class="flex flex-wrap items-center gap-3">
+    <button uiButton type="submit" [disabled]="saving()">
+      <svg [lucideIcon]="downloadIcon" class="size-4" aria-hidden="true"></svg>
+      <span i18n="@@cv.form.download">Download CV</span>
+    </button>
+  </div>
+</form>

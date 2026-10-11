@@ -11,6 +11,10 @@ import { SkillDto } from './skillDto';
 
 export interface ProjectDto {
   /**
+   * Include this project in the generated CV
+   */
+  isCvFeatured: boolean;
+  /**
    * Unique identifier of the project
    */
   id: string;

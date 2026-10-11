@@ -5,6 +5,16 @@
   <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <p class="text-text-muted text-xs"><span aria-hidden="true" class="text-error">*</span> Required field</p>
 
+    <label for="project-cv-featured" class="text-text flex cursor-pointer items-center gap-3 text-sm">
+      <input
+        id="project-cv-featured"
+        type="checkbox"
+        formControlName="isCvFeatured"
+        class="accent-accent size-5 cursor-pointer hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 active:opacity-70"
+      />
+      Include in CV
+    </label>
+
     <ui-input
       controlId="project-title"
       label="Title"

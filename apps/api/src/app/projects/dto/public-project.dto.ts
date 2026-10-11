@@ -8,6 +8,7 @@ export class PublicProjectDto extends OmitType(ProjectDto, [
   'shortDescriptionNl',
   'descriptionEn',
   'descriptionNl',
+  'isCvFeatured',
 ] as const) {
   @ApiProperty({
     description: 'Short summary shown alongside the project, resolved to the requested language',

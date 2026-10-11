@@ -1,0 +1,15 @@
+<ui-page-header title="Skills" subtitle="Group your existing skills into categories for future resume use." />
+
+<admin-skill-board
+  [data]="data()"
+  [loading]="management.isLoading()"
+  [loadError]="loadError()"
+  [busy]="mutation() !== 'idle'"
+  [mutationError]="mutationError()"
+  [status]="status()"
+  (createCategory)="createCategory($event)"
+  (updateCategory)="updateCategory($event)"
+  (deleteCategory)="deleteCategory($event)"
+  (moveSkill)="moveSkill($event)"
+  (retry)="retry()"
+/>

@@ -19,6 +19,7 @@ const PROJECT_IMAGE_MIME_TYPES: readonly string[] = Object.values(CreateProjectI
 const PROJECT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
 export interface ProjectFormValue {
+  isCvFeatured: boolean;
   title: string;
   slug: string;
   shortDescriptionEn: string;
@@ -79,6 +80,7 @@ export class ProjectForm {
   protected readonly imageObjectKey = signal('');
   protected readonly imageUploading = signal(false);
   protected readonly form = this.formBuilder.nonNullable.group({
+    isCvFeatured: [false],
     title: ['', [Validators.required, Validators.maxLength(200)]],
     slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)]],
     shortDescriptionEn: ['', [Validators.required, Validators.maxLength(255)]],
@@ -166,6 +168,7 @@ export class ProjectForm {
     this.form.reset(
       project
         ? {
+            isCvFeatured: project.isCvFeatured,
             title: project.title,
             slug: project.slug,
             shortDescriptionEn: project.shortDescriptionEn,
@@ -181,6 +184,7 @@ export class ProjectForm {
             skills: project.skills.map((skill) => skill.name),
           }
         : {
+            isCvFeatured: false,
             title: '',
             slug: '',
             shortDescriptionEn: '',

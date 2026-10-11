@@ -1,61 +1,109 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Put, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  Header,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiHeader,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
+  ApiResponse,
+  ApiServiceUnavailableResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { RequestWithGithubUser, SessionAuthGuard } from '../auth/session-auth.guard';
-import { ConfirmResumeUploadDto } from './dto/confirm-resume-upload.dto';
-import { CreateResumeUploadUrlDto } from './dto/create-resume-upload-url.dto';
-import { ResumeUploadUrlDto } from './dto/resume-upload-url.dto';
-import { ResumeDto } from './dto/resume.dto';
+import { SessionAuthGuard } from '../auth/session-auth.guard';
+import { resolveLocale } from '../shared/locale.util';
+import { CvRequestsService } from './cv-requests.service';
+import { CvDownloadDto } from './dto/cv-download.dto';
+import { CvRequestPageDto } from './dto/cv-request.dto';
+import { RequestCvDto } from './dto/request-cv.dto';
 import { ResumeService } from './resume.service';
+
+const localeHeader = {
+  name: 'x-accept-language',
+  required: false,
+  description: 'Requested content language (en/nl); defaults to en',
+};
 
 @ApiTags('resume')
 @Controller('resume')
 export class ResumeController {
-  constructor(private readonly resumeService: ResumeService) {}
-
-  @Post('upload-url')
-  @UseGuards(SessionAuthGuard)
-  @ApiOkResponse({ description: 'A short-lived presigned PUT url', type: ResumeUploadUrlDto })
-  @ApiUnauthorizedResponse({ description: 'No valid session' })
-  createUploadUrl(@Body() dto: CreateResumeUploadUrlDto): Promise<ResumeUploadUrlDto> {
-    return this.resumeService.createUploadUrl(dto);
-  }
-
-  @Put()
-  @UseGuards(SessionAuthGuard)
-  @ApiOkResponse({ description: 'The stored resume', type: ResumeDto })
-  @ApiUnauthorizedResponse({ description: 'No valid session' })
-  confirmUpload(@Body() dto: ConfirmResumeUploadDto, @Req() req: RequestWithGithubUser): Promise<ResumeDto> {
-    return this.resumeService.confirmUpload(dto, req.displayName ?? req.githubUserId);
-  }
-
-  @Get()
-  @ApiOkResponse({ description: 'The current resume metadata', type: ResumeDto })
-  @ApiNotFoundResponse({ description: 'No resume uploaded yet' })
-  findResume(): Promise<ResumeDto> {
-    return this.resumeService.findResume();
-  }
+  constructor(
+    private readonly resume: ResumeService,
+    private readonly requests: CvRequestsService
+  ) {}
 
   @Get('download')
-  @ApiNotFoundResponse({ description: 'No resume uploaded yet' })
-  async download(@Res() res: Response) {
-    const url = await this.resumeService.registerDownload();
-    return res.redirect(url);
+  @ApiHeader(localeHeader)
+  @ApiResponse({ status: 302, description: 'Redirect to the generated CV' })
+  @ApiNotFoundResponse({ description: 'CV unavailable' })
+  @ApiServiceUnavailableResponse({ description: 'CV generation unavailable' })
+  @Header('Cache-Control', 'no-store')
+  @Header('Vary', 'X-Accept-Language')
+  async download(@Res() response: Response, @Headers('x-accept-language') language?: string) {
+    const result = await this.resume.download(resolveLocale(language));
+    return response.redirect(result.downloadUrl);
   }
 
-  @Delete()
+  @Post('download')
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader(localeHeader)
+  @ApiOkResponse({ description: 'A generated CV download URL and optional logging status', type: CvDownloadDto })
+  @ApiBadRequestResponse({ description: 'Invalid details, consent or verification' })
+  @ApiNotFoundResponse({ description: 'CV unavailable' })
+  @ApiServiceUnavailableResponse({ description: 'CV generation unavailable' })
+  @Header('Cache-Control', 'no-store')
+  requestDownload(@Body() dto: RequestCvDto, @Headers('x-accept-language') language?: string): Promise<CvDownloadDto> {
+    return this.resume.download(resolveLocale(language), dto);
+  }
+
+  @Post('preview')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeader(localeHeader)
+  @ApiOkResponse({ description: 'A generated CV preview without download logging', type: CvDownloadDto })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  @ApiNotFoundResponse({ description: 'CV unavailable' })
+  @ApiServiceUnavailableResponse({ description: 'CV generation unavailable' })
+  @Header('Cache-Control', 'no-store')
+  preview(@Headers('x-accept-language') language?: string): Promise<CvDownloadDto> {
+    return this.resume.preview(resolveLocale(language));
+  }
+
+  @Get('requests')
+  @UseGuards(SessionAuthGuard)
+  @ApiQuery({ name: 'offset', required: false, type: 'integer', minimum: 0, default: 0 })
+  @ApiOkResponse({ description: 'A page of unexpired CV requests', type: CvRequestPageDto })
+  @ApiUnauthorizedResponse({ description: 'No valid session' })
+  @Header('Cache-Control', 'no-store')
+  findRequests(@Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number): Promise<CvRequestPageDto> {
+    return this.requests.findAll(offset);
+  }
+
+  @Delete('requests/:id')
   @UseGuards(SessionAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiNoContentResponse({ description: 'The resume was deleted' })
-  @ApiNotFoundResponse({ description: 'No resume uploaded yet' })
+  @ApiNoContentResponse({ description: 'The CV request was deleted' })
   @ApiUnauthorizedResponse({ description: 'No valid session' })
-  remove(@Req() req: RequestWithGithubUser): Promise<void> {
-    return this.resumeService.deleteResume(req.displayName ?? req.githubUserId);
+  @ApiNotFoundResponse({ description: 'The CV request was not found' })
+  removeRequest(@Param('id') id: string): Promise<void> {
+    return this.requests.remove(id);
   }
 }

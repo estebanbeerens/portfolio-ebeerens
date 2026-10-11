@@ -1,0 +1,14 @@
+/opt/portfolio/logs/nginx/*.log {
+    daily
+    rotate 29
+    maxage 29
+    ifempty
+    missingok
+    compress
+    delaycompress
+    create 0640 root root
+    sharedscripts
+    postrotate
+        /usr/bin/docker kill --signal=USR1 portfolio-nginx >/dev/null 2>&1 || true
+    endscript
+}
