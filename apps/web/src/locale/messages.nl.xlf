@@ -32,7 +32,7 @@
       </trans-unit>
       <trans-unit id="hero.title" datatype="html">
         <source> Engineering <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digital experiences<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> that work for <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>everyone<x id="CLOSE_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;/span&gt;"/> </source>
-        <target> Technische <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digitale ervaringen<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> die werken voor <x id="START_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>iedereen<x id="CLOSE_TAG_SPAN_1" ctype="x-span" equiv-text="&lt;/span&gt;"/> </target>
+        <target> Technische <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>digitale ervaringen<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> die werken voor <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;text-accent&quot;&gt;"/>iedereen<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> </target>
       </trans-unit>
       <trans-unit id="hero.seeProjects" datatype="html">
         <source>See My Projects</source>
