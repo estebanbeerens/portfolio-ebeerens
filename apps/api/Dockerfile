@@ -6,7 +6,7 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 # The prisma files are needed because `postinstall` runs `prisma generate`.
 COPY package.json package-lock.json prisma.config.ts ./
 COPY apps/api/prisma ./apps/api/prisma
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund && npm cache clean --force
 COPY . .
 RUN npx nx build api --configuration=production
 

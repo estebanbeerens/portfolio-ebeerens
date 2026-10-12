@@ -91,11 +91,18 @@ A self-hosted GitHub Actions runner on an internet-facing VPS is an RCE-adjacent
 git fetch --prune origin main
 git reset --hard origin/main
 docker compose -f docker-compose.yml -f docker-compose.prod.yml config >/dev/null
+docker image prune --all --force
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile migrate pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm migrate
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
 
 ```
+
+The production `migrate` service must pull its CI-published image rather than build locally. Prune
+images unused by running containers before pulling so commit-tagged images from prior deploys do not
+fill the VPS disk. Keep the API build stage's npm cache out of its image with `npm cache clean` in
+the same Docker layer as `npm ci`.
+
 4. In the deploy job, use the private key from a GitHub Actions encrypted secret (never commit it) to run only that forced command — e.g. via `appleboy/ssh-action` or a plain `ssh deploy@<host>` step (no explicit command needed; the server ignores whatever is sent and runs the forced one).
 5. Only trigger the deploy job on `main`, after lint/test/build/image-push have all succeeded.
 

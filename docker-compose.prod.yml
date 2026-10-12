@@ -18,10 +18,6 @@ services:
   # One-off: `docker compose run --rm migrate` before (re)starting api. Not part of `up`.
   migrate:
     image: ghcr.io/estebanbeerens/portfolio-ebeerens/api:${IMAGE_TAG:?set IMAGE_TAG to the target git SHA}-migrate
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-      target: migrate
     container_name: portfolio-migrate
     profiles: ['migrate']
     environment:

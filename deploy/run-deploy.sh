@@ -24,6 +24,11 @@ echo "Validating Docker Compose configuration..."
 echo "Refreshing Cloudflare real-IP trust list..."
 "${APP_DIR}/deploy/update-cloudflare-ips.sh"
 
+# Remove images not used by running containers before pulling the next release. Keeping every
+# commit-tagged image can otherwise exhaust the VPS disk before Docker has room for new layers.
+echo "Pruning unused Docker images before pull..."
+docker image prune --all --force
+
 echo "Pulling Docker images..."
 "${compose_with_migrate_profile[@]}" pull
 
