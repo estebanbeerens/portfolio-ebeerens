@@ -81,7 +81,7 @@ describe('HomePage', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.textContent).toContain('Crafting fluid');
+    expect(compiled.textContent).toContain('Engineering digital experiences');
     expect(compiled.textContent).toContain('Nebula Labs');
     expect(compiled.textContent).toContain('Aether Dashboard');
   });
