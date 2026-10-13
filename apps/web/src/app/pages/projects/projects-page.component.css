@@ -24,7 +24,6 @@
 }
 
 .project-thumbnail {
-  background: linear-gradient(105deg, var(--color-cyan-500) 10%, transparent 90%);
   border-radius: var(--radius-md);
   flex: 0 0 12.5rem;
   height: 7.5rem;
@@ -32,11 +31,17 @@
   position: relative;
 }
 
-.project-thumbnail-violet {
+.project-thumbnail-placeholder {
+  background: linear-gradient(105deg, var(--color-cyan-500) 10%, transparent 90%);
+  inset: 0;
+  position: absolute;
+}
+
+.project-thumbnail-placeholder.project-thumbnail-violet {
   background: linear-gradient(105deg, var(--color-violet-500) 10%, transparent 90%);
 }
 
-.project-thumbnail-blue {
+.project-thumbnail-placeholder.project-thumbnail-blue {
   background: linear-gradient(105deg, var(--color-blue-500) 10%, transparent 90%);
 }
 

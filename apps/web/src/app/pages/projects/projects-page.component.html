@@ -26,12 +26,24 @@
       >
         @for (project of sortedProjects(); track project.id; let index = $index) {
           <a class="project-row" [routerLink]="['/projects', project.slug]">
-            <div
-              class="project-thumbnail"
-              [class.project-thumbnail-violet]="index % 3 === 1"
-              [class.project-thumbnail-blue]="index % 3 === 2"
-              aria-hidden="true"
-            ></div>
+            <div class="project-thumbnail" aria-hidden="true">
+              @if (project.imageUrl; as imageUrl) {
+                <img
+                  [ngSrc]="imageUrl"
+                  [ngSrcset]="imageNgSrcset"
+                  sizes="(min-width: 640px) 200px, 100vw"
+                  fill
+                  class="object-cover"
+                  alt=""
+                />
+              } @else {
+                <div
+                  class="project-thumbnail-placeholder"
+                  [class.project-thumbnail-violet]="index % 3 === 1"
+                  [class.project-thumbnail-blue]="index % 3 === 2"
+                ></div>
+              }
+            </div>
             <div class="min-w-0 flex-1">
               <div class="flex items-start justify-between gap-4">
                 <h2 class="font-display text-text text-xl font-bold sm:text-2xl">{{ project.title }}</h2>

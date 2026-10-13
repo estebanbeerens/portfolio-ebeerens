@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgOptimizedImage } from '@angular/common';
 import { Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { SegmentedControl, SegmentedControlOption } from '@portfolio-ebeerens/ui';
+import { PROJECT_IMAGE_NG_SRCSET } from '../../shared/r2-image-loader';
 import {
   projectDateRange,
   projectSkillSummary,
@@ -13,7 +14,7 @@ import { ProjectsContentService } from './projects-content.service';
 
 @Component({
   selector: 'web-projects-page',
-  imports: [DatePipe, RouterLink, SegmentedControl],
+  imports: [DatePipe, NgOptimizedImage, RouterLink, SegmentedControl],
   templateUrl: './projects-page.component.html',
   styleUrl: './projects-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +22,7 @@ import { ProjectsContentService } from './projects-content.service';
 export class ProjectsPage {
   private readonly projectsContent = inject(ProjectsContentService);
   protected readonly sortedProjects = computed(() => this.projectsContent.sortedProjects());
+  protected readonly imageNgSrcset = PROJECT_IMAGE_NG_SRCSET;
   protected readonly displayMode = signal<'list' | 'timeline'>('list');
   protected readonly displayModeLabel = $localize`:@@projects.displayModeLabel:Project display mode`;
   protected readonly displayModeOptions: readonly SegmentedControlOption[] = [

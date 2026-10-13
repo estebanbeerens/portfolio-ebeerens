@@ -10,6 +10,7 @@ const project: PublicProjectDto = {
   id: 'project-1',
   title: 'Aether Dashboard',
   slug: 'aether-dashboard',
+  imageUrl: 'https://cdn.example.com/preview.png',
   startDate: '2024-03-01',
   endDate: '2024-12-01',
   skills: [{ id: 'skill-1', name: 'Angular' }],
@@ -18,15 +19,17 @@ const project: PublicProjectDto = {
   createdAt: '2024-01-01',
   updatedAt: '2024-01-01',
 };
+const projects = signal([project]);
 
 describe('ProjectsPage', () => {
   beforeEach(async () => {
+    projects.set([project]);
     await TestBed.configureTestingModule({
       imports: [ProjectsPage],
       providers: [
         provideRouter([]),
         { provide: Meta, useValue: { updateTag: vi.fn() } },
-        { provide: ProjectsContentService, useValue: { sortedProjects: signal([project]) } },
+        { provide: ProjectsContentService, useValue: { sortedProjects: projects } },
       ],
     }).compileComponents();
   });
@@ -39,6 +42,20 @@ describe('ProjectsPage', () => {
     expect(compiled.querySelector('[role="tabpanel"]')?.getAttribute('aria-label')).toBe('Project list');
     expect(compiled.querySelector('[role="tablist"]')?.getAttribute('aria-label')).toBe('Project display mode');
     expect(compiled.querySelector('a')?.getAttribute('href')).toBe('/projects/aether-dashboard');
+    expect((compiled.querySelector('.project-thumbnail img') as HTMLImageElement | null)?.src).toBe(
+      'https://cdn.example.com/preview.png'
+    );
+    expect(compiled.querySelector('.project-thumbnail-placeholder')).toBeNull();
+  });
+
+  it('renders a gradient placeholder when a project has no image', async () => {
+    const fixture = TestBed.createComponent(ProjectsPage);
+    projects.set([{ ...project, imageUrl: undefined }]);
+    await fixture.whenStable();
+
+    const projectList = fixture.nativeElement as HTMLElement;
+    expect(projectList.querySelector('.project-thumbnail img')).toBeNull();
+    expect(projectList.querySelector('.project-thumbnail-placeholder')).not.toBeNull();
   });
 
   it('renders full large-screen dates and compact years below large screens in the project list', async () => {
