@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "Ebeerens mcp": {
+      "url": "http://mcp.ebeerens.com/mcp",
+      "type": "http"
+    }
+  }
+}

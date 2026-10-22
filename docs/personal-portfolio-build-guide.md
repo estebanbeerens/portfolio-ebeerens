@@ -4,7 +4,7 @@ This is a hands-on, step-by-step execution guide for actually **building** the a
 described in [personal-portfolio-architecture-plan.md](./personal-portfolio-architecture-plan.md).
 
 It is optimized for **learning**, not for the shortest path to a deployed app. The order is
-deliberately different from that document's Phase 1–8 list: here you build a fully working app
+deliberately different from that document's Phase 1–9 list: here you build a fully working app
 **locally** first (monorepo → database → API → auth → admin UI → public site), and only then layer
 in infrastructure one piece at a time (containers → server → reverse proxy → edge/CDN → CI/CD →
 backups/hardening). Each infrastructure piece is introduced right when you first need it, so you
@@ -883,9 +883,48 @@ Principles).
 
 ---
 
+## Stage 15 — Read-only portfolio MCP
+
+**Goal:** let VS Code Copilot and other compatible MCP clients retrieve public portfolio data
+through an authenticated remote MCP endpoint, without exposing PostgreSQL or adding another
+service.
+
+**What you'll learn:** how MCP tools map to existing application services, how Streamable HTTP
+connects remote clients, and where manual provider configuration is required.
+
+**Steps:**
+
+1. Follow the task checklist in [mcp-integration-plan.md](./mcp-integration-plan.md). Tasks are
+   marked **AGENT**, **MANUAL**, or **SHARED** so implementation work is distinguished from
+   Cloudflare/VPS/client steps that require your access or confirmation.
+2. Implement and test the MCP module in the existing NestJS API. Expose only bounded, read-only
+   tools backed by public-data projections. Require OAuth authorization-code flow with PKCE and
+   authorize only the configured GitHub administrator; never reuse the opaque admin session token.
+3. Route `https://mcp.ebeerens.com/mcp` through Cloudflare and Nginx to the API container. Set
+   `MCP_PUBLIC_URL=https://mcp.ebeerens.com` in the production environment, keep the endpoint
+   excluded from caching, and apply origin and edge rate limits. Add the DNS record and ensure the
+   origin certificate covers the hostname.
+4. Configure VS Code with a remote HTTP MCP entry for `https://mcp.ebeerens.com/mcp`. Complete the
+   OAuth browser flow without placing credentials in committed workspace configuration. Verify
+   dynamic client registration, GitHub sign-in, tool calls, and token refresh in the intended
+   VS Code/Copilot mode and any additional clients you intend to use.
+5. Confirm that unauthenticated calls fail, only the configured GitHub administrator can grant
+   access, authenticated tools return only public portfolio data, malformed/oversized queries are
+   rejected or bounded, and no tool can mutate data or execute arbitrary SQL.
+
+**Verify it worked:** VS Code discovers the server and completes OAuth registration/sign-in; an
+unauthenticated request is rejected; only the configured GitHub administrator can authorize;
+response content matches public website content; the MCP endpoint does not reveal admin-only or
+contact data; and logs/configuration do not expose tokens.
+
+**Reference:** architecture doc §11 (Nginx), §12 (Cloudflare), §15 (Server Security), §22 (MCP).
+
+---
+
 ## After this guide
 
-At this point every element in the architecture plan is built, deployed, automated, and backed up.
-From here, treat further work (project tags/links/technologies, error tracking, metrics, etc.) as
-optional additions — per the architecture doc's "avoid premature abstraction" principle, only add
-them when you hit a real need or a genuine learning goal, not by default.
+At this point every element in the architecture plan, including the optional agent integration, is
+built, deployed, automated, and backed up. From here, treat further work (project
+tags/links/technologies, error tracking, metrics, etc.) as optional additions — per the architecture
+doc's "avoid premature abstraction" principle, only add them when you hit a real need or a genuine
+learning goal, not by default.
