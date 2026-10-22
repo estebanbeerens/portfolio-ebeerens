@@ -108,7 +108,9 @@ forced command. It is a thin bootstrap: it takes the deploy lock, fast-forwards 
 `origin/main`, then hands off to `deploy/run-deploy.sh` **from the freshly-pulled checkout**. The
 actual deploy steps live in `deploy/run-deploy.sh`, so changes to them ship with a normal push — you
 do **not** re-copy anything to the VPS when the deploy steps change, only when this bootstrap itself
-changes (which should be almost never).
+changes (which should be almost never). The deploy script explicitly recreates Nginx on every
+release: its main config is a single-file bind mount, and Git replacing that file during checkout
+can leave the existing container bound to the old file inode even when the path on disk is updated.
 
 ```bash
 scp deploy/pull-and-restart.sh deploy@<public-ip>:~/pull-and-restart.sh
