@@ -49,13 +49,16 @@ The infrastructure should be intentionally production-like, but not unnecessaril
        ┌─────────────┐             ┌─────────────┐
        │  Frontend   │             │   Backend   │
        │ Angular     │             │ NestJS      │
-       │ native SSR  │             │ OpenAPI     │
-       └─────────────┘             └──────┬──────┘
-                                         │
-                                         ▼
-                                  ┌─────────────┐
-                                  │ PostgreSQL  │
-                                  └─────────────┘
+       │ native SSR  │             │ REST/OpenAPI│
+       └─────────────┘             │ MCP tools   │
+                                   └──────┬──────┘
+                                          │
+                                          ▼
+                                   ┌─────────────┐
+                                   │ PostgreSQL  │
+                                   └─────────────┘
+
+VS Code / other MCP clients ──HTTPS──► Cloudflare ──► Nginx ──► NestJS MCP endpoint
 ```
 
 Run the application components using Docker Compose on the Oracle VPS.
@@ -624,6 +627,8 @@ HTTPS :443
   ├── Host: admin.ebeerens.com
   │   ├── /       → admin application
   │   └── /api    → backend
+  ├── Host: mcp.ebeerens.com
+  │   └── /mcp    → backend MCP endpoint
   └── /assets → static assets where appropriate
 ```
 
@@ -668,6 +673,7 @@ Potential domains:
 example.com
 www.example.com
 admin.example.com
+mcp.example.com
 ```
 
 Alternatively, serve the API under:
@@ -840,6 +846,12 @@ Minimum measures:
 - Validate uploaded images
 - Apply authentication and authorization server-side
 - Add reasonable API rate limiting
+- Protect the MCP endpoint with its own authentication credential; do not reuse the admin session
+  or expose database credentials to MCP clients
+- Protect MCP with public-client OAuth authorization code + PKCE, restricted to the configured
+  GitHub administrator; store only hashes of authorization codes and access/refresh tokens
+- Support OAuth token revocation and keep raw tokens out of source control, logs, and shared
+  workspace configuration
 
 ---
 
@@ -981,6 +993,12 @@ Only add these when they provide a learning opportunity or solve a real problem.
 - Security headers
 - Rate limiting
 
+### Phase 9 — Agent integration
+
+- Add authenticated, read-only MCP tools for public portfolio data (§22)
+- Route `mcp.ebeerens.com/mcp` through Cloudflare and Nginx to the existing API container
+- Configure and verify supported MCP clients, beginning with VS Code
+
 ---
 
 ## 19. Architecture Principles
@@ -1041,30 +1059,31 @@ Only introduce additional services or architectural patterns when there is a rea
 
 The exact choices can still be evaluated, but the target architecture is:
 
-| Layer                        | Technology                                                                                                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Frontend                     | Angular                                                                                                                                                                                          |
-| SSR                          | `@angular/ssr` (native Angular SSR)                                                                                                                                                              |
-| Backend                      | NestJS                                                                                                                                                                                           |
-| ORM/migrations               | Prisma                                                                                                                                                                                           |
-| Monorepo                     | Nx (`@nx/angular`, `@nx/nest`)                                                                                                                                                                   |
-| API                          | REST                                                                                                                                                                                             |
-| API contract                 | OpenAPI (generated via `@nestjs/swagger`)                                                                                                                                                        |
-| API client                   | Generated from OpenAPI                                                                                                                                                                           |
-| Database                     | PostgreSQL                                                                                                                                                                                       |
-| Authentication               | GitHub OAuth (Passport)                                                                                                                                                                          |
-| Session                      | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis)                                                                                 |
-| Rich text                    | Markdown source (`text` column), rendered client-side (incl. SSR) with `ngx-markdown`/`marked`, sanitized via Angular `DomSanitizer`                                                             |
-| Image storage                | Cloudflare R2 (presigned uploads)                                                                                                                                                                |
-| Contact form spam protection | Cloudflare Turnstile (token verified server-side against Cloudflare Siteverify; visitor IP not forwarded by default)                                                                             |
-| Containers                   | Docker (arm64/multi-arch)                                                                                                                                                                        |
-| Orchestration                | Docker Compose                                                                                                                                                                                   |
-| Reverse proxy                | Nginx                                                                                                                                                                                            |
-| Cloud                        | Oracle Cloud Always Free — Ampere A1 (Arm)                                                                                                                                                       |
-| Edge                         | Cloudflare (DNS/CDN/TLS/WAF + edge rate limiting)                                                                                                                                                |
-| CI/CD                        | GitHub Actions → GHCR → SSH push-deploy                                                                                                                                                          |
-| CI quality gates             | Vitest/Jest coverage + GitHub Actions artifacts/step summary, `pnpm audit`, Dependabot, GitHub secret scanning, CodeQL, Trivy, `license-checker`, `vitest-axe`/`@axe-core/playwright` (all free) |
-| Monitoring                   | Lightweight uptime/logging initially                                                                                                                                                             |
+| Layer                        | Technology                                                                                                                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend                     | Angular                                                                                                                                                                                              |
+| SSR                          | `@angular/ssr` (native Angular SSR)                                                                                                                                                                  |
+| Backend                      | NestJS                                                                                                                                                                                               |
+| ORM/migrations               | Prisma                                                                                                                                                                                               |
+| Monorepo                     | Nx (`@nx/angular`, `@nx/nest`)                                                                                                                                                                       |
+| API                          | REST                                                                                                                                                                                                 |
+| API contract                 | OpenAPI (generated via `@nestjs/swagger`)                                                                                                                                                            |
+| API client                   | Generated from OpenAPI                                                                                                                                                                               |
+| Database                     | PostgreSQL                                                                                                                                                                                           |
+| Authentication               | GitHub OAuth (Passport)                                                                                                                                                                              |
+| Session                      | Opaque server-side token in Postgres `sessions` table, HttpOnly/Secure/SameSite=Strict cookie (no JWT, no Redis)                                                                                     |
+| Rich text                    | Markdown source (`text` column), rendered client-side (incl. SSR) with `ngx-markdown`/`marked`, sanitized via Angular `DomSanitizer`                                                                 |
+| Image storage                | Cloudflare R2 (presigned uploads)                                                                                                                                                                    |
+| Contact form spam protection | Cloudflare Turnstile (token verified server-side against Cloudflare Siteverify; visitor IP not forwarded by default)                                                                                 |
+| Containers                   | Docker (arm64/multi-arch)                                                                                                                                                                            |
+| Orchestration                | Docker Compose                                                                                                                                                                                       |
+| Reverse proxy                | Nginx                                                                                                                                                                                                |
+| Cloud                        | Oracle Cloud Always Free — Ampere A1 (Arm)                                                                                                                                                           |
+| Edge                         | Cloudflare (DNS/CDN/TLS/WAF + edge rate limiting)                                                                                                                                                    |
+| CI/CD                        | GitHub Actions → GHCR → SSH push-deploy                                                                                                                                                              |
+| CI quality gates             | Vitest/Jest coverage + GitHub Actions artifacts/step summary, `pnpm audit`, Dependabot, GitHub secret scanning, CodeQL, Trivy, `license-checker`, `vitest-axe`/`@axe-core/playwright` (all free)     |
+| Monitoring                   | Lightweight uptime/logging initially                                                                                                                                                                 |
+| Agent interface              | Read-only MCP tools in the existing NestJS API over Streamable HTTP at `mcp.ebeerens.com/mcp`; OAuth authorization-code flow with PKCE and existing GitHub admin identity, no direct database access |
 
 ---
 
@@ -1095,3 +1114,47 @@ Choose it because the project is intended to teach and demonstrate:
 The resulting portfolio is therefore both the **product** and a **demonstration of engineering capability**.
 
 The target should be a small, maintainable production-like system—not an enterprise architecture scaled down to one visitor.
+
+---
+
+## 22. Model Context Protocol (MCP)
+
+Expose public portfolio content to compatible agents through an MCP endpoint implemented as a
+module in the existing NestJS API. Serve it over Streamable HTTP at
+`https://mcp.ebeerens.com/mcp`, routed by Cloudflare and Nginx to the existing API container. Do
+not create a second database, deploy a separate service, or let MCP clients connect to PostgreSQL.
+
+The MCP module should reuse the API's domain services and public-data rules. Initial tools should
+be read-only and narrowly scoped to public portfolio records:
+
+- `get_profile`
+- `search_projects` and `get_project`
+- `list_experience` and `get_experience`
+- `list_skills`
+- `list_education`
+- `search_portfolio`
+
+Use only published/public projections, return bounded result sets, validate tool inputs, and
+exclude contact submissions, admin-only fields, unpublished records, write operations, arbitrary
+SQL, and arbitrary URL fetching. MCP output is public data: endpoint authentication restricts who
+can call the service but does not make that data confidential or prevent an authorized agent from
+sharing it with its model provider.
+
+Require MCP OAuth independently of the website's opaque admin session. Public MCP clients use
+OAuth authorization-code flow with PKCE; the resource owner signs in through the existing GitHub
+OAuth flow, and only the configured administrator identity is authorized. The API dynamically
+registers public clients, stores only hashes of authorization codes/access tokens/refresh tokens,
+issues short-lived access tokens, rotates refresh tokens, and supports revocation. Never expose or
+reuse the admin session token, GitHub client secret, or database credentials for MCP. Keep OAuth
+validation in the API; Cloudflare Access may be an additional layer only after verifying that every
+intended MCP client can complete its authentication flow.
+
+VS Code connects as a remote HTTP MCP server at the endpoint and completes OAuth through its
+client flow. Do not put credentials in committed workspace configuration. VS Code and portable
+Copilot sessions do not have identical configuration capabilities, and other MCP clients vary;
+test dynamic client registration and the full browser sign-in/token-refresh flow in each target
+client before treating it as supported.
+
+`mcp.ebeerens.com` is a recommended routing boundary, not a privacy control or separate host. Add
+the DNS record, TLS coverage, Cloudflare policy, Nginx virtual host/routing, cache bypass, and
+rate-limit rules while continuing to use the existing VPS and API container.

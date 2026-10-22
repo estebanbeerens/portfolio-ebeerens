@@ -103,6 +103,7 @@
     "@aws-sdk/client-s3": "^3.1112.0",
     "@aws-sdk/s3-request-presigner": "^3.1112.0",
     "@lucide/angular": "^1.31.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
@@ -128,6 +129,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "~7.8.0",
     "sharp": "^0.35.3",
-    "xss": "^1.0.15"
+    "xss": "^1.0.15",
+    "zod": "^4.6.7"
   }
 }

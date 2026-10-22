@@ -12,13 +12,18 @@ import { AuthService } from './auth.service';
 import { MeResponseDto } from './dto/me-response.dto';
 import { GithubAuthGuard } from './github-auth.guard';
 import { RequestWithGithubUser, SessionAuthGuard } from './session-auth.guard';
+import { McpOAuthService } from '../mcp/mcp-oauth.service';
 
 const SESSION_COOKIE = 'session';
+const MCP_AUTHORIZATION_COOKIE = 'mcp_oauth_transaction';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mcpOAuthService: McpOAuthService
+  ) {}
 
   @Get('github')
   @ApiExcludeEndpoint()
@@ -37,6 +42,17 @@ export class AuthController {
     },
     @Res() res: Response
   ) {
+    const mcpTransactionId = req.cookies?.[MCP_AUTHORIZATION_COOKIE];
+    if (mcpTransactionId) {
+      res.clearCookie(MCP_AUTHORIZATION_COOKIE, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/api/auth/github/callback',
+      });
+      return res.redirect(await this.mcpOAuthService.finishAuthorization(mcpTransactionId, req.user?.githubUserId));
+    }
+
     const adminAppUrl = process.env.ADMIN_APP_URL;
     if (!req.user) {
       return res.redirect(`${adminAppUrl}/?error=unauthorized`);
