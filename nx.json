@@ -21,17 +21,6 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "@nx/eslint:lint": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "^default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.mjs",
-        "{workspaceRoot}/tools/eslint-rules/**/*"
-      ]
-    },
     "@angular/build:unit-test": {
       "cache": true,
       "inputs": ["default", "^production"]
@@ -40,10 +29,6 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
-    },
-    "@nx/vitest:test": {
-      "cache": true,
-      "inputs": ["default", "^production"]
     },
     "typecheck": {
       "cache": true,
@@ -81,6 +66,20 @@
         "targetName": "test"
       },
       "exclude": ["api-e2e/**/*", "apps/api-e2e/**/*"]
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testMode": "watch",
+        "testTargetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "options": {
+        "targetName": "e2e"
+      },
+      "include": ["apps/api-e2e/**/*"]
     }
   ],
   "generators": {
@@ -98,5 +97,8 @@
       "style": "css"
     }
   },
-  "nxCloudId": "6a7ed5adeaa53a8e6892cbd0"
+  "nxCloudId": "6a7ed5adeaa53a8e6892cbd0",
+  "affected": {
+    "legacy": true
+  }
 }

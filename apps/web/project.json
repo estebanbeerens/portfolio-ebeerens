@@ -4,13 +4,13 @@
   "projectType": "application",
   "prefix": "web",
   "sourceRoot": "apps/web/src",
-  "tags": [],
   "i18n": {
     "sourceLocale": "en",
     "locales": {
       "nl": "apps/web/src/locale/messages.nl.xlf"
     }
   },
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -90,10 +90,23 @@
           "buildTarget": "web:build:development",
           "proxyConfig": "apps/web/proxy.conf.json"
         }
+      },
+      "readyWhen": {
+        "signal": true
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint"
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.mjs",
+        "{workspaceRoot}/tools/eslint-rules/**/*",
+        {
+          "externalDependencies": ["eslint"]
+        }
+      ]
     },
     "typecheck": {
       "executor": "nx:run-commands",
@@ -112,6 +125,10 @@
     "serve-static": {
       "continuous": true,
       "executor": "@nx/web:file-server",
+      "readyWhen": {
+        "signal": true
+      },
+      "dependsOn": ["build"],
       "options": {
         "buildTarget": "web:build",
         "port": 4200,
