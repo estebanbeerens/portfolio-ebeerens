@@ -1,10 +1,10 @@
 {
   "mcpServers": {
-    "Ebeerens mcp": {
+    "Esteban mcp": {
       "url": "https://mcp.ebeerens.com/mcp",
       "type": "http"
     },
-    "Ebeerens mcp local": {
+    "Esteban mcp local": {
       "url": "https://localhost:3000/mcp",
       "type": "http"
     }

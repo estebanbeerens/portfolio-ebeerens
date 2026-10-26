@@ -20,9 +20,4 @@
 - DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
-## End-to-end validation
-
-- Do not add or update e2e specs (`admin-e2e`, `web-e2e`, `api-e2e`) automatically as part of a change. Only touch e2e tests when the user explicitly asks for e2e coverage or a Playwright/api-e2e run.
-- Unit/component tests (Vitest, Jest) remain expected for the code you change; e2e is opt-in on top of that.
-
 <!-- nx configuration end-->
