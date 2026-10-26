@@ -36,6 +36,12 @@ echo "Pulling Docker images..."
 echo "Running database migrations..."
 "${compose[@]}" run --rm migrate
 
+echo "Recreating Nginx to load the checked-out bind-mounted config..."
+# Git replaces tracked files during checkout, but a single-file bind mount can remain attached to
+# the previous inode. Compose does not hash bind-mounted file contents, so a normal `up` may leave
+# Nginx using its old config even though /opt/portfolio/nginx/nginx.conf has changed.
+"${compose[@]}" up -d --force-recreate nginx
+
 echo "Restarting services..."
 # `up -d` alone succeeds even when a container immediately crash-loops. Wait for services with a
 # healthcheck (notably the API) to become healthy before declaring the deployment successful.

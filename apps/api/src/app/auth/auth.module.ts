@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { McpOAuthModule } from '../mcp/mcp-oauth.module';
 import { PrismaModule } from '../prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -9,7 +10,7 @@ import { SessionAuthGuard } from './session-auth.guard';
 import { SessionCleanupService } from './session-cleanup.service';
 
 @Module({
-  imports: [PrismaModule, PassportModule.register({ defaultStrategy: 'github' })],
+  imports: [PrismaModule, McpOAuthModule, PassportModule.register({ defaultStrategy: 'github' })],
   controllers: [AuthController],
   providers: [AuthService, GithubStrategy, GithubAuthGuard, SessionAuthGuard, SessionCleanupService],
   exports: [AuthService, SessionAuthGuard],

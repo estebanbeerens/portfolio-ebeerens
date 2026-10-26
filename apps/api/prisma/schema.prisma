@@ -137,6 +137,47 @@ model Session {
   createdAt    DateTime @default(now())
 }
 
+model McpOAuthClient {
+  id             String   @id
+  clientMetadata Json
+  createdAt      DateTime @default(now())
+}
+
+model McpOAuthAuthorization {
+  id                    String   @id
+  clientId              String
+  redirectUri           String
+  codeChallenge         String
+  scopes                String[]
+  resource              String?
+  state                 String?
+  authorizationCodeHash String?  @unique
+  expiresAt             DateTime
+  createdAt             DateTime @default(now())
+  usedAt                DateTime?
+
+  @@index([expiresAt])
+}
+
+model McpOAuthToken {
+  tokenHash String             @id
+  clientId  String
+  tokenType McpOAuthTokenType
+  scopes    String[]
+  resource  String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime           @default(now())
+
+  @@index([clientId, tokenType])
+  @@index([expiresAt])
+}
+
+enum McpOAuthTokenType {
+  ACCESS
+  REFRESH
+}
+
 model ContactMessage {
   id           String   @id @default(cuid())
   fullName     String

@@ -8,6 +8,7 @@ import { EducationModule } from './education/education.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { HealthModule } from './health/health.module';
 import { InstitutionsModule } from './institutions/institutions.module';
+import { McpModule } from './mcp/mcp.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma.module';
 import { ProfileModule } from './profile/profile.module';
@@ -36,6 +37,7 @@ import { StorageModule } from './storage/storage.module';
     DashboardModule,
     EducationModule,
     InstitutionsModule,
+    McpModule,
   ],
 })
 export class AppModule {}
