@@ -1,6 +1,7 @@
 # SpecKit — Quick Start Guide
 
 ---
+
 ## Table of Contents
 
 1. [What is SpecKit?](#1-what-is-speckit)
@@ -20,6 +21,7 @@
 SpecKit is GitHub's own **opinionated spec-driven development toolkit**. Where OpenSpec is a flexible methodology, SpecKit is a full workflow toolkit using fixed command sequence, defined file structure, and structured prompts optimised for AI agents to follow with maximum consistency.
 
 **Core philosophy:**
+
 - **Spec-first** —> specification is written before any code is generated
 - **Constitution-driven** —> project-wide rules are defined first, and enforced automatically on every run
 - **Explicit constraints** —> Both goals and non-goals are important. The AI should know what to do just as much as what not to do.
@@ -30,24 +32,27 @@ SpecKit is GitHub's own **opinionated spec-driven development toolkit**. Where O
 
 ## 2. Prerequisites
 
-| Requirement  | Notes |
-|---|---|
-| Git | SpecKit is git-aware. If your project is not a git repo, speckit will initialize one for you. |
+| Requirement            | Notes                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Git                    | SpecKit is git-aware. If your project is not a git repo, speckit will initialize one for you.                    |
 | Any Supported AI Agent | See which ones are compatible [here](https://github.com/github/spec-kit#-supported-ai-coding-agent-integrations) |
-| Python 3.11| |
-| VsCode | see note below |
+| Python 3.11            |                                                                                                                  |
+| VsCode                 | see note below                                                                                                   |
 
 > **VsCode is required. IntelliJ was not compatible from my experience at the time of testing.** SpecKit slash commands did not register in IntelliJ during my testing phase. I suspect it is to do with the fact that IntelliJ is not developed by Microsoft, where VsCode is. This might have changed since then, if you are more familiar with IntelliJ, I recommend you try it out and see if it works for you.
+
 ---
 
 ## 3. Installation
 
 ### 1. Install UV:
+
 [uv](https://docs.astral.sh/uv/) is a fast Python package manager by [Astral](https://astral.sh/). SpecKit uses `uv` (via `uvx` or `uv tool install`) to run the `specify` CLI without polluting your global Python environment.
 
-### macOS and Linux 
+### macOS and Linux
+
 ```bash
-# macOS and Linux — Standalone Installer 
+# macOS and Linux — Standalone Installer
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
@@ -68,6 +73,7 @@ winget install --id=astral-sh.uv -e
 #Scoop
 scoop install uv
 ```
+
 Confirm that uv is installed and on your `PATH`:
 
 ```bash
@@ -77,6 +83,7 @@ uv --version
 You should see output similar to `uv 0.x.y (...)`.
 
 ### 2. Install Specify CLI
+
 Install once and use everywhere:
 
 ```bash
@@ -115,7 +122,8 @@ specify check
 #### Once you run the init commands, follow the on-screen instructions to complete the setup.
 
 ### ⚠️ Important: If you have a monorepo setup:
-If your SpecKit working folder is inside a larger repository with a single ".git" file at the root: create a `.code-workspace` file in the SpecKit folder, and **always open VS Code via this file**, not via the repository root. 
+
+If your SpecKit working folder is inside a larger repository with a single ".git" file at the root: create a `.code-workspace` file in the SpecKit folder, and **always open VS Code via this file**, not via the repository root.
 Without this, you run the risk of having all generated spec files land in the repository root instead of your working folder.<br>
 See [section 7.1](#71-files-generated-in-the-wrong-directory-only-if-you-have-a-monorepo-setup) for the full explanation.
 
@@ -125,20 +133,21 @@ See [section 7.1](#71-files-generated-in-the-wrong-directory-only-if-you-have-a-
 
 SpecKit defines a fixed five-command sequence. Each command builds on the previous. Running them out of order produces poor results.
 
-| # | Command | Artifact | Purpose |
-|---|---|---|---|
-| 1 | `/speckit.constitution` | `constitution.md` | Governing principles: code quality, testing standards.... <br> No project-specific details. |
-| 2 | `/speckit.specify` | `spec.md` | WHAT to build and WHY. <br> No technology: focus on user needs and behaviour. |
-| 3 | `/speckit.plan` | `plan.md` | Tech stack, architecture, implementation constraints, language, framework, file locations, coverage targets. <br> This is where you go all in on the app's tech specs |
-| 4 | `/speckit.tasks` | `tasks.md` | AI generates an ordered task list from the plan. <br> **Human review and approval required before proceeding.** |
-| 5 | `/speckit.implement` | source code | AI executes all tasks in sequence against all artifacts. |
+| #   | Command                 | Artifact          | Purpose                                                                                                                                                               |
+| --- | ----------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/speckit.constitution` | `constitution.md` | Governing principles: code quality, testing standards.... <br> No project-specific details.                                                                           |
+| 2   | `/speckit.specify`      | `spec.md`         | WHAT to build and WHY. <br> No technology: focus on user needs and behaviour.                                                                                         |
+| 3   | `/speckit.plan`         | `plan.md`         | Tech stack, architecture, implementation constraints, language, framework, file locations, coverage targets. <br> This is where you go all in on the app's tech specs |
+| 4   | `/speckit.tasks`        | `tasks.md`        | AI generates an ordered task list from the plan. <br> **Human review and approval required before proceeding.**                                                       |
+| 5   | `/speckit.implement`    | source code       | AI executes all tasks in sequence against all artifacts.                                                                                                              |
 
 **Optional commands:**
-| Command | When to use |
-|---|---|
-| `/speckit.clarify` | Resolve underspecified areas. Run after `/speckit.specify`, before `/speckit.plan`. |
-| `/speckit.analyze` | Cross-artifact consistency check. Run after `/speckit.tasks`, before `/speckit.implement`. Catches contradictions between spec, plan, and tasks before any code is written. |
-| `/speckit.checklist` | Generate quality checklists for requirement completeness and clarity. Final review gate before `/speckit.implement`. |
+
+| Command              | When to use                                                                                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/speckit.clarify`   | Resolve underspecified areas. Run after `/speckit.specify`, before `/speckit.plan`.                                                                                         |
+| `/speckit.analyze`   | Cross-artifact consistency check. Run after `/speckit.tasks`, before `/speckit.implement`. Catches contradictions between spec, plan, and tasks before any code is written. |
+| `/speckit.checklist` | Generate quality checklists for requirement completeness and clarity. Final review gate before `/speckit.implement`.                                                        |
 
 ---
 
@@ -169,7 +178,9 @@ SpecKit then generates `constitution.md`. This document governs all subsequent r
 ### Step 3 — Define the technical plan
 
 This is the most important step for quality and spec adherence. Be as detailed as possible about **everything**:
->The specs that you see here are the results of multiple iterations of refining and adding constraints to the prompt after testing the generated code and identifying issues. The more explicit you are in the plan, the better the implementation will be, and the less time you will spend fixing spec violations later on.
+
+> The specs that you see here are the results of multiple iterations of refining and adding constraints to the prompt after testing the generated code and identifying issues. The more explicit you are in the plan, the better the implementation will be, and the less time you will spend fixing spec violations later on.
+
 ```
 `/speckit.plan The application uses Java 25 and Spring Boot 4. The quotes list is in "quotes.json" (always present). No database or UI. Must be fully testable via HTTP, have meaningful unit tests, and reach at least 80% branch coverage.`
   - Warnings & Best Practices
@@ -197,7 +208,6 @@ This is the most important step for quality and spec adherence. Be as detailed a
 
 > ⚠️ **The plan step is where most implementation issues come from.** If the plan is vague, the AI makes assumptions that violate requirements. Be explicit about every dependency, file location, test convention, and coverage target.
 
-
 ---
 
 ### Step 4 — Review and approve the task list
@@ -207,6 +217,7 @@ This is the most important step for quality and spec adherence. Be as detailed a
 ```
 
 SpecKit generates `tasks.md`. **This is your human checkpoint:** review every task before running `/speckit.implement`. Check that:
+
 - Tasks are specific and independently verifiable
 - Nothing is missing
 - No tasks are overly broad
@@ -255,6 +266,7 @@ SpecKit reads all artifacts created in the previous steps, and implements everyt
 **Cause:** SpecKit anchors all file operations to the `.git` folder location. VsCode inherits this as the workspace root.
 
 **Fix:** Create a `.code-workspace` file in your working folder and always open VS Code via this file.
+
 ```json
 // your-folder/your-folder.code-workspace:
 {
@@ -265,11 +277,13 @@ SpecKit reads all artifacts created in the previous steps, and implements everyt
   ],
   "settings": {
     "speckit.rootDir": "${workspaceFolder}",
-    "speckit.outputDir": "${workspaceFolder}/specs",
+    "speckit.outputDir": "${workspaceFolder}/specs"
   }
 }
 ```
+
 Then to open VsCode, use the command line to navigate to your working folder and open the workspace file. Or double click on the `.code-workspace` file directly in your file explorer.
+
 ```bash
 # macOS / Linux
 code your-module/your-module.code-workspace
@@ -277,7 +291,6 @@ code your-module/your-module.code-workspace
 # Windows (PowerShell)
 code .\your-module\your-module.code-workspace
 ```
-
 
 ---
 
@@ -291,13 +304,14 @@ code .\your-module\your-module.code-workspace
 Find `.github/agents/speckit.specify.agent.md` and replace Step 2 with:
 
 ```markdown
-2. **Branch management**: SKIP all git operations entirely. Do NOT run `git fetch`, 
-   do NOT create branches, do NOT checkout branches. When running 
-   `create-new-feature.ps1`, pass the `--no-git` flag if available. If the flag 
-   is not available, run the script solely for the purpose of setting up the spec 
-   folder structure, and ignore any branch-related output or side effects. 
+2. **Branch management**: SKIP all git operations entirely. Do NOT run `git fetch`,
+   do NOT create branches, do NOT checkout branches. When running
+   `create-new-feature.ps1`, pass the `--no-git` flag if available. If the flag
+   is not available, run the script solely for the purpose of setting up the spec
+   folder structure, and ignore any branch-related output or side effects.
    The active branch must remain unchanged throughout the entire run.
 ```
+
 **Note:** If you follow this step, you must also implement the fix in [section 7.3](#73-branch-validation-blocks-non-standard-branch-names) to prevent errors when running `/speckit.plan` on a non-standard named branch.
 
 ---
@@ -316,13 +330,13 @@ function Test-FeatureBranch {
         [string]$Branch,
         [bool]$HasGit = $true
     )
-    
+
     # For non-git repos, we can't enforce branch naming but still provide output
     if (-not $HasGit) {
         Write-Warning "[specify] Warning: Git repository not detected; skipped branch validation"
         return $true
     }
-    
+
     if ($Branch -notmatch '^[0-9]{3}-') {
         Write-Warning "[specify] Warning: Not on a standard feature branch ($Branch). Continuing anyway."
         return $true
@@ -330,6 +344,7 @@ function Test-FeatureBranch {
     return $true
 }
 ```
+
 This will simply return a warning instead of an error, allowing you to continue with the workflow, even if your branch doesn't follow the Speckit defined pattern.
 
 ---
@@ -353,8 +368,7 @@ From testing: this step significantly reduced spec violations in generated code.
 - [YouTube: SpecKit introduction walkthrough](https://www.youtube.com/watch?v=a9eR1xsfvHg)
 - [Youtube: SpecKit with Copilot CLI](https://www.youtube.com/watch?v=7tjmA_0pl2c)
 
-
 <br>
 
-*Written by Simon Nawara*
-*Last edit:  12/05/2026*
+_Written by Simon Nawara_
+_Last edit: 12/05/2026_
