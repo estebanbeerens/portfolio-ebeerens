@@ -1,7 +1,6 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import angular from '@analogjs/vite-plugin-angular';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   resolve: {
@@ -9,7 +8,7 @@ export default defineConfig(() => ({
   },
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/libs/ui',
-  plugins: [angular(), nxCopyAssetsPlugin(['*.md'])],
+  plugins: [angular()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
