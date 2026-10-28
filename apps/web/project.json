@@ -119,6 +119,7 @@
       "executor": "@angular/build:unit-test",
       "options": {
         "watch": false,
+        "coverageReporters": ["text-summary", "json-summary"],
         "setupFiles": ["apps/web/src/test-setup.ts"]
       }
     },

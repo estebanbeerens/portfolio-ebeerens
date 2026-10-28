@@ -110,7 +110,8 @@
     "test": {
       "executor": "@angular/build:unit-test",
       "options": {
-        "watch": false
+        "watch": false,
+        "coverageReporters": ["text-summary", "json-summary"]
       }
     },
     "serve-static": {
